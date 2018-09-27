@@ -1,0 +1,3 @@
+[submodule "external/frozen"]
+	path = external/frozen
+	url = https://github.com/serge-sans-paille/frozen.git
