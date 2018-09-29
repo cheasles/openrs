@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-#include <vector>
+#include "OpenRS/net/io/buffer.h"
 
 namespace openrs
 {
@@ -18,12 +18,15 @@ enum PacketType
     kUnknown,
     kHandshake,
     kLogin,
+    kClientOutdated,
+    kGrabKeys,
+    kGrabCache,
 };
 
 struct Packet
 {
     PacketType type;
-    std::vector<uint8_t> data;
+    openrs::net::io::Buffer data;
 
 private:
     template <typename Type>

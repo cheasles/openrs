@@ -1,6 +1,7 @@
 #pragma once
 
 #include <inttypes.h>
+#include <sys/time.h>
 
 #include <vector>
 
@@ -50,6 +51,9 @@ public:
 // A class that can read/write to a socket
 class DataSocket : public BaseSocket
 {
+private:
+    struct timeval last_active_;
+
 public:
     DataSocket(int socketId)
         : BaseSocket(socketId)

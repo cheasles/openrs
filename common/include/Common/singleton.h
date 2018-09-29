@@ -10,7 +10,9 @@ template<typename Type>
 class Singleton
 {
 public:
-    Type& get()
+    virtual ~Singleton() { }
+
+    static Type& get()
     {
         static Type object;
         return object;

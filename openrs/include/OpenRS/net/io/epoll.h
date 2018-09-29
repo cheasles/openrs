@@ -85,6 +85,28 @@ public:
         return false;
     }
 
+    bool UpdatePollEvent(
+        const int& kWaitEvent,
+        const int& kSocketFileDescriptor)
+    {
+        auto channel = this->channel_map_.find(kSocketFileDescriptor);
+        if (this->channel_map_.cend() == channel)
+        {
+            return false;
+        }
+
+        epoll_event event;
+        event.data.ptr = &this->channel_map_[kSocketFileDescriptor];
+        event.events = kWaitEvent;
+
+        if (0 == ::epoll_ctl(this->file_descriptor_, EPOLL_CTL_MOD, kSocketFileDescriptor, &event))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     int Wait(std::vector<std::shared_ptr<Channel>>* channel_events)
     {
         if (!channel_events)

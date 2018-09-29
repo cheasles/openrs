@@ -143,6 +143,7 @@ std::size_t openrs::net::io::DataSocket::getMessageData(std::vector<uint8_t>* ou
         data_read += get;
     }
 
+    ::gettimeofday(&this->last_active_, nullptr);
     return data_read;
 }
 
@@ -194,6 +195,12 @@ void openrs::net::io::DataSocket::putMessageData(const std::vector<uint8_t>& dat
         }
         dataWritten += put;
     }
+
+    if (dataWritten > 0)
+    {
+        ::gettimeofday(&this->last_active_, nullptr);
+    }
+
     return;
 }
 

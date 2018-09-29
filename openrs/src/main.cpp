@@ -3,6 +3,7 @@
 
 #include <iostream>
 
+#include "OpenRS/manager/cache/cachemanager.h"
 #include "OpenRS/net/reactor.h"
 
 int main()
@@ -12,7 +13,13 @@ int main()
     bool quit = false;
     constexpr int kTickRate = 600;
 
-    std::cout << "Hello, world!" << std::endl;
+    std::cout << "OpenRS Server" << std::endl;
+
+    if (!openrs::manager::cache::CacheManager::get().Init())
+    {
+        std::cerr << "Failed to init cache manager." << std::endl;
+        return 1;
+    }
 
     openrs::net::Reactor reactor;
 
@@ -23,10 +30,10 @@ int main()
         reactor.Poll();
 
         // Sleep until the next cycle.
-		gettimeofday(&end, NULL);
-		seconds = end.tv_sec - start.tv_sec;
-		useconds = end.tv_usec - start.tv_usec;
-		mtime = ((seconds) * 1000 + useconds / 1000.0) + 0.5;
+        gettimeofday(&end, NULL);
+        seconds = end.tv_sec - start.tv_sec;
+        useconds = end.tv_usec - start.tv_usec;
+        mtime = ((seconds) * 1000 + useconds / 1000.0) + 0.5;
         if (mtime <= kTickRate)
         {
             usleep((kTickRate - mtime) * 1000);

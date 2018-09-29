@@ -18,6 +18,12 @@ namespace net
 namespace codec
 {
 
+namespace decoder
+{
+
+namespace cache_718
+{
+
 class Decoder
 {
 private:
@@ -31,6 +37,10 @@ public:
     virtual bool Decode(openrs::net::io::Buffer& buffer,
         openrs::net::codec::Packet* packet);
 };
+
+}  // namespace cache_718
+
+}  // namespace decoder
 
 }  // namespace codec
 

@@ -82,18 +82,36 @@ void openrs::net::Reactor::DoReadWrite(
     if ((channel->event() & EPOLLOUT) != 0)
     {
         client->Write();
+
+        if (!client->HasOutput())
+        {
+            if (!this->epoll_.UpdatePollEvent(EPOLLIN, client->socket().getSocketId()))
+            {
+                std::cerr << "Could not queue input for client." << std::endl;
+            }
+        }
     }
 
     if (client->status() == ClientStatus::kDisconnected)
     {
         struct sockaddr_in addr;
         socklen_t addr_len = sizeof(addr);
-        if (0 < ::getpeername(channel->descriptor(), reinterpret_cast<struct sockaddr*>(&addr), &addr_len))
+        if (0 < ::getpeername(client->socket().getSocketId(), reinterpret_cast<struct sockaddr*>(&addr), &addr_len))
         {
             std::cout << "Client " << inet_ntoa(addr.sin_addr) << " disconnected." << std::endl;
         }
 
-        this->epoll_.RemovePollEvent(channel->descriptor());
-        this->clients_.erase(channel->descriptor());
+        std::cout << "  Sent: " << std::to_string(client->bytes_sent()) << std::endl;
+        std::cout << "  Recv: " << std::to_string(client->bytes_received()) << std::endl;
+
+        this->epoll_.RemovePollEvent(client->socket().getSocketId());
+        this->clients_.erase(client->socket().getSocketId());
+    }
+    else if (client->HasOutput())
+    {
+        if (!this->epoll_.UpdatePollEvent(EPOLLOUT | EPOLLIN, client->socket().getSocketId()))
+        {
+            std::cerr << "Could not queue output for client." << std::endl;
+        }
     }
 }
