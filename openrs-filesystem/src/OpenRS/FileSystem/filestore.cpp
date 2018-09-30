@@ -82,7 +82,7 @@ bool openrs::filesystem::FileStore::GetArchiveData(
         if (kArchiveId <= 0xFFFF)
         {
             uint16_t temp_current_file = 0;
-            if (!common::ifstream::ReadValue(*data_stream, &temp_current_file))
+            if (!common::ifstream::ReadValueBE(*data_stream, &temp_current_file))
             {
                 return false;
             }
@@ -90,14 +90,14 @@ bool openrs::filesystem::FileStore::GetArchiveData(
         }
         else
         {
-            if (!common::ifstream::ReadValue(*data_stream, &current_file))
+            if (!common::ifstream::ReadValueBE(*data_stream, &current_file))
             {
                 return false;
             }
         }
 
         uint16_t current_chunk = 0;
-        if (!common::ifstream::ReadValue(*data_stream, &current_chunk))
+        if (!common::ifstream::ReadValueBE(*data_stream, &current_chunk))
         {
             return false;
         }

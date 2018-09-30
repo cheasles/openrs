@@ -1,5 +1,7 @@
 #pragma once
 
+#include <endian.h>
+
 #include <fstream>
 
 namespace openrs
@@ -32,6 +34,58 @@ inline bool ReadValue(std::ifstream& stream, Type* output)
 
     stream.read(reinterpret_cast<char*>(output), sizeof(Type));
     return stream.gcount() == sizeof(Type);
+}
+
+template <typename Type>
+inline bool ReadValueBE(std::ifstream& stream, Type* output)
+{
+    if (!ReadValue(stream, output))
+    {
+        return false;
+    }
+
+    switch (sizeof(Type))
+    {
+    case sizeof(uint16_t):
+        *output = ::be16toh(*output);
+        break;
+    case sizeof(uint32_t):
+        *output = ::be32toh(*output);
+        break;
+    case sizeof(uint64_t):
+        *output = ::be64toh(*output);
+        break;
+    default:
+        return false;
+    }
+
+    return true;
+}
+
+template <typename Type>
+inline bool ReadValueLE(std::ifstream& stream, Type* output)
+{
+    if (!ReadValue(stream, output))
+    {
+        return false;
+    }
+
+    switch (sizeof(Type))
+    {
+    case sizeof(uint16_t):
+        *output = ::le16toh(*output);
+        break;
+    case sizeof(uint32_t):
+        *output = ::le32toh(*output);
+        break;
+    case sizeof(uint64_t):
+        *output = ::le64toh(*output);
+        break;
+    default:
+        return false;
+    }
+
+    return true;
 }
 
 }  // namespace ifstream
