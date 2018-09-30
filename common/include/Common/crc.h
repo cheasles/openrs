@@ -10,10 +10,10 @@ namespace common
 {
 
 /* CRC-32C (iSCSI) polynomial in reversed bit order. */
-constexpr uint32_t kPolynomial = 0x82f63b78;
+// constexpr uint32_t kPolynomial = 0x82f63b78;
 
 /* CRC-32 (Ethernet, ZIP, etc.) polynomial in reversed bit order. */
-/* constexpr uint32_t kPolynomial = 0xedb88320; */
+constexpr uint32_t kPolynomial = 0xedb88320;
 
 uint32_t crc32c(uint32_t crc, const unsigned char *buf, size_t len)
 {

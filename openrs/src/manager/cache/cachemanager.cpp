@@ -15,9 +15,13 @@ bool openrs::manager::cache::CacheManager::Init()
     }
     catch (const std::runtime_error& ex)
     {
+        std::cerr << "[CacheManager] ";
         std::cerr << ex.what() << std::endl;
         return false;
     }
+
+    std::cout << "[CacheManager] Loaded " << this->cache_->GetTypeCount() <<
+        " archives." << std::endl;
 
     return true;
 }

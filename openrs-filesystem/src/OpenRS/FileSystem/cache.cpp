@@ -54,8 +54,8 @@ openrs::filesystem::Cache::Cache(const std::string& path)
             continue;
         }
 
-        uint32_t crc = openrs::common::crc32c(0, index_data.data(), index_data.size());
-        std::cout << "Index: " << index.first << " crc: " << crc << std::endl;
+        index.second.set_crc(openrs::common::crc32c(0, index_data.data(),
+            index_data.size()));
     }
 }
 
