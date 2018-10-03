@@ -27,6 +27,17 @@ private:
 public:
     Cache(const std::string& path);
 
+    inline const openrs::filesystem::FileStore& GetStore(const uint32_t& id) const
+    {
+        const auto& store = this->indexes_.find(id);
+        if (this->indexes_.cend() == store)
+        {
+            throw std::runtime_error("Tried to access an unknown store.");
+        }
+
+        return store->second;
+    }
+
     inline uint32_t GetTypeCount() const
     {
         return static_cast<uint32_t>(this->indexes_.size());

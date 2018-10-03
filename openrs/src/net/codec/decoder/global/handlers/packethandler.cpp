@@ -6,6 +6,8 @@
 
 #include "OpenRS/net/io/buffer.h"
 #include "OpenRS/manager/cache/grabmanager.h"
+#include "OpenRS/net/codec/decoder/global/grabdecoder.h"
+#include "OpenRS/net/codec/decoder/global/handlers/grabpackethandler.h"
 
 void openrs::net::codec::decoder::global::handlers::PacketHandler::Handle(
     openrs::net::codec::Packet& packet,
@@ -46,6 +48,10 @@ void openrs::net::codec::decoder::global::handlers::PacketHandler::Handle(
         // Client has been validated.
         client->set_status(ClientStatus::kLoggingIn);
 
+        // Make sure the next packets are handled correctly.
+        client->SetDecoder(std::make_unique<GrabDecoder>());
+        client->SetHandler(std::make_unique<GrabPacketHandler>());
+
         // Send the grab data back to the client.
         io::Buffer buffer;
         manager::cache::GrabManager::WriteKeysToBuffer(&buffer);
@@ -54,16 +60,6 @@ void openrs::net::codec::decoder::global::handlers::PacketHandler::Handle(
         grab_packet.type = PacketType::kGrabKeys;
         grab_packet.data = buffer;
         client->Send(grab_packet);
-    }
-    else if (PacketType::kGrabCache == packet.type)
-    {
-        uint8_t* index_id_ptr = nullptr;
-        uint32_t* archive_id_ptr = nullptr;
-        if (!packet.data.GetData(&index_id_ptr) ||
-            !packet.data.GetData(&archive_id_ptr))
-        {
-            return;
-        }
     }
     else if (PacketType::kLogin == packet.type &&
         client->status() == ClientStatus::kLoggingIn)

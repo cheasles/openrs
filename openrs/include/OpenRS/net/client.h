@@ -100,6 +100,36 @@ public:
         return this->buffer_output_.size() != 0;
     }
 
+    inline void SetDecoder(std::unique_ptr<
+        openrs::net::codec::decoder::global::Decoder>&& decoder)
+    {
+        this->decoder_ = std::move(decoder);
+    }
+
+    inline void SetHandler(std::unique_ptr<
+        openrs::net::codec::decoder::global::handlers::PacketHandler>&& handler)
+    {
+        this->packet_handler_ = std::move(handler);
+    }
+
+    inline void ResetEncoder()
+    {
+        this->encoder_ = std::make_unique<
+            openrs::net::codec::encoder::global::Encoder>();
+    }
+
+    inline void ResetDecoder()
+    {
+        this->decoder_ = std::make_unique<
+            openrs::net::codec::decoder::global::Decoder>();
+    }
+
+    inline void ResetHandler()
+    {
+        this->packet_handler_ = std::make_unique<
+            openrs::net::codec::decoder::global::handlers::PacketHandler>();
+    }
+
     inline ClientStatus status() const
     {
         return this->status_;

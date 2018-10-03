@@ -11,10 +11,9 @@ openrs::net::Client::Client()
     , bytes_received_(0)
     , bytes_sent_(0)
 {
-    this->decoder_ = std::make_unique<codec::decoder::global::Decoder>();
-    this->packet_handler_ = std::make_unique<
-        openrs::net::codec::decoder::global::handlers::PacketHandler>();
-    this->encoder_ = std::make_unique<codec::encoder::global::Encoder>();
+    this->ResetDecoder();
+    this->ResetEncoder();
+    this->ResetHandler();
 }
 
 openrs::net::Client::~Client()
