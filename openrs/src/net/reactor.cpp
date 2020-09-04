@@ -9,9 +9,13 @@
 #include <iostream>
 #include <stdexcept>
 
+#include "Common/log.h"
+
 #include "OpenRS/net/client.h"
 #include "OpenRS/net/io/channel.h"
 #include "OpenRS/net/io/socket.h"
+
+constexpr int openrs::net::Reactor::kDefaultPort;
 
 openrs::net::Reactor::Reactor()
     : socket_(Reactor::kDefaultPort)
@@ -24,7 +28,8 @@ openrs::net::Reactor::Reactor()
         login_channel,
         EPOLLIN,
         this->socket_.getSocketId());
-    std::cout << "Listening on port " << Reactor::kDefaultPort << std::endl;
+    openrs::common::Log(openrs::common::Log::LogLevel::kInfo)
+        << "Listening on port " << openrs::net::Reactor::kDefaultPort;
 }
 
 void openrs::net::Reactor::Poll()

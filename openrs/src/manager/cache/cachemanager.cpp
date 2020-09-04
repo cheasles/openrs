@@ -3,6 +3,8 @@
 #include <limits>
 #include <iostream>
 
+#include "Common/log.h"
+
 #include "OpenRS/FileSystem/filestore.h"
 
 const std::string openrs::manager::cache::CacheManager::kCachePath = "../data/cache/";
@@ -15,13 +17,13 @@ bool openrs::manager::cache::CacheManager::Init()
     }
     catch (const std::runtime_error& ex)
     {
-        std::cerr << "[CacheManager] ";
-        std::cerr << ex.what() << std::endl;
+        openrs::common::Log(openrs::common::Log::LogLevel::kError)
+            << "[CacheManager] " << ex.what();
         return false;
     }
 
-    std::cout << "[CacheManager] Loaded " << this->cache_->GetTypeCount() <<
-        " archives." << std::endl;
-
+    openrs::common::Log(openrs::common::Log::LogLevel::kInfo)
+        << "[CacheManager] Loaded " << this->cache_->GetTypeCount()
+        << " archives.";
     return true;
 }

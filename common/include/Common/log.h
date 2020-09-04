@@ -32,14 +32,17 @@ public:
     Log(const LogLevel& level)
         : level_(level)
     {
-        operator << ("[" + Log::GetLabel(level) + "]");
+        operator << ("[" + Log::GetLabel(level) + "] ");
     }
 
     ~Log()
     {
         if (this->level_ >= Log::minimum_level_)
         {
-            std::cout << std::endl;
+            if (this->level_ == LogLevel::kError)
+                std::cerr << std::endl;
+            else
+                std::cout << std::endl;
         }
     }
 
@@ -48,7 +51,10 @@ public:
     {
         if (this->level_ >= Log::minimum_level_)
         {
-            std::cout << message;
+            if (this->level_ == LogLevel::kError)
+                std::cerr << message;
+            else
+                std::cout << message;
         }
 
         return *this;
