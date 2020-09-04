@@ -60,14 +60,16 @@ void openrs::net::Reactor::DoAccept(const std::shared_ptr<io::CallbackChannel>&)
         throw std::runtime_error("Could not determine the peer name to accept a client.");
     }
 
-    printf("Accepted client from %s\n", inet_ntoa(addr.sin_addr));
+    openrs::common::Log(openrs::common::Log::LogLevel::kInfo)
+        << "Accepted client from " << inet_ntoa(addr.sin_addr);
 
     auto client = std::make_shared<Client>();
     auto client_channel = std::make_shared<io::ClientChannel>();
     client_channel->set_callback(std::bind(&Reactor::DoReadWrite, this, std::placeholders::_1, client));
     if (!this->epoll_.AddPollEvent(client_channel, EPOLLIN, socket.getSocketId()))
     {
-        std::cerr << "Failed to add a client." << std::endl;
+        openrs::common::Log(openrs::common::Log::LogLevel::kError)
+            << "Failed to add a client.";
         return;
     }
 
@@ -92,7 +94,8 @@ void openrs::net::Reactor::DoReadWrite(
         {
             if (!this->epoll_.UpdatePollEvent(EPOLLIN, client->socket().getSocketId()))
             {
-                std::cerr << "Could not queue input for client." << std::endl;
+                openrs::common::Log(openrs::common::Log::LogLevel::kError)
+                    << "Could not queue input for client.";
             }
         }
     }
@@ -103,11 +106,14 @@ void openrs::net::Reactor::DoReadWrite(
         socklen_t addr_len = sizeof(addr);
         if (0 < ::getpeername(client->socket().getSocketId(), reinterpret_cast<struct sockaddr*>(&addr), &addr_len))
         {
-            std::cout << "Client " << inet_ntoa(addr.sin_addr) << " disconnected." << std::endl;
+            openrs::common::Log(openrs::common::Log::LogLevel::kInfo)
+                << "Client "<< inet_ntoa(addr.sin_addr) << " disconnected.";
         }
 
-        std::cout << "  Sent: " << std::to_string(client->bytes_sent()) << std::endl;
-        std::cout << "  Recv: " << std::to_string(client->bytes_received()) << std::endl;
+        openrs::common::Log(openrs::common::Log::LogLevel::kDebug)
+            << "  Sent: "<< client->bytes_sent();
+        openrs::common::Log(openrs::common::Log::LogLevel::kDebug)
+            << "  Recv: "<< client->bytes_received();
 
         this->epoll_.RemovePollEvent(client->socket().getSocketId());
         this->clients_.erase(client->socket().getSocketId());
@@ -116,7 +122,8 @@ void openrs::net::Reactor::DoReadWrite(
     {
         if (!this->epoll_.UpdatePollEvent(EPOLLOUT | EPOLLIN, client->socket().getSocketId()))
         {
-            std::cerr << "Could not queue output for client." << std::endl;
+            openrs::common::Log(openrs::common::Log::LogLevel::kError)
+                << "Could not queue output for client.";
         }
     }
 }
