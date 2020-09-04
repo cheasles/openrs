@@ -33,13 +33,11 @@ void openrs::net::Client::Read()
         return;
     }
 
-    this->bytes_received_ += amount_read;
-
     buffer.resize(amount_read);
     this->buffer_input_.insert(
         this->buffer_input_.cend(),
         buffer.cbegin(),
-        buffer.cend());
+        buffer.cbegin() + amount_read);
 
     codec::Packet packet;
     if (!this->decoder_->Decode(this->buffer_input_, &packet))
