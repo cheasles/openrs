@@ -47,6 +47,8 @@ public:
     bool GetString(char** output);
     bool GetString(std::string* output);
 
+    bool GetTriByte(uint32_t* output);
+
     template <typename Type>
     bool PutData(const Type data)
     {

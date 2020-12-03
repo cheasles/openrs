@@ -35,6 +35,11 @@ void openrs::net::Client::Read()
         return;
     }
 
+    if (0 == amount_read)
+    {
+        return;
+    }
+
     buffer.resize(amount_read);
     this->buffer_input_.insert(
         this->buffer_input_.cend(),

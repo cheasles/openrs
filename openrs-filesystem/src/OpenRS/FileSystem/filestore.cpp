@@ -20,7 +20,7 @@ openrs::filesystem::FileStore::FileStore(
 { }
 
 bool openrs::filesystem::FileStore::GetArchiveData(
-    const int& kArchiveId, std::vector<uint8_t>* output)
+    const int& kArchiveId, std::vector<uint8_t>* output) const
 {
     auto index_stream = this->index_stream_.lock();
     if (!index_stream || index_stream->bad())

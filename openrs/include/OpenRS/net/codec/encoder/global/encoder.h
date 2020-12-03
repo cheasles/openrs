@@ -27,10 +27,11 @@ namespace global
 class Encoder
 {
 private:
-    static constexpr frozen::map<PacketType, uint8_t, 2> code_mapping_
+    static constexpr frozen::map<PacketType, uint8_t, 3> code_mapping_
     {
-        {PacketType::kGrabKeys, 0},
+        {PacketType::kStartUp, 0},
         {PacketType::kClientOutdated, 6},
+        {PacketType::kGrabCache, static_cast<uint8_t>(PacketOpCode::kNone)}
     };
 
 public:

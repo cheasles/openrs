@@ -13,14 +13,20 @@ namespace net
 namespace codec
 {
 
-enum PacketType
+enum struct PacketType : uint8_t
 {
     kUnknown,
     kHandshake,
     kLogin,
     kClientOutdated,
-    kGrabKeys,
+    kStartUp,
     kGrabCache,
+};
+
+enum struct PacketOpCode : uint8_t
+{
+    kNone = 255,
+    kUnknown = 0,
 };
 
 struct Packet

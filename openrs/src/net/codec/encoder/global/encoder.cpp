@@ -6,7 +6,7 @@
 
 #include "OpenRS/net/codec/packet.h"
 
-constexpr frozen::map<openrs::net::codec::PacketType, uint8_t, 2>
+constexpr frozen::map<openrs::net::codec::PacketType, uint8_t, 3>
     openrs::net::codec::encoder::global::Encoder::code_mapping_;
 
 bool openrs::net::codec::encoder::global::Encoder::Encode(
@@ -26,7 +26,10 @@ bool openrs::net::codec::encoder::global::Encoder::Encode(
         return false;
     }
 
-    buffer->emplace_back(kPacketCode->second);
+    if (static_cast<uint8_t>(PacketOpCode::kNone) != kPacketCode->second)
+    {
+        buffer->emplace_back(kPacketCode->second);
+    }
     if (packet.data.size() != 0)
     {
         buffer->insert(

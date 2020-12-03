@@ -40,3 +40,25 @@ bool openrs::net::io::Buffer::GetString(std::string* output)
     output->assign(c_str);
     return true;
 }
+
+bool openrs::net::io::Buffer::GetTriByte(uint32_t* output)
+{
+    if (!output)
+    {
+        return false;
+    }
+
+    struct TriByte
+    {
+        uint8_t bytes[3];
+    };
+
+    TriByte* tribyte;
+    if (!this->GetData<TriByte>(&tribyte))
+    {
+        return false;
+    }
+
+    *output = (tribyte->bytes[0] << 16) + (tribyte->bytes[1] << 8) + (tribyte->bytes[2]);
+    return true;
+}

@@ -43,7 +43,7 @@ public:
     FileStore& operator=(FileStore&&) = default;
 
     bool GetArchiveData(const int& kArchiveId,
-        std::vector<uint8_t>* output);
+        std::vector<uint8_t>* output) const;
 
     inline uint32_t crc() const
     {
