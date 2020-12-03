@@ -2,6 +2,8 @@
 
 #include <sys/socket.h>
 
+#include "Common/log.h"
+
 #include "OpenRS/net/codec/packet.h"
 
 openrs::net::Client::Client()
@@ -42,11 +44,15 @@ void openrs::net::Client::Read()
     codec::Packet packet;
     if (!this->decoder_->Decode(this->buffer_input_, &packet))
     {
+        common::Log(common::Log::LogLevel::kWarning)
+            << "Failed to decode a packet from a client.";
         return;
     }
 
     this->packet_handler_->Handle(packet, this);
     this->buffer_input_.clear();
+
+    this->bytes_received_ += amount_read;
 }
 
 void openrs::net::Client::Write()

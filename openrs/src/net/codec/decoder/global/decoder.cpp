@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "Common/log.h"
+
 #include "OpenRS/net/codec/packet.h"
 
 constexpr frozen::map<uint8_t, openrs::net::codec::PacketType, 3>
@@ -23,10 +25,8 @@ bool openrs::net::codec::decoder::global::Decoder::Decode(openrs::net::io::Buffe
     const auto kPacketType = Decoder::code_mapping_.find(buffer.at(0));
     if (Decoder::code_mapping_.cend() == kPacketType)
     {
-        std::cerr <<
-            "Invalid packet code: " <<
-            std::to_string(buffer.at(0)) <<
-            std::endl;
+        common::Log(common::Log::LogLevel::kWarning)
+            << "Invalid packet code: " << std::to_string(buffer.at(0));
         return false;
     }
 

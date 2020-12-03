@@ -4,6 +4,8 @@
 
 #include <string>
 
+#include "Common/log.h"
+
 #include "OpenRS/net/io/buffer.h"
 #include "OpenRS/manager/cache/grabmanager.h"
 #include "OpenRS/net/codec/decoder/global/grabdecoder.h"
@@ -57,18 +59,21 @@ void openrs::net::codec::decoder::global::handlers::PacketHandler::Handle(
         manager::cache::GrabManager::WriteKeysToBuffer(&buffer);
 
         Packet grab_packet;
-        grab_packet.type = PacketType::kGrabKeys;
+        grab_packet.type = PacketType::kStartUp;
         grab_packet.data = buffer;
         client->Send(grab_packet);
     }
     else if (PacketType::kLogin == packet.type &&
         client->status() == ClientStatus::kLoggingIn)
     {
-
+        common::Log(common::Log::LogLevel::kWarning)
+            << "Temp failure";
     }
     else
     {
         // Reject all other clients.
+        common::Log(common::Log::LogLevel::kDebug)
+            << "Client force disconnected";
         client->set_status(ClientStatus::kDisconnected);
     }
 }
