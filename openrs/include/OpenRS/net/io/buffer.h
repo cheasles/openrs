@@ -76,12 +76,7 @@ public:
             break;
         }
 
-        const auto data_ptr = reinterpret_cast<const uint8_t*>(&data);
-        this->insert(
-            this->cend(),
-            data_ptr,
-            data_ptr + sizeof(data));
-        return true;
+        return this->PutData(data);
     }
 
     inline void ClearOldData()
