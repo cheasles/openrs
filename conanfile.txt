@@ -1,0 +1,7 @@
+[requires]
+doctest/2.4.0
+fmt/7.0.3
+[generators]
+cmake_paths
+cmake_find_package
+cmake_find_package_multi
