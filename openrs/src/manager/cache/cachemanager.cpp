@@ -13,7 +13,7 @@ bool openrs::manager::cache::CacheManager::Init()
 {
     try
     {
-        this->cache_ = std::make_unique<filesystem::Cache>(kCachePath);
+        this->cache_ = std::make_shared<filesystem::Cache>(kCachePath);
     }
     catch (const std::runtime_error& ex)
     {

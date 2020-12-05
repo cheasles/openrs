@@ -24,7 +24,7 @@ class CacheManager
     , public openrs::common::Singleton<CacheManager>
 {
 private:
-    std::unique_ptr<openrs::filesystem::Cache> cache_;
+    std::shared_ptr<openrs::filesystem::Cache> cache_;
 
     static const std::string kCachePath;
 
@@ -33,6 +33,8 @@ public:
 
     bool GetArchiveData(const uint32_t& kStoreId, const uint32_t& kArchiveId,
         std::vector<uint8_t>* output) const;
+
+    inline const std::shared_ptr<openrs::filesystem::Cache> cache() const { return this->cache_; }
 };
 
 }  // namespace cache
