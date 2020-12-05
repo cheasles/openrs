@@ -1,6 +1,3 @@
 [submodule "external/frozen"]
 	path = external/frozen
 	url = https://github.com/serge-sans-paille/frozen.git
-[submodule "external/inicpp"]
-	path = external/inicpp
-	url = https://github.com/SemaiCZE/inicpp.git
