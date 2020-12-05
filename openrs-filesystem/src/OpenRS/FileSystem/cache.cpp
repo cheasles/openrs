@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iostream>
 
+#include <whrlpool.h>
 #include "Common/crc.h"
 
 const uint32_t openrs::filesystem::Cache::kMetadataId = 255;
@@ -56,6 +57,9 @@ openrs::filesystem::Cache::Cache(const std::string& path)
 
         index.second.set_crc(openrs::common::crc32c(0, index_data.data(),
             index_data.size()));
+        std::array<uint8_t, 64> whirlpool;
+        CryptoPP::Whirlpool().CalculateDigest(whirlpool.data(), index_data.data(),
+            index_data.size());
+        index.second.set_whirlpool(whirlpool);
     }
 }
-

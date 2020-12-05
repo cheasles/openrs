@@ -74,6 +74,8 @@ private:
 public:
     ReferenceTable();
     ReferenceTable(std::ifstream& stream);
+
+    inline const auto version() const { return this->version_; }
 };
 
 }  // namespace filesystem

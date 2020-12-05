@@ -2,6 +2,7 @@
 
 #include <inttypes.h>
 
+#include <array>
 #include <fstream>
 #include <map>
 #include <memory>
@@ -26,7 +27,7 @@ private:
 
     uint32_t crc_;
     openrs::filesystem::ReferenceTable reference_table_;
-    std::vector<uint8_t> whirlpool_;
+    std::array<uint8_t, 64> whirlpool_;
 
     static const uint32_t kIdxBlockLength;
     static const uint32_t kHeaderLength;
@@ -55,7 +56,7 @@ public:
         return this->reference_table_;
     }
 
-    inline std::vector<uint8_t>& whirlpool()
+    inline const std::array<uint8_t, 64>& whirlpool() const
     {
         return this->whirlpool_;
     }
@@ -63,6 +64,11 @@ public:
     inline void set_crc(const uint32_t& crc)
     {
         this->crc_ = crc;
+    }
+
+    inline void set_whirlpool(const std::array<uint8_t, 64>& whirlpool)
+    {
+        this->whirlpool_ = whirlpool;
     }
 
     static inline uint32_t GetCompressedUInt32(std::ifstream& stream)
