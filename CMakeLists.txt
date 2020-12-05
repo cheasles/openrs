@@ -41,8 +41,7 @@ set(CMAKE_CXX_STANDARD 14)
 # Add subdirectories
 #--------------------------------------------------------------------
 
-add_subdirectory(external/frozen)
-
+add_subdirectory(external)
 add_subdirectory(common)
 add_subdirectory(openrs-filesystem)
 add_subdirectory(openrs)
