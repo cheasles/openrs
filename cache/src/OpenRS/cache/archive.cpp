@@ -29,14 +29,19 @@ openrs::cache::Archive::Archive(openrs::common::io::Buffer<> data) {
   }
 
   CryptoPP::Gunzip gzip;
+  uint32_t* length_ptr = nullptr;
   switch (kCompressionHeader) {
     case Archive::Compression::NONE:
       this->data_.assign(data.cbegin() + data.position(), data.cend());
       break;
     case Archive::Compression::GZIP:
+      if (!data.GetData(&length_ptr) ||
+          ::be32toh(*length_ptr) > kMaxArchiveLength) {
+        throw new std::runtime_error("Invalid cache archive data.");
+      }
       gzip.Put(data.data() + data.position(), kCompressedLength);
       gzip.MessageEnd();
-      this->data_.resize(gzip.MaxRetrievable());
+      this->data_.resize(::be32toh(*length_ptr));
       gzip.Get(this->data_.data(), this->data_.size());
       break;
     default:
