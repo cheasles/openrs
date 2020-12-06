@@ -38,6 +38,7 @@ public:
     void GenerateDefaultConfig();
 
     inline const auto& config() const { return this->json_config_; }
+    auto operator [](std::string key) const { return config()[key]; }
 };
 
 }  // namespace manager
