@@ -22,12 +22,12 @@ int32_t ReadSmartInt(openrs::common::io::Buffer<> data) {
 }
 
 openrs::cache::ReferenceTable::ReferenceTable()
-    : protocol_(0), version_(0), flags_(0) {}
+    : protocol_(0), revision_(0), flags_(0) {}
 
 openrs::cache::ReferenceTable::ReferenceTable(
     openrs::common::io::Buffer<> data) {
   uint8_t* protocol_ptr = nullptr;
-  uint32_t* version_ptr = nullptr;
+  uint32_t* revision_ptr = nullptr;
   uint8_t* flags_ptr = nullptr;
   if (!data.GetData(&protocol_ptr)) {
     throw std::runtime_error("Failed to read reference table protocol.");
@@ -39,11 +39,11 @@ openrs::cache::ReferenceTable::ReferenceTable(
     throw std::runtime_error("Cache data is not supported.");
   }
 
-  if (this->protocol_ >= 6 && !data.GetData(&version_ptr)) {
-    throw std::runtime_error("Failed to read reference table version.");
+  if (this->protocol_ >= 6 && !data.GetData(&revision_ptr)) {
+    throw std::runtime_error("Failed to read reference table revision.");
   }
 
-  this->version_ = *version_ptr;
+  this->revision_ = ::be32toh(*revision_ptr);
 
   if (!data.GetData(&flags_ptr)) {
     throw std::runtime_error("Failed to read reference table flags.");

@@ -63,14 +63,14 @@ class ReferenceTable {
 
  private:
   uint8_t protocol_;
-  uint32_t version_;
+  uint32_t revision_;
   uint8_t flags_;
 
  public:
   ReferenceTable();
   ReferenceTable(openrs::common::io::Buffer<> data);
 
-  inline const auto version() const { return this->version_; }
+  inline const auto revision() const { return this->revision_; }
 };
 
 }  // namespace cache
