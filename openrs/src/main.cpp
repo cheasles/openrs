@@ -3,6 +3,7 @@
 
 #include <iostream>
 
+#include "OpenRS/manager/configmanager.h"
 #include "OpenRS/manager/cache/cachemanager.h"
 #include "OpenRS/net/reactor.h"
 
@@ -14,6 +15,12 @@ int main()
     constexpr int kTickRate = 600;
 
     std::cout << "OpenRS Server" << std::endl;
+
+    if (!openrs::manager::ConfigManager::get().Init())
+    {
+        std::cerr << "Failed to init config manager." << std::endl;
+        return 1;
+    }
 
     if (!openrs::manager::cache::CacheManager::get().Init())
     {

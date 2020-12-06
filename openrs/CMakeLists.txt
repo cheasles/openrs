@@ -34,6 +34,7 @@ find_package(Threads REQUIRED)
 target_link_libraries(${PROJECT_NAME}
     Threads::Threads
     frozen
+    nlohmann_json::nlohmann_json
     ${CMAKE_PROJECT_NAME}-Common
     ${CMAKE_PROJECT_NAME}-FileSystem)
 
