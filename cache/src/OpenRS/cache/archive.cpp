@@ -48,6 +48,4 @@ openrs::cache::Archive::Archive(openrs::common::io::Buffer<> data) {
       throw new std::runtime_error(
           "Invalid or unsupported cache archive compression.");
   }
-
-  this->data_.assign(data.cbegin() + data.position(), data.cend());
 }
