@@ -5,7 +5,8 @@
 
 #include "Common/log.h"
 
-#include "OpenRS/FileSystem/filestore.h"
+#include "OpenRS/cache/cache.h"
+#include "OpenRS/cache/filestore.h"
 
 const std::string openrs::manager::cache::CacheManager::kCachePath = "../data/cache/";
 
@@ -13,7 +14,7 @@ bool openrs::manager::cache::CacheManager::Init()
 {
     try
     {
-        this->cache_ = std::make_shared<filesystem::Cache>(kCachePath);
+        this->cache_ = std::make_shared<openrs::cache::Cache>(kCachePath);
     }
     catch (const std::runtime_error& ex)
     {

@@ -43,6 +43,6 @@ set(CMAKE_CXX_STANDARD 14)
 
 add_subdirectory(external)
 add_subdirectory(common)
-add_subdirectory(openrs-filesystem)
+add_subdirectory(cache)
 add_subdirectory(openrs)
 

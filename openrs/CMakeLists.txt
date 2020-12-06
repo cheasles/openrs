@@ -37,4 +37,4 @@ target_link_libraries(${PROJECT_NAME}
     nlohmann_json::nlohmann_json
     cryptopp-static
     ${CMAKE_PROJECT_NAME}-Common
-    ${CMAKE_PROJECT_NAME}-FileSystem)
+    ${CMAKE_PROJECT_NAME}-cache)

@@ -8,7 +8,7 @@
 #include "Common/singleton.h"
 
 #include "OpenRS/manager/manager.h"
-#include "OpenRS/FileSystem/cache.h"
+#include "OpenRS/cache/cache.h"
 
 namespace openrs
 {
@@ -24,7 +24,7 @@ class CacheManager
     , public openrs::common::Singleton<CacheManager>
 {
 private:
-    std::shared_ptr<openrs::filesystem::Cache> cache_;
+    std::shared_ptr<openrs::cache::Cache> cache_;
 
     static const std::string kCachePath;
 
@@ -34,7 +34,7 @@ public:
     bool GetArchiveData(const uint32_t& kStoreId, const uint32_t& kArchiveId,
         std::vector<uint8_t>* output) const;
 
-    inline const std::shared_ptr<openrs::filesystem::Cache> cache() const { return this->cache_; }
+    inline const std::shared_ptr<openrs::cache::Cache> cache() const { return this->cache_; }
 };
 
 }  // namespace cache

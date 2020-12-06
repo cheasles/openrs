@@ -1,4 +1,4 @@
-#include "OpenRS/FileSystem/referencetable.h"
+#include "OpenRS/cache/referencetable.h"
 
 int32_t ReadSmartInt(std::ifstream& stream)
 {
@@ -18,7 +18,7 @@ int32_t ReadSmartInt(std::ifstream& stream)
     }
 }
 
-openrs::filesystem::ReferenceTable::ReferenceTable()
+openrs::cache::ReferenceTable::ReferenceTable()
     : format_(0)
     , version_(0)
     , flags_(0)
@@ -26,7 +26,7 @@ openrs::filesystem::ReferenceTable::ReferenceTable()
 
 }
 
-openrs::filesystem::ReferenceTable::ReferenceTable(
+openrs::cache::ReferenceTable::ReferenceTable(
     std::ifstream& stream)
 {
     if (!stream.is_open())
@@ -41,7 +41,7 @@ openrs::filesystem::ReferenceTable::ReferenceTable(
         throw std::runtime_error("Cache data is not supported.");
     }
 
-    if (this->format_ == 6)
+    if (this->format_ >= 6)
     {
         stream >> this->version_;
     }

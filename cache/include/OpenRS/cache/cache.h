@@ -7,12 +7,12 @@
 #include <string>
 #include <vector>
 
-#include "OpenRS/FileSystem/filestore.h"
+#include "OpenRS/cache/filestore.h"
 
 namespace openrs
 {
 
-namespace filesystem
+namespace cache
 {
 
 class Cache
@@ -20,14 +20,15 @@ class Cache
 private:
     std::list<std::shared_ptr<std::ifstream>> streams_;
 
-    std::map<uint32_t, openrs::filesystem::FileStore> indexes_;
+    std::map<uint32_t, openrs::cache::FileStore> indexes_;
 
+public:
     static const uint32_t kMetadataId;
 
 public:
     Cache(const std::string& path);
 
-    inline const openrs::filesystem::FileStore& GetStore(const uint32_t& id) const
+    inline const openrs::cache::FileStore& GetStore(const uint32_t& id) const
     {
         const auto& store = this->indexes_.find(id);
         if (this->indexes_.cend() == store)
@@ -44,6 +45,6 @@ public:
     }
 };
 
-}  // namespace filesystem
+}  // namespace cache
 
 }  // namespace openrs

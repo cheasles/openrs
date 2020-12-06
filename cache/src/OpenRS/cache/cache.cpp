@@ -1,4 +1,4 @@
-#include "OpenRS/FileSystem/cache.h"
+#include "OpenRS/cache/cache.h"
 
 #include <stdint.h>
 
@@ -9,9 +9,9 @@
 #include <whrlpool.h>
 #include "Common/crc.h"
 
-const uint32_t openrs::filesystem::Cache::kMetadataId = 255;
+const uint32_t openrs::cache::Cache::kMetadataId = 255;
 
-openrs::filesystem::Cache::Cache(const std::string& path)
+openrs::cache::Cache::Cache(const std::string& path)
 {
     auto data_stream = std::make_shared<std::ifstream>();
     data_stream->open(path + "main_file_cache.dat2", std::ios::binary);

@@ -1,25 +1,25 @@
-#include "OpenRS/FileSystem/filestore.h"
+#include "OpenRS/cache/filestore.h"
 
 #include <iterator>
 
 #include "Common/ifstream.h"
 
-const uint32_t openrs::filesystem::FileStore::kIdxBlockLength = 6;
-const uint32_t openrs::filesystem::FileStore::kHeaderLength = 8;
-const uint32_t openrs::filesystem::FileStore::kHeaderExpandedLength = 10;
-const uint32_t openrs::filesystem::FileStore::kBlockLength = 512;
-const uint32_t openrs::filesystem::FileStore::kBlockExpandedLength = 510;
-const uint32_t openrs::filesystem::FileStore::kTotalBlockLength =
+const uint32_t openrs::cache::FileStore::kIdxBlockLength = 6;
+const uint32_t openrs::cache::FileStore::kHeaderLength = 8;
+const uint32_t openrs::cache::FileStore::kHeaderExpandedLength = 10;
+const uint32_t openrs::cache::FileStore::kBlockLength = 512;
+const uint32_t openrs::cache::FileStore::kBlockExpandedLength = 510;
+const uint32_t openrs::cache::FileStore::kTotalBlockLength =
     kHeaderLength + kBlockLength;
 
-openrs::filesystem::FileStore::FileStore(
+openrs::cache::FileStore::FileStore(
     const std::weak_ptr<std::ifstream>& kDataStream,
     const std::weak_ptr<std::ifstream>& kIndexStream)
     : data_stream_(kDataStream)
     , index_stream_(kIndexStream)
 { }
 
-bool openrs::filesystem::FileStore::GetArchiveData(
+bool openrs::cache::FileStore::GetArchiveData(
     const int& kArchiveId, std::vector<uint8_t>* output) const
 {
     auto index_stream = this->index_stream_.lock();

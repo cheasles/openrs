@@ -11,12 +11,12 @@
 
 #include "Common/ifstream.h"
 
-#include "OpenRS/FileSystem/referencetable.h"
+#include "OpenRS/cache/referencetable.h"
 
 namespace openrs
 {
 
-namespace filesystem
+namespace cache
 {
 
 class FileStore
@@ -26,7 +26,7 @@ private:
     std::weak_ptr<std::ifstream> index_stream_;
 
     uint32_t crc_;
-    openrs::filesystem::ReferenceTable reference_table_;
+    openrs::cache::ReferenceTable reference_table_;
     std::array<uint8_t, 64> whirlpool_;
 
     static const uint32_t kIdxBlockLength;
@@ -51,7 +51,7 @@ public:
         return this->crc_;
     }
 
-    inline const openrs::filesystem::ReferenceTable& reference_table() const
+    inline const openrs::cache::ReferenceTable& reference_table() const
     {
         return this->reference_table_;
     }
@@ -99,7 +99,7 @@ public:
     }
 };
 
-}  // namespace filesystem
+}  // namespace cache
 
 }  // namespace openrs
 

@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.1)
-set(PROJECT_SUBNAME FileSystem)
+set(PROJECT_SUBNAME cache)
 project (${CMAKE_PROJECT_NAME}-${PROJECT_SUBNAME} CXX)
 
 # Add source files

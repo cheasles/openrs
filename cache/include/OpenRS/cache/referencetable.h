@@ -9,7 +9,7 @@
 namespace openrs
 {
 
-namespace filesystem
+namespace cache
 {
 
 class ReferenceTable
@@ -78,6 +78,6 @@ public:
     inline const auto version() const { return this->version_; }
 };
 
-}  // namespace filesystem
+}  // namespace cache
 
 }  // namespace openrs
