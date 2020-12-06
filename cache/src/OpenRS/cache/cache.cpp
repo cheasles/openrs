@@ -6,9 +6,6 @@
 #include <fstream>
 #include <iostream>
 
-#include <whrlpool.h>
-#include "Common/crc.h"
-
 const uint32_t openrs::cache::Cache::kMetadataId = 255;
 
 openrs::cache::Cache::Cache(const std::string& path)
@@ -22,7 +19,17 @@ openrs::cache::Cache::Cache(const std::string& path)
     *data_stream >> std::noskipws;
     this->streams_.emplace_back(data_stream);
 
-    for (uint16_t i = 0; i <= std::numeric_limits<uint8_t>::max(); ++i)
+    data_stream = std::make_shared<std::ifstream>();
+    data_stream->open(path + "main_file_cache.idx255", std::ios::binary);
+    if (!data_stream->is_open())
+    {
+        throw std::runtime_error("Could not open main index cache.");
+    }
+    *data_stream >> std::noskipws;
+    this->streams_.emplace_back(data_stream);
+    this->main_index_ = MainIndex(*this->streams_.begin(), data_stream);
+
+    for (uint16_t i = 0; i <= this->main_index_.archive_count(); ++i)
     {
         data_stream = std::make_shared<std::ifstream>();
         data_stream->open(path + "main_file_cache.idx" + std::to_string(i),
@@ -31,7 +38,7 @@ openrs::cache::Cache::Cache(const std::string& path)
         {
             *data_stream >> std::noskipws;
             this->streams_.emplace_back(data_stream);
-            this->indexes_[i] = FileStore(*this->streams_.begin(), data_stream);
+            this->indexes_[i] = Index(*this->streams_.begin(), data_stream);
         }
     }
 
@@ -40,26 +47,12 @@ openrs::cache::Cache::Cache(const std::string& path)
         throw std::runtime_error("Could not locate any data caches.");
     }
 
-    auto meta_data = this->indexes_.find(kMetadataId);
-    if (this->indexes_.cend() == meta_data)
-    {
-        throw std::runtime_error("Could not locate meta-data index.");
-    }
-
     // Calculate meta-data for the actual cache information.
     for (auto& index : this->indexes_)
     {
-        std::vector<uint8_t> index_data;
-        if (!meta_data->second.GetArchiveData(index.first, &index_data))
+        if (!this->main_index_.PopulateIndexMetadata(index.first, index.second))
         {
-            continue;
+            throw std::runtime_error("Failed to calculate cache index information.");
         }
-
-        index.second.set_crc(openrs::common::crc32c(0, index_data.data(),
-            index_data.size()));
-        std::array<uint8_t, 64> whirlpool;
-        CryptoPP::Whirlpool().CalculateDigest(whirlpool.data(), index_data.data(),
-            index_data.size());
-        index.second.set_whirlpool(whirlpool);
     }
 }

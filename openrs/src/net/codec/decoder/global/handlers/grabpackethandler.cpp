@@ -44,14 +44,14 @@ void SendUKeys(openrs::net::Client* client)
     openrs::net::io::Buffer ukeys_data_packet_buffer;
     const auto& cache = openrs::manager::cache::CacheManager::get().cache();
 
-    if (cache->GetTypeCount() - 1 > static_cast<size_t>(std::numeric_limits<uint8_t>::max()))
+    if (cache->GetTypeCount() > static_cast<size_t>(std::numeric_limits<uint8_t>::max()))
     {
         openrs::common::Log(openrs::common::Log::LogLevel::kError)
             << "Too many cache indexes (" << cache->GetTypeCount() << ").";
         return;
     }
 
-    ukeys_data_packet_buffer.PutData(static_cast<uint8_t>(cache->GetTypeCount() - 1));
+    ukeys_data_packet_buffer.PutData(static_cast<uint8_t>(cache->GetTypeCount()));
     for (uint32_t index = 0; index < cache->GetTypeCount(); ++index)
     {
         try
