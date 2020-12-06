@@ -56,29 +56,29 @@ openrs::cache::ReferenceTable::ReferenceTable(
     int count = ReadSmartInt(data);
     ids.resize(count);
   } else {
-    int16_t* count_ptr = nullptr;
+    uint16_t* count_ptr = nullptr;
     if (!data.GetData(&count_ptr)) {
       throw std::runtime_error("Failed to read reference table data.");
     }
-    ids.resize(*count_ptr);
+    ids.resize(::be16toh(*count_ptr));
   }
 
-  int accumulator = 0;
+  int last_archive_id = 0;
   int size = -1;
   for (int i = 0; i < ids.size(); ++i) {
     int delta = 0;
     if (this->protocol_ >= 7) {
       delta = ReadSmartInt(data);
     } else {
-      int16_t* count_ptr = nullptr;
-      if (!data.GetData(&count_ptr)) {
+      uint16_t* delta_ptr = nullptr;
+      if (!data.GetData(&delta_ptr)) {
         throw std::runtime_error("Failed to read reference table data.");
       }
-      delta = *count_ptr;
+      delta = ::be16toh(*delta_ptr);
     }
 
-    ids[i] = accumulator + delta;
-    accumulator += delta;
+    ids[i] = last_archive_id + delta;
+    last_archive_id += delta;
     if (ids[i] > size) size = ids[i];
   }
   ++size;
