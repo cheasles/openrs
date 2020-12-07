@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+#include "OpenRS/cache/archivereference.h"
+
 namespace openrs {
 namespace cache {
 
@@ -19,57 +21,26 @@ class ReferenceTable {
     kFlagHash = 0x08
   };
 
-  struct Entry {
-    /**
-     * The identifier of this entry.
-     */
-    int identifier;
-
-    /**
-     * The CRC32 checksum of this entry.
-     */
-    int crc;
-
-    /**
-     * The compressed size of this entry.
-     */
-    int compressed;
-
-    /**
-     * The uncompressed size of this entry.
-     */
-    int uncompressed;
-
-    /**
-     * The hash of this entry
-     */
-    int hash;
-
-    /**
-     * The whirlpool digest of this entry.
-     */
-    std::vector<uint8_t> whirlpool;
-
-    /**
-     * The version of this entry.
-     */
-    int version;
-
-    /**
-     * The cache index of this entry
-     */
-    int index;
-  };
-
  private:
   uint8_t protocol_;
   uint32_t revision_;
   uint8_t flags_;
+  std::vector<ArchiveReference> archive_references_;
 
  public:
   ReferenceTable();
   ReferenceTable(openrs::common::io::Buffer<> data);
 
+  void BuildArchiveReferences(const uint32_t& kLargestArchiveId,
+                              const std::vector<uint32_t>& kIds,
+                              openrs::common::io::Buffer<>& data);
+
+  inline const auto is_named() const {
+    return (this->flags_ & kFlagIdentifiers) != 0;
+  }
+  inline const auto is_whirlpooled() const {
+    return (this->flags_ & kFlagWhirlpool) != 0;
+  }
   inline const auto revision() const { return this->revision_; }
 };
 

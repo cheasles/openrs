@@ -21,7 +21,7 @@ class Index {
   std::weak_ptr<std::ifstream> index_stream_;
 
   uint32_t crc_;
-  openrs::cache::ReferenceTable reference_table_;
+  std::shared_ptr<openrs::cache::ReferenceTable> reference_table_;
   std::array<uint8_t, 64> whirlpool_;
 
   static const uint32_t kIdxBlockLength;
@@ -43,9 +43,7 @@ class Index {
 
   inline uint32_t crc() const { return this->crc_; }
 
-  inline const openrs::cache::ReferenceTable& reference_table() const {
-    return this->reference_table_;
-  }
+  inline const auto& reference_table() const { return this->reference_table_; }
 
   inline const std::array<uint8_t, 64>& whirlpool() const {
     return this->whirlpool_;
@@ -57,7 +55,8 @@ class Index {
     this->whirlpool_ = whirlpool;
   }
 
-  inline void set_reference_table(const openrs::cache::ReferenceTable& reference_table) {
+  inline void set_reference_table(
+      const std::shared_ptr<openrs::cache::ReferenceTable>& reference_table) {
     this->reference_table_ = reference_table;
   }
 

@@ -1,5 +1,7 @@
 #include "OpenRS/cache/referencetable.h"
 
+#include <algorithm>
+
 int32_t ReadSmartInt(openrs::common::io::Buffer<> data) {
   char* flag_ptr = nullptr;
   if (!data.GetData(&flag_ptr)) {
@@ -51,7 +53,7 @@ openrs::cache::ReferenceTable::ReferenceTable(
 
   this->flags_ = *flags_ptr;
 
-  std::vector<int> ids;
+  std::vector<uint32_t> ids;
   if (this->protocol_ >= 7) {
     int count = ReadSmartInt(data);
     ids.resize(count);
@@ -63,9 +65,9 @@ openrs::cache::ReferenceTable::ReferenceTable(
     ids.resize(::be16toh(*count_ptr));
   }
 
-  int last_archive_id = 0;
-  int size = -1;
-  for (int i = 0; i < ids.size(); ++i) {
+  uint32_t last_archive_id = 0;
+  uint32_t largest_archive_id = 0;
+  for (size_t i = 0; i < ids.size(); ++i) {
     int delta = 0;
     if (this->protocol_ >= 7) {
       delta = ReadSmartInt(data);
@@ -77,9 +79,64 @@ openrs::cache::ReferenceTable::ReferenceTable(
       delta = ::be16toh(*delta_ptr);
     }
 
-    ids[i] = last_archive_id + delta;
-    last_archive_id += delta;
-    if (ids[i] > size) size = ids[i];
+    ids[i] = last_archive_id += delta;
+    if (last_archive_id > largest_archive_id) {
+      largest_archive_id = last_archive_id;
+    }
   }
-  ++size;
+
+  this->BuildArchiveReferences(largest_archive_id, ids, data);
+}
+
+void openrs::cache::ReferenceTable::BuildArchiveReferences(
+    const uint32_t& kLargestArchiveId, const std::vector<uint32_t>& kIds,
+    openrs::common::io::Buffer<>& data) {
+  this->archive_references_.clear();
+  this->archive_references_.resize(kLargestArchiveId);
+
+  if (this->archive_references_.size() == 0)
+  {
+    return;
+  }
+
+  if (this->is_named()) {
+    uint32_t* name_ptr = nullptr;
+    for (const auto& kId : kIds) {
+      if (!data.GetData(&name_ptr)) {
+        throw std::runtime_error("Failed to read reference table data.");
+      }
+      this->archive_references_[kId].set_name_hash(::be32toh(*name_ptr));
+    }
+  }
+
+  if (this->is_whirlpooled()) {
+    std::array<uint8_t, 64> whirlpool;
+    uint32_t* name_ptr = nullptr;
+    for (const auto& kId : kIds) {
+      if (data.position() + 64 > data.size()) {
+        throw std::runtime_error("Failed to read reference table data.");
+      }
+      std::copy(data.cbegin() + data.position(),
+                data.cbegin() + data.position() + 64, whirlpool.begin());
+      this->archive_references_[kId].set_whirlpool(whirlpool);
+    }
+  }
+
+  // Populate CRC hashes:
+  uint32_t* crc_ptr = nullptr;
+  for (const auto& kId : kIds) {
+    if (!data.GetData(&crc_ptr)) {
+      throw std::runtime_error("Failed to read reference table data.");
+    }
+    this->archive_references_[kId].set_crc(::be32toh(*crc_ptr));
+  }
+
+  // Populate revision:
+  uint32_t* revision_ptr = nullptr;
+  for (const auto& kId : kIds) {
+    if (!data.GetData(&revision_ptr)) {
+      throw std::runtime_error("Failed to read reference table data.");
+    }
+    this->archive_references_[kId].set_revision(::be32toh(*revision_ptr));
+  }
 }
