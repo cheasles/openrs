@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-int32_t ReadSmartInt(openrs::common::io::Buffer<> data) {
+int32_t ReadSmartInt(openrs::common::io::Buffer<>& data) {
   char* flag_ptr = nullptr;
   if (!data.GetData(&flag_ptr)) {
     throw std::runtime_error("Failed to read reference table protocol.");
