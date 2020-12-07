@@ -92,7 +92,7 @@ void openrs::cache::ReferenceTable::BuildArchiveReferences(
     const uint32_t& kLargestArchiveId, const std::vector<uint32_t>& kIds,
     openrs::common::io::Buffer<>& data) {
   this->archive_references_.clear();
-  this->archive_references_.resize(kLargestArchiveId);
+  this->archive_references_.resize(kLargestArchiveId + 1, ArchiveReference());
 
   if (this->archive_references_.size() == 0)
   {
