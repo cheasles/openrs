@@ -130,7 +130,6 @@ bool openrs::cache::MainIndex::PopulateIndexMetadata(const uint32_t& kIndexId,
   index.set_whirlpool(whirlpool);
 
   cache::Archive archive(index_data);
-  auto reference_table = std::make_shared<cache::ReferenceTable>(archive.data());
-  index.set_reference_table(reference_table);
+  index.set_reference_table(std::move(cache::ReferenceTable(archive.data())));
   return true;
 }

@@ -58,7 +58,7 @@ void SendUKeys(openrs::net::Client* client)
         {
             const auto& store = cache->GetStore(index);
             ukeys_data_packet_buffer.PutData(store.crc());
-            ukeys_data_packet_buffer.PutData(store.reference_table()->revision());
+            ukeys_data_packet_buffer.PutData(store.reference_table().revision());
             ukeys_data_packet_buffer.insert(ukeys_data_packet_buffer.cend(),
                 store.whirlpool().cbegin(), store.whirlpool().cend());
         }

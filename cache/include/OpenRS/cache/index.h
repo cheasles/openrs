@@ -21,7 +21,7 @@ class Index {
   std::weak_ptr<std::ifstream> index_stream_;
 
   uint32_t crc_;
-  std::shared_ptr<openrs::cache::ReferenceTable> reference_table_;
+  openrs::cache::ReferenceTable reference_table_;
   std::array<uint8_t, 64> whirlpool_;
 
   static const uint32_t kIdxBlockLength;
@@ -56,7 +56,7 @@ class Index {
   }
 
   inline void set_reference_table(
-      const std::shared_ptr<openrs::cache::ReferenceTable>& reference_table) {
+      const openrs::cache::ReferenceTable& reference_table) {
     this->reference_table_ = reference_table;
   }
 
