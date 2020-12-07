@@ -2,25 +2,28 @@
 
 #include <algorithm>
 
-int32_t ReadSmartInt(openrs::common::io::Buffer<>& data) {
-  char* flag_ptr = nullptr;
-  if (!data.GetData(&flag_ptr)) {
-    throw std::runtime_error("Failed to read reference table protocol.");
-  }
-
-  if (*flag_ptr < 0) {
-    int32_t* value_ptr = nullptr;
-    if (!data.GetData(&value_ptr)) {
-      throw std::runtime_error("Failed to read reference table data.");
-    }
-    return *value_ptr & 0x7FFFFFFF;
-  } else {
+int32_t ReadBigSmart(openrs::common::io::Buffer<>& data) {
+  // TODO: Handle clients < 670 (Just return unsigned short).
+  const auto kFlag = static_cast<int8_t>(
+      (static_cast<int8_t>(data.at(data.position())) ^ 0xFFFFFFFF));
+  if (kFlag <= -1) {
     int16_t* value_ptr = nullptr;
     if (!data.GetData(&value_ptr)) {
       throw std::runtime_error("Failed to read reference table data.");
     }
-    return *value_ptr;
+
+    if (::be16toh(*value_ptr) == 32767) {
+      return -1;
+    }
+
+    return ::be16toh(*value_ptr);
   }
+
+  int32_t* value_ptr = nullptr;
+  if (!data.GetData(&value_ptr)) {
+    throw std::runtime_error("Failed to read reference table data.");
+  }
+  return ::be32toh(*value_ptr) & 0x7FFFFFFF;
 }
 
 openrs::cache::ReferenceTable::ReferenceTable()
@@ -55,7 +58,7 @@ openrs::cache::ReferenceTable::ReferenceTable(
 
   std::vector<uint32_t> ids;
   if (this->protocol_ >= 7) {
-    int count = ReadSmartInt(data);
+    int32_t count = ReadBigSmart(data);
     ids.resize(count);
   } else {
     uint16_t* count_ptr = nullptr;
@@ -68,9 +71,9 @@ openrs::cache::ReferenceTable::ReferenceTable(
   uint32_t last_archive_id = 0;
   uint32_t largest_archive_id = 0;
   for (size_t i = 0; i < ids.size(); ++i) {
-    int delta = 0;
+    int32_t delta = 0;
     if (this->protocol_ >= 7) {
-      delta = ReadSmartInt(data);
+      delta = ReadBigSmart(data);
     } else {
       uint16_t* delta_ptr = nullptr;
       if (!data.GetData(&delta_ptr)) {
@@ -94,8 +97,7 @@ void openrs::cache::ReferenceTable::BuildArchiveReferences(
   this->archive_references_.clear();
   this->archive_references_.resize(kLargestArchiveId + 1, ArchiveReference());
 
-  if (this->archive_references_.size() == 0)
-  {
+  if (this->archive_references_.size() == 0) {
     return;
   }
 
