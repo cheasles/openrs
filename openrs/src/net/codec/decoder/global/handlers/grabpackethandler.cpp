@@ -19,9 +19,9 @@ bool PackCacheData(const uint8_t& kIndexId, const uint32_t& kArchiveId,
                    openrs::net::io::Buffer& cache_data, openrs::net::io::Buffer* output)
 {
     output->PutData(kIndexId);
-    output->PutData(::htobe32(kArchiveId));
+    output->PutDataBE(kArchiveId);
     output->PutData(kSettings);
-    output->PutData(::htobe32(kRealLength));
+    output->PutDataBE(kRealLength);
     uint8_t* cache_data_data_ptr = nullptr;
     for (uint32_t i = 0; i < cache_data.size(); ++i)
     {
@@ -57,8 +57,8 @@ void SendUKeys(openrs::net::Client* client)
         try
         {
             const auto& store = cache->GetStore(index);
-            ukeys_data_packet_buffer.PutData(store.crc());
-            ukeys_data_packet_buffer.PutData(store.reference_table().revision());
+            ukeys_data_packet_buffer.PutDataBE(store.crc());
+            ukeys_data_packet_buffer.PutDataBE(store.reference_table().revision());
             ukeys_data_packet_buffer.insert(ukeys_data_packet_buffer.cend(),
                 store.whirlpool().cbegin(), store.whirlpool().cend());
         }
@@ -86,8 +86,10 @@ void SendUKeys(openrs::net::Client* client)
     const auto encrypted_hash_int = rsa_function.ApplyFunction(
         CryptoPP::Integer(ukeys_hash.data(), ukeys_hash.size()));
     std::vector<uint8_t> encrypted_hash;
-    encrypted_hash.resize(encrypted_hash_int.MinEncodedSize());
-    encrypted_hash_int.Encode(encrypted_hash.data(), encrypted_hash.size());
+    // Prefix encrypted hash with zero.
+    encrypted_hash.resize(encrypted_hash_int.MinEncodedSize() + 1);
+    encrypted_hash[0] = 0;
+    encrypted_hash_int.Encode(encrypted_hash.data() + 1, encrypted_hash.size() - 1);
     ukeys_data_packet_buffer.insert(ukeys_data_packet_buffer.cend(),
         encrypted_hash.cbegin(), encrypted_hash.cend());
 
@@ -168,10 +170,10 @@ void openrs::net::codec::decoder::global::handlers::GrabPacketHandler::Handle(
             settings |= 0x80;
 
         io::Buffer cache_data_packet_buffer;
-        cache_data_packet_buffer.PutData(*index_id_ptr);
-        cache_data_packet_buffer.PutData(*archive_id_ptr);
-        cache_data_packet_buffer.PutData(settings);
-        cache_data_packet_buffer.PutData(*cache_data_length_ptr);
+        cache_data_packet_buffer.PutDataBE(*index_id_ptr);
+        cache_data_packet_buffer.PutDataBE(*archive_id_ptr);
+        cache_data_packet_buffer.PutDataBE(settings);
+        cache_data_packet_buffer.PutDataBE(*cache_data_length_ptr);
         uint32_t real_length = *cache_data_compression_ptr == 0
                                 ? ::be32toh(*cache_data_length_ptr) + 4
                                 : ::be32toh(*cache_data_length_ptr);
