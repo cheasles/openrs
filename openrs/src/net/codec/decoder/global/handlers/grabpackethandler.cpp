@@ -127,7 +127,23 @@ void openrs::net::codec::decoder::global::handlers::GrabPacketHandler::Handle(
             << "Client " << client->socket().getSocketId()
             << " requested cache"
             << " index: " << std::to_string(*index_id_ptr)
-            << " archive: " << ::be32toh(*archive_id_ptr);
+            << " archive: " << ::be32toh(*archive_id_ptr)
+            << " priority: " << std::to_string(*priority_ptr);
+
+        switch (*priority_ptr) {
+            case 2:
+            case 3:
+                continue;
+            case 4:
+                common::Log(common::Log::LogLevel::kDebug)
+                    << "Client " << client->socket().getSocketId()
+                    << " requested unsupported priority "
+                    << std::to_string(*priority_ptr);
+                continue;
+            case 7:
+                client->set_status(ClientStatus::kDisconnected);
+                return;
+        }
 
         if (::be32toh(*archive_id_ptr) == 255 && *index_id_ptr == 255)
         {
