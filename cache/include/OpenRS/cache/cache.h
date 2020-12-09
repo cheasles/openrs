@@ -44,6 +44,8 @@ public:
     {
         return static_cast<uint32_t>(this->indexes_.size());
     }
+
+    inline const auto& main_index() const { return this->main_index_; }
 };
 
 }  // namespace cache

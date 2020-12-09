@@ -29,9 +29,12 @@ bool openrs::manager::cache::CacheManager::Init()
     return true;
 }
 
-bool openrs::manager::cache::CacheManager::GetArchiveData(const uint32_t& kStoreId,
+bool openrs::manager::cache::CacheManager::GetArchiveData(const uint32_t& kIndexId,
     const uint32_t& kArchiveId, std::vector<uint8_t>* output) const
 {
-    const auto& store = this->cache_->GetStore(kStoreId);
+    if (kIndexId == 255) {
+        return this->cache_->main_index().GetArchiveData(kArchiveId, output);
+    }
+    const auto& store = this->cache_->GetStore(kIndexId);
     return store.GetArchiveData(kArchiveId, output);
 }
