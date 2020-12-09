@@ -81,6 +81,17 @@ void openrs::net::Reactor::DoAccept(const std::shared_ptr<io::CallbackChannel>&)
         throw std::runtime_error("Could not determine the peer name to accept a client.");
     }
 
+    {
+        const std::lock_guard<std::mutex> lock(this->clients_mutex_);
+        if (this->clients_.find(socket.getSocketId()) != this->clients_.cend())
+        {
+            openrs::common::Log(openrs::common::Log::LogLevel::kWarning)
+                << "Accepted client with the same ID as an existing client, id "
+                << socket.getSocketId();
+            return;
+        }
+    }
+
     openrs::common::Log(openrs::common::Log::LogLevel::kInfo)
         << "Accepted client from " << inet_ntoa(addr.sin_addr)
         << ", id " << socket.getSocketId();
