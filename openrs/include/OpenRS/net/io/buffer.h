@@ -79,6 +79,25 @@ public:
         return this->PutData(data);
     }
 
+    template <typename Type>
+    bool PutDataLE(Type data)
+    {
+        switch (sizeof(Type))
+        {
+        case sizeof(uint16_t):
+            data = ::htole16(data);
+            break;
+        case sizeof(uint32_t):
+            data = ::htole32(data);
+            break;
+        case sizeof(uint64_t):
+            data = ::htole64(data);
+            break;
+        }
+
+        return this->PutData(data);
+    }
+
     inline void ClearOldData()
     {
         this->erase(this->cbegin(),

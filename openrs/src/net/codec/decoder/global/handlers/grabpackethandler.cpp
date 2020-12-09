@@ -190,10 +190,10 @@ void openrs::net::codec::decoder::global::handlers::GrabPacketHandler::Handle(
             settings |= 0x80;
 
         io::Buffer cache_data_packet_buffer;
-        cache_data_packet_buffer.PutDataBE(*index_id_ptr);
-        cache_data_packet_buffer.PutDataBE(*archive_id_ptr);
-        cache_data_packet_buffer.PutDataBE(settings);
-        cache_data_packet_buffer.PutDataBE(*cache_data_length_ptr);
+        cache_data_packet_buffer.PutDataLE(*index_id_ptr);
+        cache_data_packet_buffer.PutDataLE(*archive_id_ptr);
+        cache_data_packet_buffer.PutDataLE(settings);
+        cache_data_packet_buffer.PutDataLE(*cache_data_length_ptr);
         uint32_t real_length = *cache_data_compression_ptr != 0
                                 ? ::be32toh(*cache_data_length_ptr) + 4
                                 : ::be32toh(*cache_data_length_ptr);
