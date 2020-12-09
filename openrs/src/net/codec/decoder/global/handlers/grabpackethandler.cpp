@@ -132,13 +132,13 @@ void openrs::net::codec::decoder::global::handlers::GrabPacketHandler::Handle(
             << " priority: " << std::to_string(*priority_ptr);
 
         switch (*priority_ptr) {
+            case 0:
+                break;
             case 1:
                 priority = true;
                 break;
-            case 2:
-            case 3:
-                continue;
             case 4:
+                // TODO: Set XOR encryption value from this packet.
                 common::Log(common::Log::LogLevel::kDebug)
                     << "Client " << client->socket().getSocketId()
                     << " requested unsupported priority "
@@ -147,6 +147,8 @@ void openrs::net::codec::decoder::global::handlers::GrabPacketHandler::Handle(
             case 7:
                 client->set_status(ClientStatus::kDisconnected);
                 return;
+            default:
+                continue;
         }
 
         if (::be32toh(*archive_id_ptr) == 255 && *index_id_ptr == 255)
