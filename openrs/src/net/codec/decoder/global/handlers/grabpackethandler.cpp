@@ -32,7 +32,7 @@ bool PackCacheData(const uint8_t& kIndexId, const uint32_t& kArchiveId,
             return false;
         }
         if (output->size() % 512 == 0)
-            output->PutData(255);
+            output->PutData(static_cast<uint8_t>(255));
         output->PutData(*cache_data_data_ptr);
     }
 
@@ -210,7 +210,7 @@ void openrs::net::codec::decoder::global::handlers::GrabPacketHandler::Handle(
                 return;
             }
             if (cache_data_packet_buffer.size() % 512 == 0)
-                cache_data_packet_buffer.PutData(255);
+                cache_data_packet_buffer.PutData(static_cast<uint8_t>(255));
             cache_data_packet_buffer.PutData(*cache_data_data_ptr);
         }
         Packet cache_data_packet;
