@@ -194,7 +194,7 @@ void openrs::net::codec::decoder::global::handlers::GrabPacketHandler::Handle(
         cache_data_packet_buffer.PutDataBE(*archive_id_ptr);
         cache_data_packet_buffer.PutDataBE(settings);
         cache_data_packet_buffer.PutDataBE(*cache_data_length_ptr);
-        uint32_t real_length = *cache_data_compression_ptr == 0
+        uint32_t real_length = *cache_data_compression_ptr != 0
                                 ? ::be32toh(*cache_data_length_ptr) + 4
                                 : ::be32toh(*cache_data_length_ptr);
 
