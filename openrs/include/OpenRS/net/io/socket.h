@@ -3,6 +3,7 @@
 #include <inttypes.h>
 #include <sys/time.h>
 
+#include <chrono>
 #include <vector>
 
 namespace openrs
@@ -52,16 +53,19 @@ public:
 class DataSocket : public BaseSocket
 {
 private:
-    struct timeval last_active_;
+    std::chrono::high_resolution_clock::time_point last_active_;
 
 public:
     DataSocket(int socketId)
         : BaseSocket(socketId)
+        , last_active_(std::chrono::high_resolution_clock::now())
     {}
 
     std::size_t getMessageData(std::vector<uint8_t>* output);
     void putMessageData(const std::vector<uint8_t>& data);
     void putMessageClose();
+
+    inline const auto& last_active() const { return this->last_active_; }
 };
 
 // A server socket that listens on a port for a connection

@@ -143,7 +143,9 @@ std::size_t openrs::net::io::DataSocket::getMessageData(std::vector<uint8_t>* ou
         data_read += get;
     }
 
-    ::gettimeofday(&this->last_active_, nullptr);
+    if (data_read > 0) {
+        this->last_active_ = std::chrono::high_resolution_clock::now();
+    }
     return data_read;
 }
 
@@ -198,7 +200,7 @@ void openrs::net::io::DataSocket::putMessageData(const std::vector<uint8_t>& dat
 
     if (dataWritten > 0)
     {
-        ::gettimeofday(&this->last_active_, nullptr);
+        this->last_active_ = std::chrono::high_resolution_clock::now();
     }
 
     return;

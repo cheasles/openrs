@@ -5,6 +5,7 @@
 #include <sys/epoll.h>
 #include <arpa/inet.h>
 
+#include <chrono>
 #include <cstring>
 #include <iostream>
 #include <stdexcept>
@@ -46,6 +47,26 @@ void openrs::net::Reactor::Poll()
             }
         }
     }
+
+    // Check for timeouts.
+    const auto kCurrentTime = std::chrono::high_resolution_clock::now();
+
+    {
+      const std::lock_guard<std::mutex> lock(this->clients_mutex_);
+      std::vector<std::shared_ptr<openrs::net::Client>> timed_out;
+      for (const auto& client : this->clients_) {
+        const auto kTimeDiff =
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                kCurrentTime - client.second->socket().last_active()).count();
+        if (kTimeDiff >= kDefaultTimeout) {
+          client.second->set_status(ClientStatus::kDisconnected);
+          timed_out.push_back(client.second);
+        }
+      }
+      for (const auto& client : timed_out) {
+        this->ClientDisconnect(client);
+      }
+    }
 }
 
 void openrs::net::Reactor::DoAccept(const std::shared_ptr<io::CallbackChannel>&)
@@ -61,7 +82,8 @@ void openrs::net::Reactor::DoAccept(const std::shared_ptr<io::CallbackChannel>&)
     }
 
     openrs::common::Log(openrs::common::Log::LogLevel::kInfo)
-        << "Accepted client from " << inet_ntoa(addr.sin_addr);
+        << "Accepted client from " << inet_ntoa(addr.sin_addr)
+        << ", id " << socket.getSocketId();
 
     auto client = std::make_shared<Client>();
     auto client_channel = std::make_shared<io::ClientChannel>();
@@ -73,7 +95,10 @@ void openrs::net::Reactor::DoAccept(const std::shared_ptr<io::CallbackChannel>&)
         return;
     }
 
-    this->clients_[socket.getSocketId()] = client;
+    {
+        const std::lock_guard<std::mutex> lock(this->clients_mutex_);
+        this->clients_[socket.getSocketId()] = client;
+    }
     client->set_socket(socket);
 }
 
@@ -102,21 +127,8 @@ void openrs::net::Reactor::DoReadWrite(
 
     if (client->status() == ClientStatus::kDisconnected)
     {
-        struct sockaddr_in addr;
-        socklen_t addr_len = sizeof(addr);
-        if (0 < ::getpeername(client->socket().getSocketId(), reinterpret_cast<struct sockaddr*>(&addr), &addr_len))
-        {
-            openrs::common::Log(openrs::common::Log::LogLevel::kInfo)
-                << "Client "<< inet_ntoa(addr.sin_addr) << " disconnected.";
-        }
-
-        openrs::common::Log(openrs::common::Log::LogLevel::kDebug)
-            << "  Sent: "<< client->bytes_sent();
-        openrs::common::Log(openrs::common::Log::LogLevel::kDebug)
-            << "  Recv: "<< client->bytes_received();
-
-        this->epoll_.RemovePollEvent(client->socket().getSocketId());
-        this->clients_.erase(client->socket().getSocketId());
+        const std::lock_guard<std::mutex> lock(this->clients_mutex_);
+        this->ClientDisconnect(client);
     }
     else if (client->HasOutput())
     {
@@ -126,4 +138,18 @@ void openrs::net::Reactor::DoReadWrite(
                 << "Could not queue output for client.";
         }
     }
+}
+
+void openrs::net::Reactor::ClientDisconnect(
+    const std::shared_ptr<Client>& client)
+{
+    openrs::common::Log(openrs::common::Log::LogLevel::kInfo)
+        << "Client "<< client->socket().getSocketId() << " disconnected.";
+    openrs::common::Log(openrs::common::Log::LogLevel::kDebug)
+        << "  Sent: "<< client->bytes_sent();
+    openrs::common::Log(openrs::common::Log::LogLevel::kDebug)
+        << "  Recv: "<< client->bytes_received();
+
+    this->epoll_.RemovePollEvent(client->socket().getSocketId());
+    this->clients_.erase(client->socket().getSocketId());
 }
