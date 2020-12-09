@@ -185,7 +185,7 @@ void openrs::net::codec::decoder::global::handlers::GrabPacketHandler::Handle(
         }
 
         uint8_t settings = *cache_data_compression_ptr;
-        if (priority)
+        if (!priority)
             // com.rs.net.encoders.GrabPacketsEncoder.getArchivePacketData(int, int, boolean)
             settings |= 0x80;
 
