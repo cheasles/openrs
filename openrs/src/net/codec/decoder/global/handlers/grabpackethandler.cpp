@@ -200,8 +200,6 @@ void openrs::net::codec::decoder::global::handlers::GrabPacketHandler::Handle(
                                 ? ::be32toh(*cache_data_length_ptr) + 4
                                 : ::be32toh(*cache_data_length_ptr);
 
-        common::Log(common::Log::LogLevel::kDebug)
-            << "Real cache length " << real_length;
         uint8_t* cache_data_data_ptr = nullptr;
         for (uint32_t i = 0; i < real_length; ++i)
         {
