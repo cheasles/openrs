@@ -116,6 +116,7 @@ void openrs::net::codec::decoder::global::handlers::GrabPacketHandler::Handle(
         uint8_t* priority_ptr = nullptr;
         uint8_t* index_id_ptr = nullptr;
         uint32_t* archive_id_ptr = nullptr;
+        bool priority = false;
         if (!packet.data.GetData(&priority_ptr) ||
             !packet.data.GetData(&index_id_ptr) ||
             !packet.data.GetData(&archive_id_ptr))
@@ -131,6 +132,9 @@ void openrs::net::codec::decoder::global::handlers::GrabPacketHandler::Handle(
             << " priority: " << std::to_string(*priority_ptr);
 
         switch (*priority_ptr) {
+            case 1:
+                priority = true;
+                break;
             case 2:
             case 3:
                 continue;
@@ -181,7 +185,7 @@ void openrs::net::codec::decoder::global::handlers::GrabPacketHandler::Handle(
         }
 
         uint8_t settings = *cache_data_compression_ptr;
-        if (*priority_ptr)
+        if (priority)
             // com.rs.net.encoders.GrabPacketsEncoder.getArchivePacketData(int, int, boolean)
             settings |= 0x80;
 
