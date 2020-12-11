@@ -13,10 +13,6 @@
 openrs::net::io::BaseSocket::BaseSocket(int socketId)
     : socketId(socketId)
 {
-    if (socketId == -1)
-    {
-        throw std::runtime_error("invalid socket id");
-    }
 }
 
 openrs::net::io::BaseSocket::~BaseSocket()

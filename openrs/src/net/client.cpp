@@ -8,7 +8,7 @@
 
 openrs::net::Client::Client()
     : status_(ClientStatus::kConnected)
-    , socket_(0)
+    , socket_(openrs::net::io::BaseSocket::kInvalidSocketId)
     , client_build_(0)
     , bytes_received_(0)
     , bytes_sent_(0)

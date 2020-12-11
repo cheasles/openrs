@@ -23,7 +23,7 @@ class BaseSocket
 private:
     int     socketId;
 
-protected:
+public:
     static constexpr int kInvalidSocketId = -1;
 
 protected:
