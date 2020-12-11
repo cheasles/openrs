@@ -5,16 +5,13 @@
 #include "OpenRS/cache/filestore.h"
 #include "OpenRS/cache/referencetable.h"
 
-namespace openrs
-{
+namespace openrs {
 
-namespace cache
-{
+namespace cache {
 
-class Container
-{
-public:
-    Container(openrs::cache::FileStore&& store);
+class Container {
+ public:
+  Container(openrs::cache::FileStore&& store);
 };
 
 }  // namespace cache

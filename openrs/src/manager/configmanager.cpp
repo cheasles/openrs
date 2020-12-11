@@ -1,54 +1,49 @@
 #include "OpenRS/manager/configmanager.h"
 
 #include <iomanip>
-
 #include <nlohmann/json.hpp>
 
 #include "Common/log.h"
 
-const std::string openrs::manager::ConfigManager::kDefaultConfigPath = "../data/config.json";
+const std::string openrs::manager::ConfigManager::kDefaultConfigPath =
+    "../data/config.json";
 
-bool openrs::manager::ConfigManager::Init()
-{
-    std::ifstream input_config(this->config_path_);
-    try
-    {
-        input_config >> this->json_config_;
-    }
-    catch (const nlohmann::detail::parse_error& ex)
-    {
-        common::Log(common::Log::LogLevel::kWarning)
-            << "[ConfigManager] Failed to parse config file, using defaults: "
-            << ex.what();
-        this->GenerateDefaultConfig();
-        return true;
-    }
-
-    common::Log(common::Log::LogLevel::kInfo)
-        << "[ConfigManager] Loaded " << this->json_config_.size()
-        << " config entries.";
+bool openrs::manager::ConfigManager::Init() {
+  std::ifstream input_config(this->config_path_);
+  try {
+    input_config >> this->json_config_;
+  } catch (const nlohmann::detail::parse_error& ex) {
+    common::Log(common::Log::LogLevel::kWarning)
+        << "[ConfigManager] Failed to parse config file, using defaults: "
+        << ex.what();
+    this->GenerateDefaultConfig();
     return true;
+  }
+
+  common::Log(common::Log::LogLevel::kInfo)
+      << "[ConfigManager] Loaded " << this->json_config_.size()
+      << " config entries.";
+  return true;
 }
 
-void openrs::manager::ConfigManager::GenerateDefaultConfig()
-{
-    this->json_config_.clear();
-    this->json_config_["logging"]["level"] = 0;
-    this->json_config_["network"]["ip_address"] = "0.0.0.0";
-    this->json_config_["network"]["port"] = 43594;
-    this->json_config_["grab"]["private_exponent"] =
-        "9577634011115533732134402962763417888862610179158224522858675069799671"
-        "3454019354716577077577558156976177994479837760989691356438974879647293"
-        "0641775555181875673276597933314314211532039319149338585268573964280522"
-        "6692650786060316670508430284574031017830600140077767059195846665363727"
-        "5131498866778592148380588481";
-    this->json_config_["grab"]["modulus"] =
-        "1195553312609955304946273221916548166131554766126038171030796899259954"
-        "0226345789589082914809341413534242080728782003241745842876349656560597"
-        "0163936696811485500553506743979521465489801746973392901885588777462023"
-        "1652524839884318774110218164450587065976074532801660451229719600036298"
-        "60919338852061972113876035333";
+void openrs::manager::ConfigManager::GenerateDefaultConfig() {
+  this->json_config_.clear();
+  this->json_config_["logging"]["level"] = 0;
+  this->json_config_["network"]["ip_address"] = "0.0.0.0";
+  this->json_config_["network"]["port"] = 43594;
+  this->json_config_["grab"]["private_exponent"] =
+      "9577634011115533732134402962763417888862610179158224522858675069799671"
+      "3454019354716577077577558156976177994479837760989691356438974879647293"
+      "0641775555181875673276597933314314211532039319149338585268573964280522"
+      "6692650786060316670508430284574031017830600140077767059195846665363727"
+      "5131498866778592148380588481";
+  this->json_config_["grab"]["modulus"] =
+      "1195553312609955304946273221916548166131554766126038171030796899259954"
+      "0226345789589082914809341413534242080728782003241745842876349656560597"
+      "0163936696811485500553506743979521465489801746973392901885588777462023"
+      "1652524839884318774110218164450587065976074532801660451229719600036298"
+      "60919338852061972113876035333";
 
-    std::ofstream output_config(this->config_path_);
-    output_config << std::setw(4) << this->json_config_ << std::endl;
+  std::ofstream output_config(this->config_path_);
+  output_config << std::setw(4) << this->json_config_ << std::endl;
 }

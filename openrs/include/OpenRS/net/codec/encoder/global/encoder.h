@@ -1,40 +1,31 @@
 #pragma once
 
+#include <frozen/map.h>
 #include <stdint.h>
 
 #include <map>
 
-#include <frozen/map.h>
-
 #include "OpenRS/net/codec/packet.h"
 #include "OpenRS/net/io/buffer.h"
 
-namespace openrs
-{
+namespace openrs {
 
-namespace net
-{
+namespace net {
 
-namespace codec
-{
+namespace codec {
 
-namespace encoder
-{
+namespace encoder {
 
-namespace global
-{
+namespace global {
 
-class Encoder
-{
-private:
-    static constexpr frozen::map<PacketType, uint8_t, 1> code_mapping_
-    {
-        {PacketType::kClientOutdated, 6}
-    };
+class Encoder {
+ private:
+  static constexpr frozen::map<PacketType, uint8_t, 1> code_mapping_{
+      {PacketType::kClientOutdated, 6}};
 
-public:
-    virtual bool Encode(const openrs::net::codec::Packet& packet,
-        openrs::net::io::Buffer* buffer);
+ public:
+  virtual bool Encode(const openrs::net::codec::Packet& packet,
+                      openrs::net::io::Buffer* buffer);
 };
 
 }  // namespace global

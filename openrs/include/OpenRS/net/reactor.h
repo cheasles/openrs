@@ -7,45 +7,42 @@
 #include <mutex>
 
 #include "OpenRS/net/client.h"
-#include "OpenRS/net/io/socket.h"
 #include "OpenRS/net/io/epoll.h"
+#include "OpenRS/net/io/socket.h"
 
-namespace openrs
-{
+namespace openrs {
 
-namespace net
-{
+namespace net {
 
-class Reactor
-{
-private:
+class Reactor {
+ private:
+  /**
+   * The default port to use to listen for connections.
+   */
+  static constexpr int kDefaultPort = 43594;
 
-    /**
-     * The default port to use to listen for connections.
-     */
-    static constexpr int kDefaultPort = 43594;
+  /**
+   * The amount of time in ms to wait before timing out a client.
+   */
+  static constexpr int kDefaultTimeout = 500;
 
-    /**
-     * The amount of time in ms to wait before timing out a client.
-     */
-    static constexpr int kDefaultTimeout = 500;
+  openrs::net::io::ServerSocket socket_;
+  openrs::net::io::EPoll<> epoll_;
 
-    openrs::net::io::ServerSocket socket_;
-    openrs::net::io::EPoll<> epoll_;
+  std::mutex clients_mutex_;
+  std::map<int, std::shared_ptr<openrs::net::Client>> clients_;
 
-    std::mutex clients_mutex_;
-    std::map<int, std::shared_ptr<openrs::net::Client>> clients_;
+ public:
+  Reactor();
 
-public:
-    Reactor();
+  void Poll();
 
-    void Poll();
+  void DoAccept(const std::shared_ptr<io::CallbackChannel>&);
 
-    void DoAccept(const std::shared_ptr<io::CallbackChannel>&);
+  void DoReadWrite(const std::shared_ptr<io::CallbackChannel>&,
+                   std::shared_ptr<Client>&);
 
-    void DoReadWrite(const std::shared_ptr<io::CallbackChannel>&, std::shared_ptr<Client>&);
-
-    void ClientDisconnect(const std::shared_ptr<Client>& client);
+  void ClientDisconnect(const std::shared_ptr<Client>& client);
 };
 
 }  // namespace net

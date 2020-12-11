@@ -4,17 +4,13 @@
 
 #include "Common/singleton.h"
 
-namespace openrs
-{
+namespace openrs {
 
-namespace manager
-{
+namespace manager {
 
-class Manager
-{
-public:
-    virtual bool Init() = 0;
-
+class Manager {
+ public:
+  virtual bool Init() = 0;
 };
 
 }  // namespace manager

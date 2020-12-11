@@ -1,42 +1,33 @@
 #pragma once
 
+#include <frozen/map.h>
 #include <stdint.h>
 
 #include <map>
 
-#include <frozen/map.h>
-
+#include "OpenRS/net/codec/encoder/global/encoder.h"
 #include "OpenRS/net/codec/packet.h"
 #include "OpenRS/net/io/buffer.h"
-#include "OpenRS/net/codec/encoder/global/encoder.h"
 
-namespace openrs
-{
+namespace openrs {
 
-namespace net
-{
+namespace net {
 
-namespace codec
-{
+namespace codec {
 
-namespace encoder
-{
+namespace encoder {
 
-namespace global
-{
+namespace global {
 
-class GrabEncoder : public Encoder
-{
-private:
-    static constexpr frozen::map<PacketType, uint8_t, 2> code_mapping_
-    {
-        {PacketType::kStartUp, 0},
-        {PacketType::kGrabCache, static_cast<uint8_t>(PacketOpCode::kNone)}
-    };
+class GrabEncoder : public Encoder {
+ private:
+  static constexpr frozen::map<PacketType, uint8_t, 2> code_mapping_{
+      {PacketType::kStartUp, 0},
+      {PacketType::kGrabCache, static_cast<uint8_t>(PacketOpCode::kNone)}};
 
-public:
-    bool Encode(const openrs::net::codec::Packet& packet,
-        openrs::net::io::Buffer* buffer) override;
+ public:
+  bool Encode(const openrs::net::codec::Packet& packet,
+              openrs::net::io::Buffer* buffer) override;
 };
 
 }  // namespace global

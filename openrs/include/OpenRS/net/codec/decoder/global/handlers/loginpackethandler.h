@@ -6,14 +6,12 @@
 #include <vector>
 
 #include "OpenRS/net/client.h"
-#include "OpenRS/net/codec/packet.h"
 #include "OpenRS/net/codec/decoder/global/handlers/packethandler.h"
+#include "OpenRS/net/codec/packet.h"
 
-namespace openrs
-{
+namespace openrs {
 
-namespace net
-{
+namespace net {
 
 class Client;
 
@@ -21,29 +19,22 @@ class Client;
 
 }  // namespace openrs
 
-namespace openrs
-{
+namespace openrs {
 
-namespace net
-{
+namespace net {
 
-namespace codec
-{
+namespace codec {
 
-namespace decoder
-{
+namespace decoder {
 
-namespace global
-{
+namespace global {
 
-namespace handlers
-{
+namespace handlers {
 
-class LoginPacketHandler : public PacketHandler
-{
-public:
-    void Handle(openrs::net::codec::Packet& packet,
-        openrs::net::Client* client) override;
+class LoginPacketHandler : public PacketHandler {
+ public:
+  void Handle(openrs::net::codec::Packet& packet,
+              openrs::net::Client* client) override;
 };
 
 }  // namespace handlers

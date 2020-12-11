@@ -4,45 +4,38 @@
 
 #include "OpenRS/net/io/buffer.h"
 
-namespace openrs
-{
+namespace openrs {
 
-namespace net
-{
+namespace net {
 
-namespace codec
-{
+namespace codec {
 
-enum struct PacketType : uint8_t
-{
-    kUnknown,
-    kHandshake,
-    kLogin,
-    kLoginWorld,
-    kLoginLobby,
-    kClientOutdated,
-    kStartUp,
-    kGrabCache,
-    kServerShuttingDown,
+enum struct PacketType : uint8_t {
+  kUnknown,
+  kHandshake,
+  kLogin,
+  kLoginWorld,
+  kLoginLobby,
+  kClientOutdated,
+  kStartUp,
+  kGrabCache,
+  kServerShuttingDown,
 };
 
-enum struct PacketOpCode : uint8_t
-{
-    kNone = 255,
-    kUnknown = 0,
+enum struct PacketOpCode : uint8_t {
+  kNone = 255,
+  kUnknown = 0,
 };
 
-struct Packet
-{
-    PacketType type;
-    openrs::net::io::Buffer data;
+struct Packet {
+  PacketType type;
+  openrs::net::io::Buffer data;
 
-private:
-    template <typename Type>
-    bool GetObjectFromOffset(const std::size_t& offset, Type* output)
-    {
-        return false;
-    }
+ private:
+  template <typename Type>
+  bool GetObjectFromOffset(const std::size_t& offset, Type* output) {
+    return false;
+  }
 };
 
 }  // namespace codec

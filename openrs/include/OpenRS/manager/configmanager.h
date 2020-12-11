@@ -5,40 +5,31 @@
 #include <nlohmann/json.hpp>
 
 #include "Common/singleton.h"
-
 #include "OpenRS/manager/manager.h"
 #include "OpenRS/net/io/buffer.h"
 
-namespace openrs
-{
+namespace openrs {
 
-namespace manager
-{
+namespace manager {
 
-class ConfigManager
-    : public openrs::manager::Manager
-    , public openrs::common::Singleton<ConfigManager>
-{
-private:
-    static const std::string kDefaultConfigPath;
+class ConfigManager : public openrs::manager::Manager,
+                      public openrs::common::Singleton<ConfigManager> {
+ private:
+  static const std::string kDefaultConfigPath;
 
-    std::string config_path_;
-    nlohmann::json json_config_;
+  std::string config_path_;
+  nlohmann::json json_config_;
 
-public:
-    ConfigManager(void)
-        : config_path_(kDefaultConfigPath)
-    { }
-    ConfigManager(std::string config_path)
-        : config_path_(config_path)
-    { }
+ public:
+  ConfigManager(void) : config_path_(kDefaultConfigPath) {}
+  ConfigManager(std::string config_path) : config_path_(config_path) {}
 
-    bool Init() override;
+  bool Init() override;
 
-    void GenerateDefaultConfig();
+  void GenerateDefaultConfig();
 
-    inline const auto& config() const { return this->json_config_; }
-    auto operator [](std::string key) const { return config()[key]; }
+  inline const auto& config() const { return this->json_config_; }
+  auto operator[](std::string key) const { return config()[key]; }
 };
 
 }  // namespace manager

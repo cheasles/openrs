@@ -1,22 +1,18 @@
 #pragma once
 
-namespace openrs
-{
+namespace openrs {
 
-namespace common
-{
+namespace common {
 
-template<typename Type>
-class Singleton
-{
-public:
-    virtual ~Singleton() { }
+template <typename Type>
+class Singleton {
+ public:
+  virtual ~Singleton() {}
 
-    static Type& get()
-    {
-        static Type object;
-        return object;
-    }
+  static Type& get() {
+    static Type object;
+    return object;
+  }
 };
 
 }  // namespace common
