@@ -1,4 +1,4 @@
-#include "OpenRS/net/codec/decoder/global/handlers/grabpackethandler.h"
+#include "OpenRS/net/codec/handler/global/grabpackethandler.h"
 
 #include <common/io/buffer.h>
 #include <endian.h>
@@ -101,7 +101,7 @@ void SendUKeys(openrs::net::Client* client) {
   client->Send(cache_data_packet);
 }
 
-void openrs::net::codec::decoder::global::handlers::GrabPacketHandler::Handle(
+void openrs::net::codec::handler::global::GrabPacketHandler::Handle(
     openrs::net::codec::Packet& packet, openrs::net::Client* client) {
   while (packet.data.position() != packet.data.size()) {
     uint8_t* priority_ptr = nullptr;

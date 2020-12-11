@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "OpenRS/net/client.h"
+#include "OpenRS/net/codec/handler/global/packethandler.h"
 #include "OpenRS/net/codec/packet.h"
 
 namespace openrs {
@@ -24,29 +25,19 @@ namespace net {
 
 namespace codec {
 
-namespace decoder {
+namespace handler {
 
 namespace global {
 
-namespace handlers {
-
-class PacketHandler {
+class LoginPacketHandler : public PacketHandler {
  public:
-  virtual void Handle(openrs::net::codec::Packet& packet,
-                      openrs::net::Client* client);
-
-  virtual std::vector<openrs::net::codec::PacketType> HandledTypes() const {
-    return {
-        openrs::net::codec::PacketType::kHandshake,
-    };
-  };
+  void Handle(openrs::net::codec::Packet& packet,
+              openrs::net::Client* client) override;
 };
-
-}  // namespace handlers
 
 }  // namespace global
 
-}  // namespace decoder
+}  // namespace handler
 
 }  // namespace codec
 

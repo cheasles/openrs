@@ -6,7 +6,7 @@
 #include <memory>
 
 #include "OpenRS/net/codec/decoder/global/decoder.h"
-#include "OpenRS/net/codec/decoder/global/handlers/packethandler.h"
+#include "OpenRS/net/codec/handler/global/packethandler.h"
 #include "OpenRS/net/codec/encoder/global/encoder.h"
 #include "OpenRS/net/io/socket.h"
 
@@ -16,19 +16,15 @@ namespace net {
 
 namespace codec {
 
-namespace decoder {
+namespace handler {
 
 namespace global {
 
-namespace handlers {
-
 class PacketHandler;
-
-}  // namespace handlers
 
 }  // namespace global
 
-}  // namespace decoder
+}  // namespace handler
 
 }  // namespace codec
 
@@ -54,7 +50,7 @@ class Client {
   io::DataSocket socket_;
 
   std::unique_ptr<openrs::net::codec::decoder::global::Decoder> decoder_;
-  std::unique_ptr<openrs::net::codec::decoder::global::handlers::PacketHandler>
+  std::unique_ptr<openrs::net::codec::handler::global::PacketHandler>
       packet_handler_;
   std::unique_ptr<openrs::net::codec::encoder::global::Encoder> encoder_;
 
@@ -97,7 +93,7 @@ class Client {
 
   inline void SetHandler(
       std::unique_ptr<
-          openrs::net::codec::decoder::global::handlers::PacketHandler>&&
+          openrs::net::codec::handler::global::PacketHandler>&&
           handler) {
     this->packet_handler_ = std::move(handler);
   }
@@ -114,7 +110,7 @@ class Client {
 
   inline void ResetHandler() {
     this->packet_handler_ = std::make_unique<
-        openrs::net::codec::decoder::global::handlers::PacketHandler>();
+        openrs::net::codec::handler::global::PacketHandler>();
   }
 
   inline ClientStatus status() const { return this->status_; }

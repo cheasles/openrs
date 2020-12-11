@@ -1,4 +1,4 @@
-#include "OpenRS/net/codec/decoder/global/handlers/packethandler.h"
+#include "OpenRS/net/codec/handler/global/packethandler.h"
 
 #include <common/io/buffer.h>
 #include <endian.h>
@@ -7,14 +7,14 @@
 
 #include "OpenRS/manager/cache/grabmanager.h"
 #include "OpenRS/net/codec/decoder/global/grabdecoder.h"
-#include "OpenRS/net/codec/decoder/global/handlers/grabpackethandler.h"
-#include "OpenRS/net/codec/decoder/global/handlers/loginpackethandler.h"
+#include "OpenRS/net/codec/handler/global/grabpackethandler.h"
+#include "OpenRS/net/codec/handler/global/loginpackethandler.h"
 #include "OpenRS/net/codec/decoder/global/logindecoder.h"
 #include "OpenRS/net/codec/encoder/global/grabencoder.h"
 #include "OpenRS/net/codec/encoder/global/loginencoder.h"
 #include "common/log.h"
 
-void openrs::net::codec::decoder::global::handlers::PacketHandler::Handle(
+void openrs::net::codec::handler::global::PacketHandler::Handle(
     openrs::net::codec::Packet& packet, openrs::net::Client* client) {
   if (PacketType::kHandshake == packet.type &&
       client->status() == ClientStatus::kConnected) {
@@ -49,9 +49,9 @@ void openrs::net::codec::decoder::global::handlers::PacketHandler::Handle(
     client->set_status(ClientStatus::kDownloadingCache);
 
     // Make sure the next packets are handled correctly.
-    client->SetDecoder(std::make_unique<GrabDecoder>());
+    client->SetDecoder(std::make_unique<decoder::global::GrabDecoder>());
     client->SetEncoder(std::make_unique<encoder::global::GrabEncoder>());
-    client->SetHandler(std::make_unique<GrabPacketHandler>());
+    client->SetHandler(std::make_unique<handler::global::GrabPacketHandler>());
 
     // Send the grab data back to the client.
     common::io::Buffer<> buffer;
@@ -66,9 +66,9 @@ void openrs::net::codec::decoder::global::handlers::PacketHandler::Handle(
     client->set_status(ClientStatus::kLoggingIn);
 
     // Make sure the next packets are handled correctly.
-    client->SetDecoder(std::make_unique<LoginDecoder>());
+    client->SetDecoder(std::make_unique<decoder::global::LoginDecoder>());
     client->SetEncoder(std::make_unique<encoder::global::LoginEncoder>());
-    client->SetHandler(std::make_unique<LoginPacketHandler>());
+    client->SetHandler(std::make_unique<handler::global::LoginPacketHandler>());
 
     Packet login_packet;
     login_packet.type = PacketType::kStartUp;
