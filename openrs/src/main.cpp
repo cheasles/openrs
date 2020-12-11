@@ -25,21 +25,26 @@ int main() {
     return 1;
   }
 
-  openrs::net::Reactor reactor;
+  try {
+    openrs::net::Reactor reactor;
 
-  while (!quit) {
-    gettimeofday(&start, NULL);
+    while (!quit) {
+      gettimeofday(&start, NULL);
 
-    reactor.Poll();
+      reactor.Poll();
 
-    // Sleep until the next cycle.
-    gettimeofday(&end, NULL);
-    seconds = end.tv_sec - start.tv_sec;
-    useconds = end.tv_usec - start.tv_usec;
-    mtime = ((seconds)*1000 + useconds / 1000.0) + 0.5;
-    if (mtime <= kTickRate) {
-      usleep((kTickRate - mtime) * 1000);
+      // Sleep until the next cycle.
+      gettimeofday(&end, NULL);
+      seconds = end.tv_sec - start.tv_sec;
+      useconds = end.tv_usec - start.tv_usec;
+      mtime = ((seconds)*1000 + useconds / 1000.0) + 0.5;
+      if (mtime <= kTickRate) {
+        usleep((kTickRate - mtime) * 1000);
+      }
     }
+  } catch (const std::runtime_error& ex) {
+    std::cerr << "Failed to bind to port:" << ex.what() << std::endl;
+    return 1;
   }
 
   return 0;
