@@ -18,9 +18,12 @@ enum struct PacketType : uint8_t
     kUnknown,
     kHandshake,
     kLogin,
+    kLoginWorld,
+    kLoginLobby,
     kClientOutdated,
     kStartUp,
     kGrabCache,
+    kServerShuttingDown,
 };
 
 enum struct PacketOpCode : uint8_t

@@ -1,4 +1,4 @@
-#include "OpenRS/net/codec/decoder/global/decoder.h"
+#include "OpenRS/net/codec/decoder/global/logindecoder.h"
 
 #include <iostream>
 
@@ -7,9 +7,9 @@
 #include "OpenRS/net/codec/packet.h"
 
 constexpr frozen::map<uint8_t, openrs::net::codec::PacketType, 3>
-    openrs::net::codec::decoder::global::Decoder::code_mapping_;
+    openrs::net::codec::decoder::global::LoginDecoder::code_mapping_;
 
-bool openrs::net::codec::decoder::global::Decoder::Decode(openrs::net::io::Buffer& buffer,
+bool openrs::net::codec::decoder::global::LoginDecoder::Decode(openrs::net::io::Buffer& buffer,
     openrs::net::codec::Packet* packet)
 {
     if (!packet)
@@ -22,8 +22,8 @@ bool openrs::net::codec::decoder::global::Decoder::Decode(openrs::net::io::Buffe
         return false;
     }
 
-    const auto kPacketType = Decoder::code_mapping_.find(buffer.at(0));
-    if (Decoder::code_mapping_.cend() == kPacketType)
+    const auto kPacketType = LoginDecoder::code_mapping_.find(buffer.at(0));
+    if (LoginDecoder::code_mapping_.cend() == kPacketType)
     {
         common::Log(common::Log::LogLevel::kWarning)
             << "Invalid packet code: " << std::to_string(buffer.at(0));

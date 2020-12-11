@@ -9,8 +9,11 @@
 #include "OpenRS/net/io/buffer.h"
 #include "OpenRS/manager/cache/grabmanager.h"
 #include "OpenRS/net/codec/decoder/global/grabdecoder.h"
+#include "OpenRS/net/codec/decoder/global/logindecoder.h"
 #include "OpenRS/net/codec/decoder/global/handlers/grabpackethandler.h"
+#include "OpenRS/net/codec/decoder/global/handlers/loginpackethandler.h"
 #include "OpenRS/net/codec/encoder/global/grabencoder.h"
+#include "OpenRS/net/codec/encoder/global/loginencoder.h"
 
 void openrs::net::codec::decoder::global::handlers::PacketHandler::Handle(
     openrs::net::codec::Packet& packet,
@@ -66,10 +69,18 @@ void openrs::net::codec::decoder::global::handlers::PacketHandler::Handle(
         client->Send(grab_packet);
     }
     else if (PacketType::kLogin == packet.type &&
-        client->status() == ClientStatus::kLoggingIn)
+        client->status() == ClientStatus::kConnected)
     {
-        common::Log(common::Log::LogLevel::kWarning)
-            << "Temp failure";
+        client->set_status(ClientStatus::kLoggingIn);
+
+        // Make sure the next packets are handled correctly.
+        client->SetDecoder(std::make_unique<LoginDecoder>());
+        client->SetEncoder(std::make_unique<encoder::global::LoginEncoder>());
+        client->SetHandler(std::make_unique<LoginPacketHandler>());
+
+        Packet login_packet;
+        login_packet.type = PacketType::kStartUp;
+        client->Send(login_packet);
     }
     else
     {
