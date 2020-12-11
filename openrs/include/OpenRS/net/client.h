@@ -1,5 +1,6 @@
 #pragma once
 
+#include <common/io/buffer.h>
 #include <sys/epoll.h>
 
 #include <memory>
@@ -7,7 +8,6 @@
 #include "OpenRS/net/codec/decoder/global/decoder.h"
 #include "OpenRS/net/codec/decoder/global/handlers/packethandler.h"
 #include "OpenRS/net/codec/encoder/global/encoder.h"
-#include "OpenRS/net/io/buffer.h"
 #include "OpenRS/net/io/socket.h"
 
 namespace openrs {
@@ -58,8 +58,8 @@ class Client {
       packet_handler_;
   std::unique_ptr<openrs::net::codec::encoder::global::Encoder> encoder_;
 
-  openrs::net::io::Buffer buffer_input_;
-  openrs::net::io::Buffer buffer_output_;
+  openrs::common::io::Buffer<> buffer_input_;
+  openrs::common::io::Buffer<> buffer_output_;
 
   std::size_t bytes_received_;
   std::size_t bytes_sent_;
@@ -75,10 +75,10 @@ class Client {
   void Read();
   void Write();
 
-  void Send(const openrs::net::io::Buffer& buffer);
+  void Send(const openrs::common::io::Buffer<>& buffer);
 
   inline void Send(const openrs::net::codec::Packet& packet) {
-    openrs::net::io::Buffer buffer;
+    openrs::common::io::Buffer<> buffer;
     this->encoder_->Encode(packet, &buffer);
     this->Send(buffer);
   }

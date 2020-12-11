@@ -2,7 +2,7 @@
 
 #include <iterator>
 
-#include "Common/ifstream.h"
+#include "common/ifstream.h"
 
 const uint32_t openrs::cache::FileStore::kIdxBlockLength = 6;
 const uint32_t openrs::cache::FileStore::kHeaderLength = 8;

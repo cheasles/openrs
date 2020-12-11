@@ -1,11 +1,11 @@
 #pragma once
 
+#include <common/io/buffer.h>
 #include <frozen/set.h>
 #include <inttypes.h>
 
-#include "Common/singleton.h"
 #include "OpenRS/manager/manager.h"
-#include "OpenRS/net/io/buffer.h"
+#include "common/singleton.h"
 
 namespace openrs {
 
@@ -22,7 +22,7 @@ class GrabManager : public openrs::manager::Manager,
       150,   7416,   266,   15,    119620, 153189, 493,  436};
 
  public:
-  inline static void WriteKeysToBuffer(openrs::net::io::Buffer* buffer) {
+  inline static void WriteKeysToBuffer(openrs::common::io::Buffer<>* buffer) {
     for (const auto key : GrabManager::kGrabKeys) {
       buffer->PutDataBE<uint32_t>(key);
     }

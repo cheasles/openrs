@@ -10,10 +10,10 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "Common/log.h"
 #include "OpenRS/net/client.h"
 #include "OpenRS/net/io/channel.h"
 #include "OpenRS/net/io/socket.h"
+#include "common/log.h"
 
 constexpr int openrs::net::Reactor::kDefaultPort;
 

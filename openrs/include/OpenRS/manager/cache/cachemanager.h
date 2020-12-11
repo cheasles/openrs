@@ -5,9 +5,9 @@
 #include <memory>
 #include <string>
 
-#include "Common/singleton.h"
 #include "OpenRS/cache/cache.h"
 #include "OpenRS/manager/manager.h"
+#include "common/singleton.h"
 
 namespace openrs {
 

@@ -5,7 +5,7 @@
 #include "OpenRS/net/codec/packet.h"
 
 bool openrs::net::codec::decoder::global::GrabDecoder::Decode(
-    openrs::net::io::Buffer& buffer, openrs::net::codec::Packet* packet) {
+    openrs::common::io::Buffer<>& buffer, openrs::net::codec::Packet* packet) {
   if (!packet) {
     return false;
   }

@@ -2,8 +2,8 @@
 
 #include <sys/socket.h>
 
-#include "Common/log.h"
 #include "OpenRS/net/codec/packet.h"
+#include "common/log.h"
 
 openrs::net::Client::Client()
     : status_(ClientStatus::kConnected),
@@ -59,7 +59,7 @@ void openrs::net::Client::Write() {
   this->buffer_output_.clear();
 }
 
-void openrs::net::Client::Send(const openrs::net::io::Buffer& buffer) {
+void openrs::net::Client::Send(const openrs::common::io::Buffer<>& buffer) {
   this->buffer_output_.insert(this->buffer_output_.cend(), buffer.cbegin(),
                               buffer.cend());
 }

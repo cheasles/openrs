@@ -1,12 +1,12 @@
 #pragma once
 
+#include <common/io/buffer.h>
 #include <frozen/map.h>
 #include <stdint.h>
 
 #include <map>
 
 #include "OpenRS/net/codec/packet.h"
-#include "OpenRS/net/io/buffer.h"
 
 namespace openrs {
 
@@ -27,7 +27,7 @@ class Decoder {
   };
 
  public:
-  virtual bool Decode(openrs::net::io::Buffer& buffer,
+  virtual bool Decode(openrs::common::io::Buffer<>& buffer,
                       openrs::net::codec::Packet* packet);
 };
 

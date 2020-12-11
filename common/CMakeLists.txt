@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.1)
-set(PROJECT_SUBNAME Common)
+set(PROJECT_SUBNAME common)
 project (${CMAKE_PROJECT_NAME}-${PROJECT_SUBNAME})
 
 # Add source files

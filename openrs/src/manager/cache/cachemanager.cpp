@@ -3,9 +3,9 @@
 #include <iostream>
 #include <limits>
 
-#include "Common/log.h"
 #include "OpenRS/cache/cache.h"
 #include "OpenRS/cache/filestore.h"
+#include "common/log.h"
 
 const std::string openrs::manager::cache::CacheManager::kCachePath =
     "../data/cache/";

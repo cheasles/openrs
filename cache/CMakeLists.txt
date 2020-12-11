@@ -32,6 +32,6 @@ target_include_directories (
 find_package(LibLZMA)
 target_link_libraries(${PROJECT_NAME}
     ${LIBLZMA_LIBRARIES}
-    ${CMAKE_PROJECT_NAME}-Common
+    ${CMAKE_PROJECT_NAME}-common
     cryptopp-static)
 

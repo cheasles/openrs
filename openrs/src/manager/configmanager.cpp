@@ -3,7 +3,7 @@
 #include <iomanip>
 #include <nlohmann/json.hpp>
 
-#include "Common/log.h"
+#include "common/log.h"
 
 const std::string openrs::manager::ConfigManager::kDefaultConfigPath =
     "../data/config.json";

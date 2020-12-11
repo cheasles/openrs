@@ -4,9 +4,9 @@
 
 #include <iterator>
 
-#include "Common/crc.h"
-#include "Common/ifstream.h"
 #include "OpenRS/cache/archive.h"
+#include "common/crc.h"
+#include "common/ifstream.h"
 
 const uint32_t openrs::cache::Index::kIdxBlockLength = 6;
 const uint32_t openrs::cache::Index::kHeaderLength = 8;

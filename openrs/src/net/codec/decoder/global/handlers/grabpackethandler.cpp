@@ -1,5 +1,6 @@
 #include "OpenRS/net/codec/decoder/global/handlers/grabpackethandler.h"
 
+#include <common/io/buffer.h>
 #include <endian.h>
 #include <integer.h>
 #include <rsa.h>
@@ -7,16 +8,15 @@
 
 #include <string>
 
-#include "Common/log.h"
 #include "OpenRS/manager/cache/cachemanager.h"
 #include "OpenRS/manager/cache/grabmanager.h"
 #include "OpenRS/manager/configmanager.h"
-#include "OpenRS/net/io/buffer.h"
+#include "common/log.h"
 
 bool PackCacheData(const uint8_t& kIndexId, const uint32_t& kArchiveId,
                    const uint8_t& kSettings, const uint32_t& kRealLength,
-                   openrs::net::io::Buffer& cache_data,
-                   openrs::net::io::Buffer* output) {
+                   openrs::common::io::Buffer<>& cache_data,
+                   openrs::common::io::Buffer<>* output) {
   output->PutData(kIndexId);
   output->PutDataBE(kArchiveId);
   output->PutData(kSettings);
@@ -36,7 +36,7 @@ bool PackCacheData(const uint8_t& kIndexId, const uint32_t& kArchiveId,
 }
 
 void SendUKeys(openrs::net::Client* client) {
-  openrs::net::io::Buffer ukeys_data_packet_buffer;
+  openrs::common::io::Buffer<> ukeys_data_packet_buffer;
   const auto& cache = openrs::manager::cache::CacheManager::get().cache();
 
   if (cache->GetTypeCount() >
@@ -88,7 +88,7 @@ void SendUKeys(openrs::net::Client* client) {
                                   encrypted_hash.cend());
 
   // Send the result to the client.
-  openrs::net::io::Buffer packet_buffer;
+  openrs::common::io::Buffer<> packet_buffer;
   if (!PackCacheData(255, 255, 0,
                      static_cast<uint32_t>(ukeys_data_packet_buffer.size()),
                      ukeys_data_packet_buffer, &packet_buffer)) {
@@ -145,7 +145,7 @@ void openrs::net::codec::decoder::global::handlers::GrabPacketHandler::Handle(
       continue;
     }
 
-    io::Buffer cache_data;
+    common::io::Buffer<> cache_data;
     try {
       const auto& store = openrs::manager::cache::CacheManager::get();
       if (!store.GetArchiveData(*index_id_ptr, ::be32toh(*archive_id_ptr),
@@ -179,7 +179,7 @@ void openrs::net::codec::decoder::global::handlers::GrabPacketHandler::Handle(
       // boolean)
       settings |= 0x80;
 
-    io::Buffer cache_data_packet_buffer;
+    common::io::Buffer<> cache_data_packet_buffer;
     cache_data_packet_buffer.PutDataLE(*index_id_ptr);
     cache_data_packet_buffer.PutDataLE(*archive_id_ptr);
     cache_data_packet_buffer.PutDataLE(settings);

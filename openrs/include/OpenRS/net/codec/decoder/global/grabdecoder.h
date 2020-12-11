@@ -1,5 +1,6 @@
 #pragma once
 
+#include <common/io/buffer.h>
 #include <frozen/map.h>
 #include <stdint.h>
 
@@ -7,7 +8,6 @@
 
 #include "OpenRS/net/codec/decoder/global/decoder.h"
 #include "OpenRS/net/codec/packet.h"
-#include "OpenRS/net/io/buffer.h"
 
 namespace openrs {
 
@@ -21,7 +21,7 @@ namespace global {
 
 class GrabDecoder : public Decoder {
  public:
-  bool Decode(openrs::net::io::Buffer& buffer,
+  bool Decode(openrs::common::io::Buffer<>& buffer,
               openrs::net::codec::Packet* packet) override;
 };
 

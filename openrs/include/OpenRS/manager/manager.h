@@ -2,7 +2,7 @@
 
 #include <inttypes.h>
 
-#include "Common/singleton.h"
+#include "common/singleton.h"
 
 namespace openrs {
 

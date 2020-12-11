@@ -9,8 +9,8 @@
 #include <string>
 #include <vector>
 
-#include "Common/ifstream.h"
 #include "OpenRS/cache/referencetable.h"
+#include "common/ifstream.h"
 
 namespace openrs {
 namespace cache {

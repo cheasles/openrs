@@ -1,12 +1,12 @@
 #pragma once
 
+#include <common/io/buffer.h>
 #include <frozen/map.h>
 #include <stdint.h>
 
 #include <map>
 
 #include "OpenRS/net/codec/packet.h"
-#include "OpenRS/net/io/buffer.h"
 
 namespace openrs {
 
@@ -25,7 +25,7 @@ class Encoder {
 
  public:
   virtual bool Encode(const openrs::net::codec::Packet& packet,
-                      openrs::net::io::Buffer* buffer);
+                      openrs::common::io::Buffer<>* buffer);
 };
 
 }  // namespace global

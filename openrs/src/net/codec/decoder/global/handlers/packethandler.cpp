@@ -1,10 +1,10 @@
 #include "OpenRS/net/codec/decoder/global/handlers/packethandler.h"
 
+#include <common/io/buffer.h>
 #include <endian.h>
 
 #include <string>
 
-#include "Common/log.h"
 #include "OpenRS/manager/cache/grabmanager.h"
 #include "OpenRS/net/codec/decoder/global/grabdecoder.h"
 #include "OpenRS/net/codec/decoder/global/handlers/grabpackethandler.h"
@@ -12,7 +12,7 @@
 #include "OpenRS/net/codec/decoder/global/logindecoder.h"
 #include "OpenRS/net/codec/encoder/global/grabencoder.h"
 #include "OpenRS/net/codec/encoder/global/loginencoder.h"
-#include "OpenRS/net/io/buffer.h"
+#include "common/log.h"
 
 void openrs::net::codec::decoder::global::handlers::PacketHandler::Handle(
     openrs::net::codec::Packet& packet, openrs::net::Client* client) {
@@ -54,7 +54,7 @@ void openrs::net::codec::decoder::global::handlers::PacketHandler::Handle(
     client->SetHandler(std::make_unique<GrabPacketHandler>());
 
     // Send the grab data back to the client.
-    io::Buffer buffer;
+    common::io::Buffer<> buffer;
     manager::cache::GrabManager::WriteKeysToBuffer(&buffer);
 
     Packet grab_packet;

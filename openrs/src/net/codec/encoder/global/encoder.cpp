@@ -2,14 +2,15 @@
 
 #include <iostream>
 
-#include "Common/log.h"
 #include "OpenRS/net/codec/packet.h"
+#include "common/log.h"
 
 constexpr frozen::map<openrs::net::codec::PacketType, uint8_t, 1>
     openrs::net::codec::encoder::global::Encoder::code_mapping_;
 
 bool openrs::net::codec::encoder::global::Encoder::Encode(
-    const openrs::net::codec::Packet& packet, openrs::net::io::Buffer* buffer) {
+    const openrs::net::codec::Packet& packet,
+    openrs::common::io::Buffer<>* buffer) {
   if (!buffer) {
     return false;
   }
