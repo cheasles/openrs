@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <arpa/inet.h>
 
 #include <cstring>
 #include <stdexcept>
@@ -86,30 +87,6 @@ openrs::net::io::BaseSocket& openrs::net::io::BaseSocket::operator=(BaseSocket&&
 {
     move.swap(*this);
     return *this;
-}
-
-openrs::net::io::DataSocket openrs::net::io::ServerSocket::accept()
-{
-    if (getSocketId() == kInvalidSocketId)
-    {
-        throw std::logic_error("accept called on a bad socket object (this object was moved)");
-    }
-
-    struct  sockaddr_storage    serverStorage;
-    socklen_t                   addr_size   = sizeof serverStorage;
-    int newSocket = ::accept(getSocketId(), (struct sockaddr*)&serverStorage, &addr_size);
-    if (newSocket == -1)
-    {
-        throw std::runtime_error("accept");
-    }
-
-    // Configure the socket for asynchronous operation.
-    if (fcntl(newSocket, F_SETFL, O_NONBLOCK) == -1)
-    {
-        throw std::runtime_error("fcntl");
-    }
-
-    return DataSocket(newSocket);
 }
 
 std::size_t openrs::net::io::DataSocket::getMessageData(std::vector<uint8_t>* output)
@@ -210,22 +187,24 @@ void openrs::net::io::DataSocket::putMessageClose()
     }
 }
 
+openrs::net::io::ConnectSocket::ConnectSocket(std::string const& host, int port)
+    : DataSocket(::socket(PF_INET, SOCK_STREAM, 0))
+{
+    struct sockaddr_in serverAddr{};
+    serverAddr.sin_family       = AF_INET;
+    serverAddr.sin_port         = htons(port);
+    serverAddr.sin_addr.s_addr  = inet_addr(host.c_str());
+
+    if (::connect(getSocketId(), (struct sockaddr*)&serverAddr, sizeof(serverAddr)) != 0)
+    {
+        this->close();
+        throw std::runtime_error(std::string("connect: ") + strerror(errno));
+    }
+}
+
 openrs::net::io::ServerSocket::ServerSocket(int port)
     : BaseSocket(::socket(PF_INET, SOCK_STREAM, 0))
 {
-    // Configure the socket for asynchronous operation.
-    if (fcntl(getSocketId(), F_SETFL, O_NONBLOCK) == -1) {
-        close();
-        throw std::runtime_error("fcntl");
-    }
-
-    // Set the SO_REUSEADDR flag.
-    int ON = 1, OFF = 0;
-    if (setsockopt(getSocketId(), SOL_SOCKET, SO_REUSEADDR, &ON, sizeof(int)) == -1) {
-        close();
-        throw std::runtime_error("setsockopt");
-    }
-
     struct sockaddr_in serverAddr;
     std::memset((char*)&serverAddr, 0, sizeof(serverAddr));
     serverAddr.sin_family       = AF_INET;
@@ -243,4 +222,28 @@ openrs::net::io::ServerSocket::ServerSocket(int port)
         close();
         throw std::runtime_error("listen");
     }
+}
+
+openrs::net::io::DataSocket openrs::net::io::ServerSocket::accept()
+{
+    if (getSocketId() == kInvalidSocketId)
+    {
+        throw std::logic_error("accept called on a bad socket object (this object was moved)");
+    }
+
+    struct  sockaddr_storage    serverStorage;
+    socklen_t                   addr_size   = sizeof serverStorage;
+    int newSocket = ::accept(getSocketId(), (struct sockaddr*)&serverStorage, &addr_size);
+    if (newSocket == -1)
+    {
+        throw std::runtime_error(std::string("accept: ") + strerror(errno));
+    }
+
+    // Configure the socket for asynchronous operation.
+    if (fcntl(newSocket, F_SETFL, O_NONBLOCK) == -1)
+    {
+        throw std::runtime_error("fcntl");
+    }
+
+    return DataSocket(newSocket);
 }

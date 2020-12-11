@@ -4,6 +4,7 @@
 #include <sys/time.h>
 
 #include <chrono>
+#include <string>
 #include <vector>
 
 namespace openrs
@@ -66,6 +67,14 @@ public:
     void putMessageClose();
 
     inline const auto& last_active() const { return this->last_active_; }
+};
+
+// A class the conects to a remote machine
+// Allows read/write accesses to the remote machine
+class ConnectSocket: public DataSocket
+{
+    public:
+        ConnectSocket(const std::string& host, int port);
 };
 
 // A server socket that listens on a port for a connection
