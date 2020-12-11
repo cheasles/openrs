@@ -62,7 +62,7 @@ class Client {
 
   uint32_t client_build_;
 
-  static constexpr size_t kReadSize = 256;
+  static constexpr size_t kReadSize = 1024;
 
  public:
   Client();
