@@ -120,7 +120,7 @@ public:
             return 0;
         }
 
-        channel_events->resize(kNumberEvents);
+        channel_events->reserve(kNumberEvents);
         for (int i = 0; i < kNumberEvents; ++i)
         {
             auto channel = *static_cast<std::shared_ptr<Channel>*>(
