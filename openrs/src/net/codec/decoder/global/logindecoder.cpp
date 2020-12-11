@@ -27,16 +27,7 @@ bool openrs::net::codec::decoder::global::LoginDecoder::Decode(
 
   packet->type = kPacketType->second;
   if (buffer.size() > 1) {
-    const uint8_t kSize = buffer.at(1);
-
-    const auto cbegin = buffer.cbegin() + sizeof(uint8_t) + sizeof(uint8_t);
-    const auto cend = cbegin + kSize;
-
-    if (cbegin >= buffer.cend() || cend > buffer.cend()) {
-      return false;
-    }
-
-    packet->data.assign(cbegin, cend);
+    packet->data.assign(buffer.cbegin() + sizeof(uint8_t), buffer.cend());
   }
 
   return true;
