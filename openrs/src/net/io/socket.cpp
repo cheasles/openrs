@@ -50,13 +50,9 @@ void openrs::net::io::BaseSocket::close()
     {
         throw std::logic_error("close called on a bad socket object (this object was moved)");
     }
-    while(true)
+
+    if (::close(socketId) != 0)
     {
-        int state = ::close(socketId);
-        if (state == kInvalidSocketId)
-        {
-            break;
-        }
         switch(errno)
         {
             case EBADF: throw std::domain_error("close: EBADF");
