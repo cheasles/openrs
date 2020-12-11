@@ -133,9 +133,14 @@ public:
         return kNumberEvents;
     }
 
-    void RemovePollEvent(const int& socket)
+    void RemovePollEvent(const int& kSocketFileDescriptor)
     {
-        this->channel_map_.erase(socket);
+        this->channel_map_.erase(kSocketFileDescriptor);
+
+        if (0 != ::epoll_ctl(this->file_descriptor_, EPOLL_CTL_DEL, kSocketFileDescriptor, nullptr))
+        {
+            throw std::runtime_error("Could not remove poll event");
+        }
     }
 
     inline int get_file_descriptor() const
