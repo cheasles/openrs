@@ -8,6 +8,7 @@
 
 #include "OpenRS/net/codec/packet.h"
 #include "OpenRS/net/io/buffer.h"
+#include "OpenRS/net/codec/encoder/global/encoder.h"
 
 namespace openrs
 {
@@ -24,17 +25,18 @@ namespace encoder
 namespace global
 {
 
-class Encoder
+class GrabEncoder : public Encoder
 {
 private:
-    static constexpr frozen::map<PacketType, uint8_t, 1> code_mapping_
+    static constexpr frozen::map<PacketType, uint8_t, 2> code_mapping_
     {
-        {PacketType::kClientOutdated, 6}
+        {PacketType::kStartUp, 0},
+        {PacketType::kGrabCache, static_cast<uint8_t>(PacketOpCode::kNone)}
     };
 
 public:
-    virtual bool Encode(const openrs::net::codec::Packet& packet,
-        openrs::net::io::Buffer* buffer);
+    bool Encode(const openrs::net::codec::Packet& packet,
+        openrs::net::io::Buffer* buffer) override;
 };
 
 }  // namespace global

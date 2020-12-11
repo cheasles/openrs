@@ -10,6 +10,7 @@
 #include "OpenRS/manager/cache/grabmanager.h"
 #include "OpenRS/net/codec/decoder/global/grabdecoder.h"
 #include "OpenRS/net/codec/decoder/global/handlers/grabpackethandler.h"
+#include "OpenRS/net/codec/encoder/global/grabencoder.h"
 
 void openrs::net::codec::decoder::global::handlers::PacketHandler::Handle(
     openrs::net::codec::Packet& packet,
@@ -48,10 +49,11 @@ void openrs::net::codec::decoder::global::handlers::PacketHandler::Handle(
         packet.data.GetString(&token);
 
         // Client has been validated.
-        client->set_status(ClientStatus::kLoggingIn);
+        client->set_status(ClientStatus::kDownloadingCache);
 
         // Make sure the next packets are handled correctly.
         client->SetDecoder(std::make_unique<GrabDecoder>());
+        client->SetEncoder(std::make_unique<encoder::global::GrabEncoder>());
         client->SetHandler(std::make_unique<GrabPacketHandler>());
 
         // Send the grab data back to the client.

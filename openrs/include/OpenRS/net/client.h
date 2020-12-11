@@ -54,6 +54,7 @@ enum ClientStatus
 {
     kDisconnected,
     kConnected,
+    kDownloadingCache,
     kLoggingIn,
     kLoggedIn
 };
@@ -104,6 +105,12 @@ public:
         openrs::net::codec::decoder::global::Decoder>&& decoder)
     {
         this->decoder_ = std::move(decoder);
+    }
+
+    inline void SetEncoder(std::unique_ptr<
+        openrs::net::codec::encoder::global::Encoder>&& encoder)
+    {
+        this->encoder_ = std::move(encoder);
     }
 
     inline void SetHandler(std::unique_ptr<
