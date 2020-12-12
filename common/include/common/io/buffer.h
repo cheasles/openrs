@@ -45,7 +45,7 @@ class Buffer : public Container {
     }
 
     char* index = *output;
-    while (index && *index != '\n') {
+    while (index && *index != '\n' && *index != 0) {
       if (!this->GetData<char>(&index)) {
         return false;
       }
