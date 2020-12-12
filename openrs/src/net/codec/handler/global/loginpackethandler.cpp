@@ -42,7 +42,7 @@ void DecodeXTEA(const std::vector<uint32_t>& keys,
 }
 
 void HandleLoginWorld(openrs::net::codec::Packet& packet,
-                      openrs::net::Client* client) {
+                      openrs::net::Session* session) {
   packet.data.seek(std::ios_base::cur, sizeof(uint8_t));
   uint16_t* rsa_block_size_ptr = nullptr;
   if (!packet.data.GetData(&rsa_block_size_ptr)) {
@@ -50,7 +50,7 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
   }
   const uint16_t kRsaBlockSize = ::be16toh(*rsa_block_size_ptr);
   if (kRsaBlockSize > packet.data.remaining()) {
-    client->SendOpCode(openrs::net::codec::PacketType::kErrorSession);
+    session->SendOpCode(openrs::net::codec::PacketType::kErrorSession);
     return;
   }
 
@@ -71,7 +71,7 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
   uint8_t* rsa_block_header_ptr = nullptr;
   if (!decrypted_packet.GetData(&rsa_block_header_ptr) ||
       *rsa_block_header_ptr != 10) {
-    client->SendOpCode(openrs::net::codec::PacketType::kErrorSession);
+    session->SendOpCode(openrs::net::codec::PacketType::kErrorSession);
     return;
   }
 
@@ -80,7 +80,7 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
   for (int i = 0; i < 4; ++i) {
     uint32_t* xtea_key = nullptr;
     if (!decrypted_packet.GetData(&xtea_key)) {
-      client->SendOpCode(openrs::net::codec::PacketType::kErrorSession);
+      session->SendOpCode(openrs::net::codec::PacketType::kErrorSession);
       return;
     }
     xtea_keys.emplace_back(::be32toh(*xtea_key));
@@ -88,14 +88,14 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
 
   uint64_t* rsa_block_ptr = nullptr;
   if (!decrypted_packet.GetData(&rsa_block_ptr) || *rsa_block_ptr != 0) {
-    client->SendOpCode(openrs::net::codec::PacketType::kErrorSession);
+    session->SendOpCode(openrs::net::codec::PacketType::kErrorSession);
     return;
   }
 
   std::string password;
   if (!decrypted_packet.GetString(&password) || password.size() < 3 ||
       password.size() > 30) {
-    client->SendOpCode(openrs::net::codec::PacketType::kErrorInvalidUsername);
+    session->SendOpCode(openrs::net::codec::PacketType::kErrorInvalidUsername);
     return;
   }
 
@@ -106,20 +106,20 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
   uint8_t* username_header_ptr = nullptr;
   if (!decoded_packet.GetData(&username_header_ptr) || *username_header_ptr != 1) {
     // TODO: Handle 'long' usernames for when *username_header_ptr != 1.
-    client->SendOpCode(openrs::net::codec::PacketType::kErrorSession);
+    session->SendOpCode(openrs::net::codec::PacketType::kErrorSession);
     return;
   }
 
   std::string username;
   if (!decoded_packet.GetString(&password)) {
-    client->SendOpCode(openrs::net::codec::PacketType::kErrorInvalidUsername);
+    session->SendOpCode(openrs::net::codec::PacketType::kErrorInvalidUsername);
     return;
   }
 }
 
 void openrs::net::codec::handler::global::LoginPacketHandler::Handle(
-    openrs::net::codec::Packet& packet, openrs::net::Client* client) {
-  client->ResetDecoder();
+    openrs::net::codec::Packet& packet, openrs::net::Session* session) {
+  session->ResetDecoder();
 
   uint16_t* packet_size_ptr = nullptr;
   if (!packet.data.GetData(&packet_size_ptr)) {
@@ -145,17 +145,17 @@ void openrs::net::codec::handler::global::LoginPacketHandler::Handle(
   // Validate the client version is supported.
   switch (kClientBuild) {
     case 718:
-      client->set_client_build(kClientBuild);
+      session->set_client_build(kClientBuild);
       break;
     default:
-      // Client version is not supported.
-      client->ResetEncoder();
-      client->SendOpCode(openrs::net::codec::PacketType::kClientOutdated);
+      // Session version is not supported.
+      session->ResetEncoder();
+      session->SendOpCode(openrs::net::codec::PacketType::kClientOutdated);
       return;
   }
 
   if (PacketType::kLoginWorld == packet.type) {
-    HandleLoginWorld(packet, client);
+    HandleLoginWorld(packet, session);
   } else if (PacketType::kLoginLobby == packet.type) {
   }
 }

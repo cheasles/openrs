@@ -5,7 +5,7 @@
 #include <map>
 #include <vector>
 
-#include "OpenRS/net/client.h"
+#include "OpenRS/net/session.h"
 #include "OpenRS/net/codec/handler/global/packethandler.h"
 #include "OpenRS/net/codec/packet.h"
 
@@ -13,7 +13,7 @@ namespace openrs {
 
 namespace net {
 
-class Client;
+class Session;
 
 }  // namespace net
 
@@ -32,7 +32,7 @@ namespace global {
 class LoginPacketHandler : public PacketHandler {
  public:
   void Handle(openrs::net::codec::Packet& packet,
-              openrs::net::Client* client) override;
+              openrs::net::Session* session) override;
 };
 
 }  // namespace global

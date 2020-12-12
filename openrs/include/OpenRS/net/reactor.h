@@ -6,7 +6,7 @@
 #include <memory>
 #include <mutex>
 
-#include "OpenRS/net/client.h"
+#include "OpenRS/net/session.h"
 #include "OpenRS/net/io/epoll.h"
 #include "OpenRS/net/io/socket.h"
 
@@ -29,8 +29,8 @@ class Reactor {
   openrs::net::io::ServerSocket socket_;
   openrs::net::io::EPoll<> epoll_;
 
-  std::mutex clients_mutex_;
-  std::map<int, std::shared_ptr<openrs::net::Client>> clients_;
+  std::mutex sessions_mutex_;
+  std::map<int, std::shared_ptr<openrs::net::Session>> sessions_;
 
  public:
   Reactor();
@@ -40,9 +40,9 @@ class Reactor {
   void DoAccept(const std::shared_ptr<io::CallbackChannel>&);
 
   void DoReadWrite(const std::shared_ptr<io::CallbackChannel>&,
-                   std::shared_ptr<Client>&);
+                   std::shared_ptr<Session>&);
 
-  void ClientDisconnect(const std::shared_ptr<Client>& client);
+  void SessionDisconnect(const std::shared_ptr<Session>& session);
 };
 
 }  // namespace net

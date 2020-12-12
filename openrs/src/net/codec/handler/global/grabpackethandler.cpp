@@ -35,7 +35,7 @@ bool PackCacheData(const uint8_t& kIndexId, const uint32_t& kArchiveId,
   return true;
 }
 
-void SendUKeys(openrs::net::Client* client) {
+void SendUKeys(openrs::net::Session* session) {
   openrs::common::io::Buffer<> ukeys_data_packet_buffer;
   const auto& cache = openrs::manager::cache::CacheManager::get().cache();
 
@@ -98,11 +98,11 @@ void SendUKeys(openrs::net::Client* client) {
   openrs::net::codec::Packet cache_data_packet;
   cache_data_packet.type = openrs::net::codec::PacketType::kGrabCache;
   cache_data_packet.data = packet_buffer;
-  client->Send(cache_data_packet);
+  session->Send(cache_data_packet);
 }
 
 void openrs::net::codec::handler::global::GrabPacketHandler::Handle(
-    openrs::net::codec::Packet& packet, openrs::net::Client* client) {
+    openrs::net::codec::Packet& packet, openrs::net::Session* session) {
   while (packet.data.position() != packet.data.size()) {
     uint8_t* priority_ptr = nullptr;
     uint8_t* index_id_ptr = nullptr;
@@ -115,7 +115,7 @@ void openrs::net::codec::handler::global::GrabPacketHandler::Handle(
     }
 
     common::Log(common::Log::LogLevel::kDebug)
-        << "Client " << client->socket().getSocketId() << " requested cache"
+        << "Session " << session->socket().getSocketId() << " requested cache"
         << " index: " << std::to_string(*index_id_ptr)
         << " archive: " << ::be32toh(*archive_id_ptr)
         << " priority: " << std::to_string(*priority_ptr);
@@ -129,19 +129,19 @@ void openrs::net::codec::handler::global::GrabPacketHandler::Handle(
       case 4:
         // TODO: Set XOR encryption value from this packet.
         common::Log(common::Log::LogLevel::kDebug)
-            << "Client " << client->socket().getSocketId()
+            << "Session " << session->socket().getSocketId()
             << " requested unsupported priority "
             << std::to_string(*priority_ptr);
         continue;
       case 7:
-        client->set_status(ClientStatus::kDisconnected);
+        session->set_status(SessionStatus::kDisconnected);
         return;
       default:
         continue;
     }
 
     if (::be32toh(*archive_id_ptr) == 255 && *index_id_ptr == 255) {
-      SendUKeys(client);
+      SendUKeys(session);
       continue;
     }
 
@@ -152,7 +152,7 @@ void openrs::net::codec::handler::global::GrabPacketHandler::Handle(
                                 &cache_data)) {
         common::Log(common::Log::LogLevel::kWarning)
             << "Failed to retrieve cache for client "
-            << client->socket().getSocketId();
+            << session->socket().getSocketId();
         continue;
       }
     } catch (const std::runtime_error& ex) {
@@ -202,6 +202,6 @@ void openrs::net::codec::handler::global::GrabPacketHandler::Handle(
     Packet cache_data_packet;
     cache_data_packet.type = PacketType::kGrabCache;
     cache_data_packet.data = cache_data_packet_buffer;
-    client->Send(cache_data_packet);
+    session->Send(cache_data_packet);
   }
 }

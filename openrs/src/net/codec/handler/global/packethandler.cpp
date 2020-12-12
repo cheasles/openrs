@@ -15,9 +15,9 @@
 #include "common/log.h"
 
 void openrs::net::codec::handler::global::PacketHandler::Handle(
-    openrs::net::codec::Packet& packet, openrs::net::Client* client) {
+    openrs::net::codec::Packet& packet, openrs::net::Session* session) {
   if (PacketType::kHandshake == packet.type &&
-      client->status() == ClientStatus::kConnected) {
+      session->status() == SessionStatus::kConnected) {
     int* custom_client_build_ptr = nullptr;
     int* client_build_ptr = nullptr;
 
@@ -31,13 +31,11 @@ void openrs::net::codec::handler::global::PacketHandler::Handle(
     // Validate the client version is supported.
     switch (client_build) {
       case 718:
-        client->set_client_build(client_build);
+        session->set_client_build(client_build);
         break;
       default:
         // Client version is not supported.
-        Packet error_packet;
-        error_packet.type = PacketType::kClientOutdated;
-        client->Send(error_packet);
+        session->SendOpCode(PacketType::kClientOutdated);
         return;
     }
 
@@ -45,13 +43,13 @@ void openrs::net::codec::handler::global::PacketHandler::Handle(
     std::string token;
     packet.data.GetString(&token);
 
-    // Client has been validated.
-    client->set_status(ClientStatus::kDownloadingCache);
+    // Session has been validated.
+    session->set_status(SessionStatus::kDownloadingCache);
 
     // Make sure the next packets are handled correctly.
-    client->SetDecoder(std::make_unique<decoder::global::GrabDecoder>());
-    client->SetEncoder(std::make_unique<encoder::global::GrabEncoder>());
-    client->SetHandler(std::make_unique<handler::global::GrabPacketHandler>());
+    session->SetDecoder(std::make_unique<decoder::global::GrabDecoder>());
+    session->SetEncoder(std::make_unique<encoder::global::GrabEncoder>());
+    session->SetHandler(std::make_unique<handler::global::GrabPacketHandler>());
 
     // Send the grab data back to the client.
     common::io::Buffer<> buffer;
@@ -60,22 +58,20 @@ void openrs::net::codec::handler::global::PacketHandler::Handle(
     Packet grab_packet;
     grab_packet.type = PacketType::kStartUp;
     grab_packet.data = buffer;
-    client->Send(grab_packet);
+    session->Send(grab_packet);
   } else if (PacketType::kLogin == packet.type &&
-             client->status() == ClientStatus::kConnected) {
-    client->set_status(ClientStatus::kLoggingIn);
+             session->status() == SessionStatus::kConnected) {
+    session->set_status(SessionStatus::kLoggingIn);
 
     // Make sure the next packets are handled correctly.
-    client->SetDecoder(std::make_unique<decoder::global::LoginDecoder>());
-    client->SetEncoder(std::make_unique<encoder::global::LoginEncoder>());
-    client->SetHandler(std::make_unique<handler::global::LoginPacketHandler>());
+    session->SetDecoder(std::make_unique<decoder::global::LoginDecoder>());
+    session->SetEncoder(std::make_unique<encoder::global::LoginEncoder>());
+    session->SetHandler(std::make_unique<handler::global::LoginPacketHandler>());
 
-    Packet login_packet;
-    login_packet.type = PacketType::kStartUp;
-    client->Send(login_packet);
+    session->SendOpCode(PacketType::kStartUp);
   } else {
     // Reject all other clients.
-    common::Log(common::Log::LogLevel::kDebug) << "Client force disconnected";
-    client->set_status(ClientStatus::kDisconnected);
+    common::Log(common::Log::LogLevel::kDebug) << "Session force disconnected";
+    session->set_status(SessionStatus::kDisconnected);
   }
 }

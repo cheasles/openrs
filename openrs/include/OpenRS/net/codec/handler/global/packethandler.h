@@ -5,14 +5,14 @@
 #include <map>
 #include <vector>
 
-#include "OpenRS/net/client.h"
+#include "OpenRS/net/session.h"
 #include "OpenRS/net/codec/packet.h"
 
 namespace openrs {
 
 namespace net {
 
-class Client;
+class Session;
 
 }  // namespace net
 
@@ -31,7 +31,7 @@ namespace global {
 class PacketHandler {
  public:
   virtual void Handle(openrs::net::codec::Packet& packet,
-                      openrs::net::Client* client);
+                      openrs::net::Session* session);
 
   virtual std::vector<openrs::net::codec::PacketType> HandledTypes() const {
     return {

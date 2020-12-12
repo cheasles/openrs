@@ -36,7 +36,7 @@ namespace openrs {
 
 namespace net {
 
-enum ClientStatus {
+enum SessionStatus {
   kDisconnected,
   kConnected,
   kDownloadingCache,
@@ -44,9 +44,9 @@ enum ClientStatus {
   kLoggedIn
 };
 
-class Client {
+class Session {
  private:
-  ClientStatus status_;
+  SessionStatus status_;
   io::DataSocket socket_;
 
   std::unique_ptr<openrs::net::codec::decoder::global::Decoder> decoder_;
@@ -65,8 +65,8 @@ class Client {
   static constexpr size_t kReadSize = 1024;
 
  public:
-  Client();
-  ~Client();
+  Session();
+  ~Session();
 
   void Read();
   void Write();
@@ -119,7 +119,7 @@ class Client {
         openrs::net::codec::handler::global::PacketHandler>();
   }
 
-  inline ClientStatus status() const { return this->status_; }
+  inline SessionStatus status() const { return this->status_; }
 
   inline const io::DataSocket& socket() const { return this->socket_; }
 
@@ -133,7 +133,7 @@ class Client {
     this->socket_ = std::move(socket);
   }
 
-  inline void set_status(const ClientStatus& status) { this->status_ = status; }
+  inline void set_status(const SessionStatus& status) { this->status_ = status; }
 
   inline void set_client_build(const uint32_t& client_build) {
     this->client_build_ = client_build;

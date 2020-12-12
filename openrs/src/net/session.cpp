@@ -1,12 +1,12 @@
-#include "OpenRS/net/client.h"
+#include "OpenRS/net/session.h"
 
 #include <sys/socket.h>
 
 #include "OpenRS/net/codec/packet.h"
 #include "common/log.h"
 
-openrs::net::Client::Client()
-    : status_(ClientStatus::kConnected),
+openrs::net::Session::Session()
+    : status_(SessionStatus::kConnected),
       socket_(openrs::net::io::BaseSocket::kInvalidSocketId),
       client_build_(0),
       bytes_received_(0),
@@ -16,15 +16,15 @@ openrs::net::Client::Client()
   this->ResetHandler();
 }
 
-openrs::net::Client::~Client() {}
+openrs::net::Session::~Session() {}
 
-void openrs::net::Client::Read() {
+void openrs::net::Session::Read() {
   std::vector<uint8_t> buffer;
-  buffer.resize(Client::kReadSize);
+  buffer.resize(Session::kReadSize);
 
   int amount_read = this->socket_.getMessageData(&buffer);
   if (-1 == amount_read) {
-    this->status_ = ClientStatus::kDisconnected;
+    this->status_ = SessionStatus::kDisconnected;
     return;
   }
 
@@ -48,7 +48,7 @@ void openrs::net::Client::Read() {
   this->bytes_received_ += amount_read;
 }
 
-void openrs::net::Client::Write() {
+void openrs::net::Session::Write() {
   this->buffer_output_.ClearOldData();
 
   this->bytes_sent_ += this->buffer_output_.size();
@@ -58,7 +58,7 @@ void openrs::net::Client::Write() {
   this->buffer_output_.clear();
 }
 
-void openrs::net::Client::Send(const openrs::common::io::Buffer<>& buffer) {
+void openrs::net::Session::Send(const openrs::common::io::Buffer<>& buffer) {
   this->buffer_output_.insert(this->buffer_output_.cend(), buffer.cbegin(),
                               buffer.cend());
 }

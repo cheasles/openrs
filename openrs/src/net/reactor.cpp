@@ -10,7 +10,7 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "OpenRS/net/client.h"
+#include "OpenRS/net/session.h"
 #include "OpenRS/net/io/channel.h"
 #include "OpenRS/net/io/socket.h"
 #include "common/log.h"
@@ -44,20 +44,20 @@ void openrs::net::Reactor::Poll() {
   const auto kCurrentTime = std::chrono::high_resolution_clock::now();
 
   {
-    const std::lock_guard<std::mutex> lock(this->clients_mutex_);
-    std::vector<std::shared_ptr<openrs::net::Client>> timed_out;
-    for (const auto& client : this->clients_) {
+    const std::lock_guard<std::mutex> lock(this->sessions_mutex_);
+    std::vector<std::shared_ptr<openrs::net::Session>> timed_out;
+    for (const auto& session : this->sessions_) {
       const auto kTimeDiff =
           std::chrono::duration_cast<std::chrono::milliseconds>(
-              kCurrentTime - client.second->socket().last_active())
+              kCurrentTime - session.second->socket().last_active())
               .count();
       if (kTimeDiff >= kDefaultTimeout) {
-        client.second->set_status(ClientStatus::kDisconnected);
-        timed_out.push_back(client.second);
+        session.second->set_status(SessionStatus::kDisconnected);
+        timed_out.push_back(session.second);
       }
     }
-    for (const auto& client : timed_out) {
-      this->ClientDisconnect(client);
+    for (const auto& session : timed_out) {
+      this->SessionDisconnect(session);
     }
   }
 }
@@ -66,7 +66,7 @@ void openrs::net::Reactor::DoAccept(
     const std::shared_ptr<io::CallbackChannel>&) {
   auto socket = this->socket_.accept();
 
-  // Initialize the client.
+  // Initialize the session.
   struct sockaddr_in addr;
   socklen_t addr_len = sizeof(addr);
   if (0 != ::getpeername(socket.getSocketId(),
@@ -77,10 +77,10 @@ void openrs::net::Reactor::DoAccept(
   }
 
   {
-    const std::lock_guard<std::mutex> lock(this->clients_mutex_);
-    if (this->clients_.find(socket.getSocketId()) != this->clients_.cend()) {
+    const std::lock_guard<std::mutex> lock(this->sessions_mutex_);
+    if (this->sessions_.find(socket.getSocketId()) != this->sessions_.cend()) {
       openrs::common::Log(openrs::common::Log::LogLevel::kWarning)
-          << "Accepted client with the same ID as an existing client, id "
+          << "Accepted client with the same ID as an existing session, id "
           << socket.getSocketId();
       return;
     }
@@ -90,11 +90,11 @@ void openrs::net::Reactor::DoAccept(
       << "Accepted client from " << inet_ntoa(addr.sin_addr) << ", id "
       << socket.getSocketId();
 
-  auto client = std::make_shared<Client>();
-  auto client_channel = std::make_shared<io::ClientChannel>();
-  client_channel->set_callback(
-      std::bind(&Reactor::DoReadWrite, this, std::placeholders::_1, client));
-  if (!this->epoll_.AddPollEvent(client_channel, EPOLLIN,
+  auto session = std::make_shared<Session>();
+  auto session_channel = std::make_shared<io::ClientChannel>();
+  session_channel->set_callback(
+      std::bind(&Reactor::DoReadWrite, this, std::placeholders::_1, session));
+  if (!this->epoll_.AddPollEvent(session_channel, EPOLLIN,
                                  socket.getSocketId())) {
     openrs::common::Log(openrs::common::Log::LogLevel::kError)
         << "Failed to add a client.";
@@ -102,52 +102,52 @@ void openrs::net::Reactor::DoAccept(
   }
 
   {
-    const std::lock_guard<std::mutex> lock(this->clients_mutex_);
-    this->clients_[socket.getSocketId()] = client;
+    const std::lock_guard<std::mutex> lock(this->sessions_mutex_);
+    this->sessions_[socket.getSocketId()] = session;
   }
-  client->set_socket(socket);
+  session->set_socket(socket);
 }
 
 void openrs::net::Reactor::DoReadWrite(
     const std::shared_ptr<io::CallbackChannel>& channel,
-    std::shared_ptr<Client>& client) {
+    std::shared_ptr<Session>& session) {
   if ((channel->event() & EPOLLIN) != 0) {
-    client->Read();
+    session->Read();
   }
 
   if ((channel->event() & EPOLLOUT) != 0) {
-    client->Write();
+    session->Write();
 
-    if (!client->HasOutput()) {
+    if (!session->HasOutput()) {
       if (!this->epoll_.UpdatePollEvent(EPOLLIN,
-                                        client->socket().getSocketId())) {
+                                        session->socket().getSocketId())) {
         openrs::common::Log(openrs::common::Log::LogLevel::kError)
             << "Could not queue input for client.";
       }
     }
   }
 
-  if (client->status() == ClientStatus::kDisconnected) {
-    const std::lock_guard<std::mutex> lock(this->clients_mutex_);
-    this->ClientDisconnect(client);
-  } else if (client->HasOutput()) {
+  if (session->status() == SessionStatus::kDisconnected) {
+    const std::lock_guard<std::mutex> lock(this->sessions_mutex_);
+    this->SessionDisconnect(session);
+  } else if (session->HasOutput()) {
     if (!this->epoll_.UpdatePollEvent(EPOLLOUT | EPOLLIN,
-                                      client->socket().getSocketId())) {
+                                      session->socket().getSocketId())) {
       openrs::common::Log(openrs::common::Log::LogLevel::kError)
           << "Could not queue output for client.";
     }
   }
 }
 
-void openrs::net::Reactor::ClientDisconnect(
-    const std::shared_ptr<Client>& client) {
+void openrs::net::Reactor::SessionDisconnect(
+    const std::shared_ptr<Session>& session) {
   openrs::common::Log(openrs::common::Log::LogLevel::kInfo)
-      << "Client " << client->socket().getSocketId() << " disconnected.";
+      << "Client " << session->socket().getSocketId() << " disconnected.";
   openrs::common::Log(openrs::common::Log::LogLevel::kDebug)
-      << "  Sent: " << client->bytes_sent();
+      << "  Sent: " << session->bytes_sent();
   openrs::common::Log(openrs::common::Log::LogLevel::kDebug)
-      << "  Recv: " << client->bytes_received();
+      << "  Recv: " << session->bytes_received();
 
-  this->epoll_.RemovePollEvent(client->socket().getSocketId());
-  this->clients_.erase(client->socket().getSocketId());
+  this->epoll_.RemovePollEvent(session->socket().getSocketId());
+  this->sessions_.erase(session->socket().getSocketId());
 }
