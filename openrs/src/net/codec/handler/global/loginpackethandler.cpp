@@ -23,9 +23,7 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
   }
   const uint16_t kRsaBlockSize = ::be16toh(*rsa_block_size_ptr);
   if (kRsaBlockSize > packet.data.remaining()) {
-    openrs::net::codec::Packet error_packet;
-    error_packet.type = openrs::net::codec::PacketType::kErrorRSA;
-    client->Send(error_packet);
+    client->SendOpCode(openrs::net::codec::PacketType::kErrorRSA);
     return;
   }
 
@@ -46,9 +44,7 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
   uint8_t* rsa_block_header_ptr = nullptr;
   if (!decrypted_packet.GetData(&rsa_block_header_ptr) ||
       *rsa_block_header_ptr != 10) {
-    openrs::net::codec::Packet error_packet;
-    error_packet.type = openrs::net::codec::PacketType::kErrorRSA;
-    client->Send(error_packet);
+    client->SendOpCode(openrs::net::codec::PacketType::kErrorRSA);
     return;
   }
 
@@ -68,18 +64,14 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
 
   uint64_t* rsa_block_ptr = nullptr;
   if (!decrypted_packet.GetData(&rsa_block_ptr) || *rsa_block_ptr != 0) {
-    openrs::net::codec::Packet error_packet;
-    error_packet.type = openrs::net::codec::PacketType::kErrorRSA;
-    client->Send(error_packet);
+    client->SendOpCode(openrs::net::codec::PacketType::kErrorRSA);
     return;
   }
 
   std::string password;
   if (!decrypted_packet.GetString(&password) || password.size() < 3 ||
       password.size() > 30) {
-    openrs::net::codec::Packet error_packet;
-    error_packet.type = openrs::net::codec::PacketType::kErrorInvalidUsername;
-    client->Send(error_packet);
+    client->SendOpCode(openrs::net::codec::PacketType::kErrorInvalidUsername);
     return;
   }
 
@@ -104,9 +96,7 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
     openrs::common::Log(openrs::common::Log::LogLevel::kWarning)
         << "Invalid cipher text from client "
         << std::to_string(client->socket().getSocketId()) << ": " << ex.what();
-    openrs::net::codec::Packet error_packet;
-    error_packet.type = openrs::net::codec::PacketType::kErrorRSA;
-    client->Send(error_packet);
+    client->SendOpCode(openrs::net::codec::PacketType::kErrorRSA);
     return;
   }
 }
@@ -143,10 +133,8 @@ void openrs::net::codec::handler::global::LoginPacketHandler::Handle(
       break;
     default:
       // Client version is not supported.
-      Packet error_packet;
-      error_packet.type = PacketType::kClientOutdated;
       client->ResetEncoder();
-      client->Send(error_packet);
+      client->SendOpCode(openrs::net::codec::PacketType::kClientOutdated);
       return;
   }
 

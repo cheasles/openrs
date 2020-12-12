@@ -79,6 +79,12 @@ class Client {
     this->Send(buffer);
   }
 
+  inline void SendOpCode(const openrs::net::codec::PacketType& opcode) {
+    openrs::net::codec::Packet error_packet;
+    error_packet.type = opcode;
+    this->Send(error_packet);
+  }
+
   inline bool HasOutput() const { return this->buffer_output_.size() != 0; }
 
   inline void SetDecoder(
