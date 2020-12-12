@@ -19,7 +19,7 @@ enum struct PacketType : uint8_t {
   kStartUp,
   kGrabCache,
   kServerShuttingDown,
-  kErrorRSA,
+  kErrorSession,
   kErrorInvalidUsername,
 };
 

@@ -23,7 +23,7 @@ class LoginEncoder : public Encoder {
  private:
   static constexpr frozen::map<PacketType, uint8_t, 4> code_mapping_{
       {PacketType::kStartUp, 0},
-      {PacketType::kErrorRSA, 10},
+      {PacketType::kErrorSession, 10},
       {PacketType::kErrorInvalidUsername, 3},
       {PacketType::kGrabCache, static_cast<uint8_t>(PacketOpCode::kNone)}};
 

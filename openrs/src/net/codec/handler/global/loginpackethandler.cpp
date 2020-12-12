@@ -14,6 +14,33 @@
 #include "OpenRS/manager/configmanager.h"
 #include "common/log.h"
 
+void DecodeXTEA(const std::vector<uint32_t>& keys,
+                openrs::common::io::Buffer<>& input,
+                openrs::common::io::Buffer<>* output) {
+  uint32_t l = input.position();
+  uint32_t i1 =
+      input.remaining() - (input.remaining() % CryptoPP::XTEA::BLOCKSIZE);
+  for (uint32_t j1 = 0; j1 < i1; j1++) {
+    uint32_t* k1_ptr = nullptr;
+    uint32_t* l1_ptr = nullptr;
+    if (!input.GetData(&k1_ptr) || !input.GetData(&l1_ptr)) {
+      return;
+    }
+    uint32_t k1 = ::be32toh(*k1_ptr);
+    uint32_t l1 = ::be32toh(*l1_ptr);
+    uint32_t sum = 0xc6ef3720;
+    uint32_t delta = 0x9e3779b9;
+    for (uint32_t k2 = 32; k2-- > 0;) {
+      l1 -= keys[(sum & 0x1c84) >> 11] + sum ^ (k1 >> 5 ^ k1 << 4) + k1;
+      sum -= delta;
+      k1 -= (l1 >> 5 ^ l1 << 4) + l1 ^ keys[sum & 3] + sum;
+    }
+
+    output->PutDataBE(k1);
+    output->PutDataBE(l1);
+  }
+}
+
 void HandleLoginWorld(openrs::net::codec::Packet& packet,
                       openrs::net::Client* client) {
   packet.data.seek(std::ios_base::cur, sizeof(uint8_t));
@@ -23,7 +50,7 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
   }
   const uint16_t kRsaBlockSize = ::be16toh(*rsa_block_size_ptr);
   if (kRsaBlockSize > packet.data.remaining()) {
-    client->SendOpCode(openrs::net::codec::PacketType::kErrorRSA);
+    client->SendOpCode(openrs::net::codec::PacketType::kErrorSession);
     return;
   }
 
@@ -44,27 +71,24 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
   uint8_t* rsa_block_header_ptr = nullptr;
   if (!decrypted_packet.GetData(&rsa_block_header_ptr) ||
       *rsa_block_header_ptr != 10) {
-    client->SendOpCode(openrs::net::codec::PacketType::kErrorRSA);
+    client->SendOpCode(openrs::net::codec::PacketType::kErrorSession);
     return;
   }
 
-  std::vector<uint8_t> isaac_keys;
-  isaac_keys.reserve(4 * sizeof(uint32_t));
-  if (decrypted_packet.remaining() < 4 * sizeof(uint32_t)) {
-    openrs::net::codec::Packet error_packet;
-    error_packet.type = openrs::net::codec::PacketType::kErrorRSA;
-    client->Send(error_packet);
-    return;
+  std::vector<uint32_t> xtea_keys;
+  xtea_keys.reserve(4 * sizeof(uint32_t));
+  for (int i = 0; i < 4; ++i) {
+    uint32_t* xtea_key = nullptr;
+    if (!decrypted_packet.GetData(&xtea_key)) {
+      client->SendOpCode(openrs::net::codec::PacketType::kErrorSession);
+      return;
+    }
+    xtea_keys.emplace_back(::be32toh(*xtea_key));
   }
-  isaac_keys.insert(isaac_keys.cbegin(),
-                    decrypted_packet.data() + decrypted_packet.position(),
-                    decrypted_packet.data() + decrypted_packet.position() +
-                        4 * sizeof(uint32_t));
-  decrypted_packet.seek(std::ios_base::cur, 4 * sizeof(uint32_t));
 
   uint64_t* rsa_block_ptr = nullptr;
   if (!decrypted_packet.GetData(&rsa_block_ptr) || *rsa_block_ptr != 0) {
-    client->SendOpCode(openrs::net::codec::PacketType::kErrorRSA);
+    client->SendOpCode(openrs::net::codec::PacketType::kErrorSession);
     return;
   }
 
@@ -77,26 +101,18 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
 
   // Decode XTEA block from the packet.
   openrs::common::io::Buffer<> decoded_packet;
-  CryptoPP::AutoSeededRandomPool prng;
-  std::vector<uint8_t> iv;
-  iv.resize(CryptoPP::XTEA::BLOCKSIZE);
-  prng.GenerateBlock(iv.data(), iv.size());
-  CryptoPP::CBC_Mode<CryptoPP::XTEA>::Decryption xtea;
-  xtea.SetKeyWithIV(isaac_keys.data(), isaac_keys.size(), iv.data());
-  try {
-    // Ignore excess bytes.
-    const auto kDecodedPacketSize =
-        packet.data.remaining() -
-        (packet.data.remaining() % CryptoPP::XTEA::BLOCKSIZE);
-    CryptoPP::StringSource encrypted_source(
-        packet.data.data() + packet.data.position(), kDecodedPacketSize, true,
-        new CryptoPP::StreamTransformationFilter(
-            xtea, new CryptoPP::VectorSink(decoded_packet)));
-  } catch (const CryptoPP::InvalidCiphertext& ex) {
-    openrs::common::Log(openrs::common::Log::LogLevel::kWarning)
-        << "Invalid cipher text from client "
-        << std::to_string(client->socket().getSocketId()) << ": " << ex.what();
-    client->SendOpCode(openrs::net::codec::PacketType::kErrorRSA);
+  DecodeXTEA(xtea_keys, packet.data, &decoded_packet);
+
+  uint8_t* username_header_ptr = nullptr;
+  if (!decoded_packet.GetData(&username_header_ptr) || *username_header_ptr != 1) {
+    // TODO: Handle 'long' usernames for when *username_header_ptr != 1.
+    client->SendOpCode(openrs::net::codec::PacketType::kErrorSession);
+    return;
+  }
+
+  std::string username;
+  if (!decoded_packet.GetString(&password)) {
+    client->SendOpCode(openrs::net::codec::PacketType::kErrorInvalidUsername);
     return;
   }
 }
