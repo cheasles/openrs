@@ -18,7 +18,8 @@ bool openrs::net::codec::encoder::global::LoginEncoder::Encode(
   const auto kPacketCode = LoginEncoder::code_mapping_.find(packet.type);
   if (LoginEncoder::code_mapping_.cend() == kPacketCode) {
     common::Log(common::Log::LogLevel::kWarning)
-        << "Invalid packet code: " << static_cast<uint8_t>(packet.type);
+        << "Invalid packet code: "
+        << std::to_string(static_cast<uint8_t>(packet.type));
     return false;
   }
 
