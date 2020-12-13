@@ -20,9 +20,7 @@ bool openrs::net::codec::decoder::global::LoginDecoder::Decode(
 
   const auto kPacketType = LoginDecoder::code_mapping_.find(buffer.at(0));
   if (LoginDecoder::code_mapping_.cend() == kPacketType) {
-    common::Log(common::Log::LogLevel::kWarning)
-        << "Invalid packet code: " << std::to_string(buffer.at(0));
-    return false;
+    return Decoder::Decode(buffer, packet);
   }
 
   packet->type = kPacketType->second;
