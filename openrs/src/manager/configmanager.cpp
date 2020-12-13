@@ -32,6 +32,10 @@ void openrs::manager::ConfigManager::GenerateDefaultConfig() {
   this->json_config_["logging"]["level"] = 0;
   this->json_config_["network"]["ip_address"] = "0.0.0.0";
   this->json_config_["network"]["port"] = 43594;
+  this->json_config_["grab"]["keys"] = {
+      1441,   78700,  44880,  39771,  363186, 44375,  0,       16140, 7316,
+      271148, 810710, 216189, 379672, 454149, 933950, 21006,   25367, 17247,
+      1244,   1,      14856,  1494,   119,    882901, 1818764, 3963,  3618};
   this->json_config_["grab"]["private_exponent"] =
       "9577634011115533732134402962763417888862610179158224522858675069799671"
       "3454019354716577077577558156976177994479837760989691356438974879647293"

@@ -18,20 +18,20 @@ void openrs::net::codec::handler::global::PacketHandler::Handle(
     openrs::net::codec::Packet& packet, openrs::net::Session* session) {
   if (PacketType::kHandshake == packet.type &&
       session->status() == SessionStatus::kConnected) {
-    int* custom_client_build_ptr = nullptr;
-    int* client_build_ptr = nullptr;
+    uint32_t* client_revision = nullptr;
+    uint32_t* client_revision_sub = nullptr;
 
-    if (!packet.data.GetData<int>(&custom_client_build_ptr) ||
-        !packet.data.GetData<int>(&client_build_ptr)) {
+    if (!packet.data.GetData<uint32_t>(&client_revision) ||
+        !packet.data.GetData<uint32_t>(&client_revision_sub)) {
       return;
     }
 
-    uint32_t client_build = be32toh(*client_build_ptr);
+    const uint32_t kClientBuild = ::be32toh(*client_revision);
 
     // Validate the client version is supported.
-    switch (client_build) {
+    switch (kClientBuild) {
       case 718:
-        session->set_client_build(client_build);
+        session->set_client_build(kClientBuild);
         break;
       default:
         // Client version is not supported.
