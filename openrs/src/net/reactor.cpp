@@ -76,6 +76,8 @@ void openrs::net::Reactor::DoAccept(
         "Could not determine the peer name to accept a client.");
   }
 
+  socket.set_socket_address(addr);
+
   {
     const std::lock_guard<std::mutex> lock(this->sessions_mutex_);
     if (this->sessions_.find(socket.getSocketId()) != this->sessions_.cend()) {

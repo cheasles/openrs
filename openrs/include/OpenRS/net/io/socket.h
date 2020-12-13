@@ -1,6 +1,7 @@
 #pragma once
 
 #include <inttypes.h>
+#include <netinet/in.h>
 #include <sys/time.h>
 
 #include <chrono>
@@ -47,6 +48,7 @@ class BaseSocket {
 class DataSocket : public BaseSocket {
  private:
   std::chrono::high_resolution_clock::time_point last_active_;
+  struct sockaddr_in socket_address_;
 
  public:
   DataSocket(int socketId)
@@ -58,6 +60,11 @@ class DataSocket : public BaseSocket {
   void putMessageClose();
 
   inline const auto& last_active() const { return this->last_active_; }
+  inline const auto& socket_address() const { return this->socket_address_; }
+
+  inline void set_socket_address(const struct sockaddr_in& socket_address) {
+    this->socket_address_ = socket_address;
+  }
 };
 
 // A class the conects to a remote machine
