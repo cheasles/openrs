@@ -112,7 +112,7 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
   }
 
   std::string username;
-  if (!decoded_packet.GetString(&password)) {
+  if (!decoded_packet.GetString(&username)) {
     session->SendOpCode(openrs::net::codec::PacketType::kErrorInvalidUsername);
     return;
   }
