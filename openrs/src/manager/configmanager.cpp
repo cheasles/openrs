@@ -4,9 +4,10 @@
 #include <nlohmann/json.hpp>
 
 #include "common/log.h"
+#include "options.h"
 
 const std::string openrs::manager::ConfigManager::kDefaultConfigPath =
-    "../data/config.json";
+    OPENRS_CONFIG_DIR "/config.json";
 
 bool openrs::manager::ConfigManager::Init() {
   std::ifstream input_config(this->config_path_);

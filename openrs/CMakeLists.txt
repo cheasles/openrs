@@ -7,12 +7,19 @@ file (GLOB_RECURSE SOURCES
 	"src/*.cpp"
 	"include/${PROJECT_SUBNAME}/*.h"
 	"include/${PROJECT_SUBNAME}/*.hpp"
+	"${CMAKE_BINARY_DIR}/options.h"
 	"${CMAKE_BINARY_DIR}/Version.h"
 	)
 
 add_executable(
     ${PROJECT_NAME}
     ${SOURCES}
+    )
+
+target_include_directories (
+    ${PROJECT_NAME}
+    PRIVATE
+    ${CMAKE_BINARY_DIR}
     )
 
 target_include_directories (

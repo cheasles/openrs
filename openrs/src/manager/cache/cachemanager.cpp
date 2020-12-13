@@ -6,9 +6,10 @@
 #include "OpenRS/cache/cache.h"
 #include "OpenRS/cache/filestore.h"
 #include "common/log.h"
+#include "options.h"
 
 const std::string openrs::manager::cache::CacheManager::kCachePath =
-    "../data/cache/";
+    OPENRS_CACHE_DIR "/";
 
 bool openrs::manager::cache::CacheManager::Init() {
   try {

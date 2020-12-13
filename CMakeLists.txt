@@ -2,6 +2,7 @@ cmake_minimum_required (VERSION 3.1)
 project (OpenRS)
 
 include(cmake/genrev.cmake)
+include(cmake/options.cmake)
 
 configure_file(
 	${CMAKE_SOURCE_DIR}/res/Version.h.in

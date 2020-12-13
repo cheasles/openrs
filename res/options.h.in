@@ -1,0 +1,4 @@
+#pragma once
+
+#define OPENRS_CACHE_DIR  "@CACHE_DIR@"
+#define OPENRS_CONFIG_DIR "@CONFIG_DIR@"
