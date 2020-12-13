@@ -187,7 +187,9 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
 
   // Validate cache hashes.
   const auto& cache = openrs::manager::cache::CacheManager::get().cache();
-  for (uint32_t index = 0; index < cache->GetTypeCount(); ++index) {
+  for (uint32_t index = 0;
+       index < std::min(static_cast<uint32_t>(32), cache->GetTypeCount());
+       ++index) {
     const auto& store_crc = cache->GetStore(index).crc();
     uint32_t* crc_ptr = nullptr;
     if (!decoded_packet.GetData(&crc_ptr)) {
