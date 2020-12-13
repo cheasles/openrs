@@ -104,7 +104,8 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
   DecodeXTEA(xtea_keys, packet.data, &decoded_packet);
 
   uint8_t* username_header_ptr = nullptr;
-  if (!decoded_packet.GetData(&username_header_ptr) || *username_header_ptr != 1) {
+  if (!decoded_packet.GetData(&username_header_ptr) ||
+      *username_header_ptr != 1) {
     // TODO: Handle 'long' usernames for when *username_header_ptr != 1.
     session->SendOpCode(openrs::net::codec::PacketType::kErrorSession);
     return;
@@ -115,6 +116,92 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
     session->SendOpCode(openrs::net::codec::PacketType::kErrorInvalidUsername);
     return;
   }
+
+  uint8_t* display_mode_ptr = nullptr;
+  uint16_t* screen_width_ptr = nullptr;
+  uint16_t* screen_height_ptr = nullptr;
+  if (!decoded_packet.GetData(&display_mode_ptr) ||
+      !decoded_packet.GetData(&screen_width_ptr) ||
+      !decoded_packet.GetData(&screen_height_ptr)) {
+    session->SendOpCode(openrs::net::codec::PacketType::kErrorSession);
+    return;
+  }
+
+  // Skip unknown byte.
+  decoded_packet.seek(std::ios_base::cur, sizeof(uint8_t));
+  // Skip unknown 24 bytes.
+  decoded_packet.seek(std::ios_base::cur, sizeof(uint8_t) * 24);
+
+  std::string settings;
+  if (!decoded_packet.GetString(&settings)) {
+    session->SendOpCode(openrs::net::codec::PacketType::kErrorSession);
+    return;
+  }
+
+  // Skip unknown int.
+  decoded_packet.seek(std::ios_base::cur, sizeof(uint32_t));
+
+  // Skip variable length block.
+  uint8_t* block_length_ptr = nullptr;
+  if (!decoded_packet.GetData(&block_length_ptr)) {
+    session->SendOpCode(openrs::net::codec::PacketType::kErrorSession);
+    return;
+  }
+  decoded_packet.seek(std::ios_base::cur, *block_length_ptr);
+
+  // Skip unknown int.
+  decoded_packet.seek(std::ios_base::cur, sizeof(uint32_t));
+  // Skip unknown long.
+  decoded_packet.seek(std::ios_base::cur, sizeof(uint64_t));
+
+  uint8_t* has_additional_info_ptr = nullptr;
+  if (!decoded_packet.GetData(&has_additional_info_ptr)) {
+    session->SendOpCode(openrs::net::codec::PacketType::kErrorSession);
+    return;
+  }
+  if (*has_additional_info_ptr == 1) {
+    std::string additional_information;
+    if (!decoded_packet.GetString(&additional_information)) {
+      session->SendOpCode(openrs::net::codec::PacketType::kErrorSession);
+      return;
+    }
+  }
+
+  // Skip unknown byte.
+  decoded_packet.seek(std::ios_base::cur, sizeof(uint8_t));
+  // Skip unknown byte.
+  decoded_packet.seek(std::ios_base::cur, sizeof(uint8_t));
+  // Skip unknown byte.
+  decoded_packet.seek(std::ios_base::cur, sizeof(uint8_t));
+  // Skip unknown byte.
+  decoded_packet.seek(std::ios_base::cur, sizeof(uint8_t));
+  // Skip unknown int.
+  decoded_packet.seek(std::ios_base::cur, sizeof(uint32_t));
+  // Skip unknown string.
+  if (!decoded_packet.GetString(&settings)) {
+    session->SendOpCode(openrs::net::codec::PacketType::kErrorSession);
+    return;
+  }
+  // Skip unknown byte.
+  decoded_packet.seek(std::ios_base::cur, sizeof(uint8_t));
+
+  // Validate cache hashes.
+  const auto& cache = openrs::manager::cache::CacheManager::get().cache();
+  for (uint32_t index = 0; index < cache->GetTypeCount(); ++index) {
+    const auto& store_crc = cache->GetStore(index).crc();
+    uint32_t* crc_ptr = nullptr;
+    if (!decoded_packet.GetData(&crc_ptr)) {
+      session->SendOpCode(openrs::net::codec::PacketType::kErrorSession);
+      return;
+    }
+    if (store_crc != ::be32toh(*crc_ptr)) {
+      session->SendOpCode(openrs::net::codec::PacketType::kClientOutdated);
+      return;
+    }
+  }
+
+  openrs::common::Log(openrs::common::Log::LogLevel::kInfo)
+      << "Player " << username << " logged in.";
 }
 
 void openrs::net::codec::handler::global::LoginPacketHandler::Handle(
