@@ -23,12 +23,8 @@ void openrs::net::Session::Read() {
   buffer.resize(Session::kReadSize);
 
   int amount_read = this->socket_.getMessageData(&buffer);
-  if (-1 == amount_read) {
+  if (-1 == amount_read || 0 == amount_read) {
     this->status_ = SessionStatus::kDisconnected;
-    return;
-  }
-
-  if (0 == amount_read) {
     return;
   }
 
