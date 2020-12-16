@@ -944,6 +944,7 @@ public:
 	iblobstream& operator=(iblobstream&& src) 
 	{
 		m_buffer.operator =(std::move(src.m_buffer));
+		return *this;
 	}
 
 	bool is_open() const { return m_buffer.is_open(); }
@@ -1002,6 +1003,7 @@ public:
 	oblobstream& operator=(oblobstream&& src) 
 	{
 		m_buffer.operator =(std::move(src.m_buffer));
+		return *this;
 	}
 
 	bool is_open() const { return m_buffer.is_open(); }
@@ -1060,6 +1062,7 @@ public:
 	blobstream& operator=(blobstream&& src) 
 	{
 		m_buffer.operator =(std::move(src.m_buffer));
+		return *this;
 	}
 
 	bool is_open() const { return m_buffer.is_open(); }
