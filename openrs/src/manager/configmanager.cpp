@@ -29,6 +29,8 @@ bool openrs::manager::ConfigManager::Init() {
 
 void openrs::manager::ConfigManager::GenerateDefaultConfig() {
   this->json_config_.clear();
+  this->json_config_["database"]["mode"] = "sqlite";
+  this->json_config_["database"]["filename"] = "database.db";
   this->json_config_["logging"]["level"] = 0;
   this->json_config_["network"]["ip_address"] = "0.0.0.0";
   this->json_config_["network"]["port"] = 43594;

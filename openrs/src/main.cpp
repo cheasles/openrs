@@ -5,6 +5,7 @@
 
 #include "OpenRS/manager/cache/cachemanager.h"
 #include "OpenRS/manager/configmanager.h"
+#include "OpenRS/manager/databasemanager.h"
 #include "OpenRS/net/reactor.h"
 
 int main() {
@@ -17,6 +18,11 @@ int main() {
 
   if (!openrs::manager::ConfigManager::get().Init()) {
     std::cerr << "Failed to init config manager." << std::endl;
+    return 1;
+  }
+
+  if (!openrs::manager::DatabaseManager::get().Init()) {
+    std::cerr << "Failed to init database manager." << std::endl;
     return 1;
   }
 
