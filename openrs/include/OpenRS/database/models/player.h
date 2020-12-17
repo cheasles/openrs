@@ -22,9 +22,6 @@ struct PlayerModel : public openrs::database::Model {
 
   template <typename Database>
   static void CreateModelTable(Database& database);
-
-  bool CheckPassword(const std::vector<uint8_t>& kPassword,
-                     const uint32_t& kIterations = 10) const;
 };
 
 template <>

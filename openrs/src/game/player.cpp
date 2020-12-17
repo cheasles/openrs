@@ -1,11 +1,11 @@
-#include "OpenRS/database/models/player.h"
+#include "OpenRS/game/player.h"
 
 #include <base64.h>
 #include <filters.h>
 #include <pwdbased.h>
 #include <sha.h>
 
-bool openrs::database::models::PlayerModel::CheckPassword(
+bool openrs::game::Player::CheckPassword(
     const std::vector<uint8_t>& kPassword, const uint32_t& kIterations) const {
   std::vector<uint8_t> encoded_password;
   encoded_password.resize(32);
@@ -24,5 +24,5 @@ bool openrs::database::models::PlayerModel::CheckPassword(
                    kPassword.data(), kPassword.size(), salt.data(), salt.size(),
                    kIterations);
   return std::equal(encoded_password.cbegin(), encoded_password.cend(),
-                    kPassword.cbegin(), kPassword.cend());
+                    password.cbegin(), password.cend());
 }
