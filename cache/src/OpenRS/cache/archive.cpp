@@ -14,7 +14,7 @@ openrs::cache::Archive::Archive(openrs::common::io::Buffer<> data) {
   this->data_.clear();
 
   const auto kCompressionHeader = static_cast<Archive::Compression>(data.at(0));
-  data.seek(std::ios_base::beg, sizeof(Archive::Compression));
+  data.seek(SEEK_SET, sizeof(Archive::Compression));
 
   uint32_t* compressed_length_ptr = nullptr;
   if (!data.GetData(&compressed_length_ptr) ||

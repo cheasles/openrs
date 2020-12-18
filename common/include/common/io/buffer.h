@@ -133,13 +133,13 @@ class Buffer : public Container {
     this->position_ = 0;
   }
 
-  inline void seek(const std::ios_base::seek_dir& dir,
+  inline void seek(const int& dir,
                    const std::vector<uint8_t>::size_type& offset) {
-    if (dir == std::ios_base::beg) {
+    if (dir == SEEK_SET) {
       this->position_ = offset;
-    } else if (dir == std::ios_base::end) {
+    } else if (dir == SEEK_END) {
       this->position_ = this->size() - offset;
-    } else if (dir == std::ios_base::cur) {
+    } else if (dir == SEEK_CUR) {
       this->position_ += offset;
     }
   }

@@ -43,7 +43,7 @@ void DecodeXTEA(const std::vector<uint32_t>& keys,
 
 void HandleLoginWorld(openrs::net::codec::Packet& packet,
                       openrs::net::Session* session) {
-  packet.data.seek(std::ios_base::cur, sizeof(uint8_t));
+  packet.data.seek(SEEK_CUR, sizeof(uint8_t));
   uint16_t* rsa_block_size_ptr = nullptr;
   if (!packet.data.GetData(&rsa_block_size_ptr)) {
     return;
@@ -63,7 +63,7 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
   const auto decrypted_packet_int =
       rsa_function.ApplyFunction(CryptoPP::Integer(
           packet.data.data() + packet.data.position(), kRsaBlockSize));
-  packet.data.seek(std::ios_base::cur, kRsaBlockSize);
+  packet.data.seek(SEEK_CUR, kRsaBlockSize);
   openrs::common::io::Buffer<> decrypted_packet;
   decrypted_packet.resize(decrypted_packet_int.MinEncodedSize());
   decrypted_packet_int.Encode(decrypted_packet.data(), decrypted_packet.size());
@@ -128,9 +128,9 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
   }
 
   // Skip unknown byte.
-  decoded_packet.seek(std::ios_base::cur, sizeof(uint8_t));
+  decoded_packet.seek(SEEK_CUR, sizeof(uint8_t));
   // Skip unknown 24 bytes.
-  decoded_packet.seek(std::ios_base::cur, sizeof(uint8_t) * 24);
+  decoded_packet.seek(SEEK_CUR, sizeof(uint8_t) * 24);
 
   std::string settings;
   if (!decoded_packet.GetString(&settings)) {
@@ -139,7 +139,7 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
   }
 
   // Skip unknown int.
-  decoded_packet.seek(std::ios_base::cur, sizeof(uint32_t));
+  decoded_packet.seek(SEEK_CUR, sizeof(uint32_t));
 
   // Skip variable length block.
   uint8_t* block_length_ptr = nullptr;
@@ -147,12 +147,12 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
     session->SendOpCode(openrs::net::codec::PacketType::kErrorSession);
     return;
   }
-  decoded_packet.seek(std::ios_base::cur, *block_length_ptr);
+  decoded_packet.seek(SEEK_CUR, *block_length_ptr);
 
   // Skip unknown int.
-  decoded_packet.seek(std::ios_base::cur, sizeof(uint32_t));
+  decoded_packet.seek(SEEK_CUR, sizeof(uint32_t));
   // Skip unknown long.
-  decoded_packet.seek(std::ios_base::cur, sizeof(uint64_t));
+  decoded_packet.seek(SEEK_CUR, sizeof(uint64_t));
 
   uint8_t* has_additional_info_ptr = nullptr;
   if (!decoded_packet.GetData(&has_additional_info_ptr)) {
@@ -168,22 +168,22 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
   }
 
   // Skip unknown byte.
-  decoded_packet.seek(std::ios_base::cur, sizeof(uint8_t));
+  decoded_packet.seek(SEEK_CUR, sizeof(uint8_t));
   // Skip unknown byte.
-  decoded_packet.seek(std::ios_base::cur, sizeof(uint8_t));
+  decoded_packet.seek(SEEK_CUR, sizeof(uint8_t));
   // Skip unknown byte.
-  decoded_packet.seek(std::ios_base::cur, sizeof(uint8_t));
+  decoded_packet.seek(SEEK_CUR, sizeof(uint8_t));
   // Skip unknown byte.
-  decoded_packet.seek(std::ios_base::cur, sizeof(uint8_t));
+  decoded_packet.seek(SEEK_CUR, sizeof(uint8_t));
   // Skip unknown int.
-  decoded_packet.seek(std::ios_base::cur, sizeof(uint32_t));
+  decoded_packet.seek(SEEK_CUR, sizeof(uint32_t));
   // Skip unknown string.
   if (!decoded_packet.GetString(&settings)) {
     session->SendOpCode(openrs::net::codec::PacketType::kErrorSession);
     return;
   }
   // Skip unknown byte.
-  decoded_packet.seek(std::ios_base::cur, sizeof(uint8_t));
+  decoded_packet.seek(SEEK_CUR, sizeof(uint8_t));
 
   // Validate cache hashes.
   const auto& cache = openrs::manager::cache::CacheManager::get().cache();
