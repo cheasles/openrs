@@ -20,8 +20,8 @@ enum struct PacketType : uint8_t {
   kGrabCache,
   kServerShuttingDown,
   kErrorSession,
-  kErrorInvalidUsername,
-  kErrorLoginFailed,
+  kErrorInvalidLogin,
+  kErrorInvalidLoginServer,
 };
 
 enum struct PacketOpCode : uint8_t {

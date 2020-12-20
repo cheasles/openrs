@@ -107,7 +107,7 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
   std::string password;
   if (!decrypted_packet.GetString(&password) || password.size() < 3 ||
       password.size() > 30) {
-    session->SendOpCode(openrs::net::codec::PacketType::kErrorInvalidUsername);
+    session->SendOpCode(openrs::net::codec::PacketType::kErrorInvalidLogin);
     return;
   }
 
@@ -125,7 +125,7 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
 
   std::string username;
   if (!decoded_packet.GetString(&username)) {
-    session->SendOpCode(openrs::net::codec::PacketType::kErrorInvalidUsername);
+    session->SendOpCode(openrs::net::codec::PacketType::kErrorInvalidLogin);
     return;
   }
 
@@ -229,7 +229,8 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
         << "Player " << username << " has registered.";
   } else {
     if (players.size() != 1) {
-      session->SendOpCode(openrs::net::codec::PacketType::kErrorLoginFailed);
+      session->SendOpCode(
+          openrs::net::codec::PacketType::kErrorInvalidLoginServer);
       return;
     }
 
@@ -238,7 +239,8 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
     // Validate the password.
     if (!player.CheckPassword(password)) {
       // TODO: Add IP to anti-spam filter.
-      session->SendOpCode(openrs::net::codec::PacketType::kErrorLoginFailed);
+      session->SendOpCode(
+          openrs::net::codec::PacketType::kErrorInvalidLogin);
       return;
     }
   }
