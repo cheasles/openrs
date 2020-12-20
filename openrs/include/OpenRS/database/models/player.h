@@ -20,6 +20,27 @@ struct PlayerModel : public openrs::database::Model {
   std::string password;
   std::string salt;
 
+  inline static const std::string TABLE_NAME = "players";
+
+  template <typename Database>
+  inline bool Save(Database& database) {
+    if (this->id == 0) {
+      this->id = database.insert(
+          "INSERT INTO " + PlayerModel::TABLE_NAME +
+              " (username, password, salt) VALUES (?, ?, ?);",
+          std::forward_as_tuple(this->username, this->password, this->salt));
+    } else {
+      database.execute_direct(
+          std::string("UPDATE " + PlayerModel::TABLE_NAME +
+                      " SET "
+                      " username=?, password=?, salt=? WHERE id=?")
+              .c_str(),
+          nullptr, this->username, this->password, this->salt, this->id);
+    }
+
+    return true;
+  }
+
   template <typename Database>
   static void CreateModelTable(Database& database);
 };
@@ -33,12 +54,14 @@ inline void PlayerModel::CreateModelTable<qtl::mysql::database>(
 template <>
 inline void PlayerModel::CreateModelTable<qtl::sqlite::database>(
     qtl::sqlite::database& database) {
-  database.simple_execute(
-      "CREATE TABLE IF NOT EXISTS players ( "
-      "id INTEGER PRIMARY KEY, "
-      "username TEXT NOT NULL UNIQUE, "
-      "password TEXT NOT NULL, "
-      "salt TEXT NOT NULL );");
+  static const std::string kQuery = "CREATE TABLE IF NOT EXISTS " +
+                                    PlayerModel::TABLE_NAME +
+                                    " ( "
+                                    "id INTEGER PRIMARY KEY, "
+                                    "username TEXT NOT NULL UNIQUE, "
+                                    "password TEXT NOT NULL, "
+                                    "salt TEXT NOT NULL );";
+  database.simple_execute(kQuery.c_str());
 }
 
 }  // namespace models
@@ -51,11 +74,7 @@ template <>
 inline void
 bind_record<qtl::mysql::statement, openrs::database::models::PlayerModel>(
     qtl::mysql::statement& command, openrs::database::models::PlayerModel&& v) {
-  qtl::bind_record<qtl::mysql::statement, openrs::database::Model>(
-      command, std::move(v));
-  qtl::bind_field(command, 1, v.username);
-  qtl::bind_field(command, 2, v.password);
-  qtl::bind_field(command, 3, v.salt);
+  qtl::bind_fields(command, v.id, v.username, v.password, v.salt);
 }
 
 template <>
@@ -63,11 +82,7 @@ inline void
 bind_record<qtl::sqlite::statement, openrs::database::models::PlayerModel>(
     qtl::sqlite::statement& command,
     openrs::database::models::PlayerModel&& v) {
-  qtl::bind_record<qtl::sqlite::statement, openrs::database::Model>(
-      command, std::move(v));
-  qtl::bind_field(command, 1, v.username);
-  qtl::bind_field(command, 2, v.password);
-  qtl::bind_field(command, 3, v.salt);
+  qtl::bind_fields(command, v.id, v.username, v.password, v.salt);
 }
 
 }  // namespace qtl

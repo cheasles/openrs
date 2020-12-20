@@ -5,7 +5,7 @@
 #include "OpenRS/net/codec/packet.h"
 #include "common/log.h"
 
-constexpr frozen::map<openrs::net::codec::PacketType, uint8_t, 4>
+constexpr frozen::map<openrs::net::codec::PacketType, uint8_t, 5>
     openrs::net::codec::encoder::global::LoginEncoder::code_mapping_;
 
 bool openrs::net::codec::encoder::global::LoginEncoder::Encode(

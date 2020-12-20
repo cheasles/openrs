@@ -5,24 +5,18 @@
 #include <pwdbased.h>
 #include <sha.h>
 
-bool openrs::game::Player::CheckPassword(
-    const std::vector<uint8_t>& kPassword, const uint32_t& kIterations) const {
+void openrs::game::Player::EncodePassword(const std::vector<uint8_t>& kPassword,
+                                          const std::vector<uint8_t>& kSalt,
+                                          std::string* output,
+                                          const uint32_t& kIterations) {
   std::vector<uint8_t> encoded_password;
   encoded_password.resize(32);
 
-  std::vector<uint8_t> salt;
-  CryptoPP::StringSource(
-      this->salt, true,
-      new CryptoPP::Base64Decoder(new CryptoPP::VectorSink(salt)));
-  std::vector<uint8_t> password;
-  CryptoPP::StringSource(
-      this->password, true,
-      new CryptoPP::Base64Decoder(new CryptoPP::VectorSink(password)));
-
   CryptoPP::PKCS5_PBKDF2_HMAC<CryptoPP::SHA256> pbkdf2;
   pbkdf2.DeriveKey(encoded_password.data(), encoded_password.size(), 0,
-                   kPassword.data(), kPassword.size(), salt.data(), salt.size(),
-                   kIterations);
-  return std::equal(encoded_password.cbegin(), encoded_password.cend(),
-                    password.cbegin(), password.cend());
+                   kPassword.data(), kPassword.size(), kSalt.data(),
+                   kSalt.size(), kIterations);
+  CryptoPP::VectorSource(
+      encoded_password, true,
+      new CryptoPP::Base64Encoder(new CryptoPP::StringSink(*output), false));
 }

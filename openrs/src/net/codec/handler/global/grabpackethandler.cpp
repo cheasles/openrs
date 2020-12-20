@@ -70,7 +70,7 @@ void SendUKeys(openrs::net::Session* session) {
 
   // Encrypt the whirlpool hash with RSA.
   CryptoPP::RSA::PublicKey rsa_function;
-  const auto grab_config = openrs::manager::ConfigManager::get()["grab"];
+  const auto& grab_config = openrs::manager::ConfigManager::get()["grab"];
   CryptoPP::Integer private_exponent(
       grab_config["private_exponent"].get<std::string>().c_str());
   CryptoPP::Integer modulus(grab_config["modulus"].get<std::string>().c_str());

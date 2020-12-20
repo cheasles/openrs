@@ -14,6 +14,8 @@ namespace database {
 
 struct Model {
   int id;
+
+  Model() : id(0) {}
 };
 
 }  // namespace database
@@ -28,8 +30,7 @@ inline void bind_record<qtl::mysql::statement, openrs::database::Model>(
 }
 
 template <>
-inline void
-bind_record<qtl::sqlite::statement, openrs::database::Model>(
+inline void bind_record<qtl::sqlite::statement, openrs::database::Model>(
     qtl::sqlite::statement& command, openrs::database::Model&& v) {
   qtl::bind_field(command, "id", v.id);
 }

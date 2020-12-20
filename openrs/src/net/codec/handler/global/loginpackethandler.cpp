@@ -1,5 +1,6 @@
 #include "OpenRS/net/codec/handler/global/loginpackethandler.h"
 
+#include <common/log.h>
 #include <endian.h>
 #include <integer.h>
 #include <modes.h>
@@ -9,10 +10,21 @@
 
 #include <string>
 
+#include "OpenRS/database/models/player.h"
+#include "OpenRS/game/player.h"
 #include "OpenRS/manager/cache/cachemanager.h"
 #include "OpenRS/manager/cache/grabmanager.h"
 #include "OpenRS/manager/configmanager.h"
-#include "common/log.h"
+#include "OpenRS/manager/databasemanager.h"
+
+template <typename Model>
+inline bool GetModel(std::vector<Model>* output) {
+  qtl::sqlite::database db;
+  db.open("tmp");
+  db.query("select * from " + Model::TABLE_NAME,
+           [&output](const Model& record) { output->emplace_back(record); });
+  return output->size() != 0;
+}
 
 void DecodeXTEA(const std::vector<uint32_t>& keys,
                 openrs::common::io::Buffer<>& input,
@@ -55,7 +67,7 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
   }
 
   CryptoPP::RSA::PublicKey rsa_function;
-  const auto login_config = openrs::manager::ConfigManager::get()["login"];
+  const auto& login_config = openrs::manager::ConfigManager::get()["login"];
   CryptoPP::Integer private_exponent(
       login_config["private_exponent"].get<std::string>().c_str());
   CryptoPP::Integer modulus(login_config["modulus"].get<std::string>().c_str());
@@ -198,6 +210,35 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
     }
     if (store_crc != ::be32toh(*crc_ptr)) {
       session->SendOpCode(openrs::net::codec::PacketType::kClientOutdated);
+      return;
+    }
+  }
+
+  // TODO: Validate username.
+  openrs::game::Player player;
+  auto& database_manager = openrs::manager::DatabaseManager::get();
+  std::vector<openrs::database::models::PlayerModel> players;
+  if (!database_manager.GetModel<openrs::database::models::PlayerModel>(
+          &players)) {
+    player.username = username;
+    openrs::game::Player::GenerateRandomString(24, &player.salt);
+    openrs::game::Player::EncodePassword(password, player.salt,
+                                         &player.password);
+    database_manager.CreateModel(player);
+    openrs::common::Log(openrs::common::Log::LogLevel::kInfo)
+        << "Player " << username << " has registered.";
+  } else {
+    if (players.size() != 1) {
+      session->SendOpCode(openrs::net::codec::PacketType::kErrorLoginFailed);
+      return;
+    }
+
+    player = players.at(0);
+
+    // Validate the password.
+    if (!player.CheckPassword(password)) {
+      // TODO: Add IP to anti-spam filter.
+      session->SendOpCode(openrs::net::codec::PacketType::kErrorLoginFailed);
       return;
     }
   }

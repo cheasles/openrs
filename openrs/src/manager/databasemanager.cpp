@@ -16,7 +16,7 @@ openrs::manager::DatabaseManager::~DatabaseManager() {
 }
 
 bool openrs::manager::DatabaseManager::Init() {
-  const auto database_config =
+  const auto& database_config =
       openrs::manager::ConfigManager::get()["database"];
   if (database_config["mode"].get<std::string>() == "mysql") {
     if (!this->InitMySQL()) return false;
@@ -46,7 +46,7 @@ bool openrs::manager::DatabaseManager::Init() {
 }
 
 bool openrs::manager::DatabaseManager::InitMySQL() {
-  const auto database_config =
+  const auto& database_config =
       openrs::manager::ConfigManager::get()["database"];
   this->db_mysql = std::make_shared<qtl::mysql::database>();
   if (this->db_mysql->open(
@@ -67,7 +67,7 @@ bool openrs::manager::DatabaseManager::InitMySQL() {
 }
 
 bool openrs::manager::DatabaseManager::InitSqlite() {
-  const auto database_config =
+  const auto& database_config =
       openrs::manager::ConfigManager::get()["database"];
   this->db_sqlite = std::make_shared<qtl::sqlite::database>();
   try {
