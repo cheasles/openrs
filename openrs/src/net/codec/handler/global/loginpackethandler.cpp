@@ -17,15 +17,6 @@
 #include "OpenRS/manager/configmanager.h"
 #include "OpenRS/manager/databasemanager.h"
 
-template <typename Model>
-inline bool GetModel(std::vector<Model>* output) {
-  qtl::sqlite::database db;
-  db.open("tmp");
-  db.query("select * from " + Model::TABLE_NAME,
-           [&output](const Model& record) { output->emplace_back(record); });
-  return output->size() != 0;
-}
-
 void DecodeXTEA(const std::vector<uint32_t>& keys,
                 openrs::common::io::Buffer<>& input,
                 openrs::common::io::Buffer<>* output) {
@@ -246,7 +237,7 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
   }
 
   openrs::common::Log(openrs::common::Log::LogLevel::kInfo)
-      << "Player " << username << " logged in.";
+      << "Player " << player.username << " logged in.";
 }
 
 void openrs::net::codec::handler::global::LoginPacketHandler::Handle(
