@@ -12,6 +12,8 @@ configure_file(
 
 set(CMAKE_CXX_STANDARD 17)
 
+option(BUILD_TESTS "Compile test modules" ON)
+
 #--------------------------------------------------------------------
 # Add subdirectories
 #--------------------------------------------------------------------
@@ -20,6 +22,11 @@ add_subdirectory(external)
 add_subdirectory(common)
 add_subdirectory(cache)
 add_subdirectory(openrs)
+
+if(BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(test)
+endif(BUILD_TESTS)
 
 #--------------------------------------------------------------------
 # Create package
