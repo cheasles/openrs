@@ -20,7 +20,7 @@
         {
             "label": "CMake Build",
             "type": "shell",
-            "command": "cmake --build .",
+            "command": "cmake --build . --parallel 4",
             "dependsOn": ["CMake Generation Debug"],
             "options": {
                 "cwd": "${workspaceFolder}/build"

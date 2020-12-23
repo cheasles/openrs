@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.1)
 set(PROJECT_SUBNAME openrs)
-project (${CMAKE_PROJECT_NAME}-${PROJECT_SUBNAME} CXX)
+project (${CMAKE_PROJECT_NAME} CXX)
 
 # pthread
 set(THREADS_PREFER_PTHREAD_FLAG ON)
