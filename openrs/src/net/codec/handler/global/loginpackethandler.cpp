@@ -1,14 +1,13 @@
 #include "openrs/net/codec/handler/global/loginpackethandler.h"
 
-#include <openrs/database/models/player.h>
-#include <openrs/game/player.h>
-#include <openrs/common/log.h>
 #include <endian.h>
 #include <integer.h>
 #include <modes.h>
-#include <osrng.h>
+#include <openrs/common/crypt/xtea.h>
+#include <openrs/common/log.h>
+#include <openrs/database/models/player.h>
+#include <openrs/game/player.h>
 #include <rsa.h>
-#include <tea.h>
 
 #include <string>
 
@@ -16,33 +15,6 @@
 #include "openrs/manager/cache/grabmanager.h"
 #include "openrs/manager/configmanager.h"
 #include "openrs/manager/databasemanager.h"
-
-void DecodeXTEA(const std::vector<uint32_t>& keys,
-                openrs::common::io::Buffer<>& input,
-                openrs::common::io::Buffer<>* output) {
-  uint32_t l = input.position();
-  uint32_t i1 =
-      input.remaining() - (input.remaining() % CryptoPP::XTEA::BLOCKSIZE);
-  for (uint32_t j1 = 0; j1 < i1; j1++) {
-    uint32_t* k1_ptr = nullptr;
-    uint32_t* l1_ptr = nullptr;
-    if (!input.GetData(&k1_ptr) || !input.GetData(&l1_ptr)) {
-      return;
-    }
-    uint32_t k1 = ::be32toh(*k1_ptr);
-    uint32_t l1 = ::be32toh(*l1_ptr);
-    uint32_t sum = 0xc6ef3720;
-    uint32_t delta = 0x9e3779b9;
-    for (uint32_t k2 = 32; k2-- > 0;) {
-      l1 -= keys[(sum & 0x1c84) >> 11] + sum ^ (k1 >> 5 ^ k1 << 4) + k1;
-      sum -= delta;
-      k1 -= (l1 >> 5 ^ l1 << 4) + l1 ^ keys[sum & 3] + sum;
-    }
-
-    output->PutDataBE(k1);
-    output->PutDataBE(l1);
-  }
-}
 
 void HandleLoginWorld(openrs::net::codec::Packet& packet,
                       openrs::net::Session* session) {
@@ -78,16 +50,13 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
     return;
   }
 
-  std::vector<uint32_t> xtea_keys;
-  xtea_keys.reserve(4 * sizeof(uint32_t));
-  for (int i = 0; i < 4; ++i) {
-    uint32_t* xtea_key = nullptr;
-    if (!decrypted_packet.GetData(&xtea_key)) {
-      session->SendOpCode(openrs::net::codec::PacketType::kErrorSession);
-      return;
-    }
-    xtea_keys.emplace_back(::be32toh(*xtea_key));
+  if (decrypted_packet.remaining() < CryptoPP::XTEA::KEYLENGTH) {
+    session->SendOpCode(openrs::net::codec::PacketType::kErrorSession);
+    return;
   }
+  const uint8_t* xtea_keys =
+      decrypted_packet.data() + decrypted_packet.position();
+  decrypted_packet.seek(SEEK_CUR, CryptoPP::XTEA::KEYLENGTH);
 
   uint64_t* rsa_block_ptr = nullptr;
   if (!decrypted_packet.GetData(&rsa_block_ptr) || *rsa_block_ptr != 0) {
@@ -104,7 +73,12 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
 
   // Decode XTEA block from the packet.
   openrs::common::io::Buffer<> decoded_packet;
-  DecodeXTEA(xtea_keys, packet.data, &decoded_packet);
+  openrs::common::crypt::DecryptXTEA(
+      xtea_keys, CryptoPP::XTEA::KEYLENGTH,
+      packet.data.data() + packet.data.position(),
+      packet.data.remaining() -
+          (packet.data.remaining() % CryptoPP::XTEA::BLOCKSIZE),
+      &decoded_packet);
 
   uint8_t* username_header_ptr = nullptr;
   if (!decoded_packet.GetData(&username_header_ptr) ||
