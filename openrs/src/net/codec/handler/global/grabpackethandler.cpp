@@ -1,6 +1,7 @@
-#include "OpenRS/net/codec/handler/global/grabpackethandler.h"
+#include "openrs/net/codec/handler/global/grabpackethandler.h"
 
 #include <common/io/buffer.h>
+#include <common/log.h>
 #include <endian.h>
 #include <integer.h>
 #include <rsa.h>
@@ -8,10 +9,9 @@
 
 #include <string>
 
-#include "OpenRS/manager/cache/cachemanager.h"
-#include "OpenRS/manager/cache/grabmanager.h"
-#include "OpenRS/manager/configmanager.h"
-#include "common/log.h"
+#include "openrs/manager/cache/cachemanager.h"
+#include "openrs/manager/cache/grabmanager.h"
+#include "openrs/manager/configmanager.h"
 
 bool PackCacheData(const uint8_t& kIndexId, const uint32_t& kArchiveId,
                    const uint8_t& kSettings, const uint32_t& kRealLength,

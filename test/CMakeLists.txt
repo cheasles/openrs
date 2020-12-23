@@ -7,3 +7,4 @@ include(GoogleTest)
 #--------------------------------------------------------------------
 
 add_subdirectory(common)
+add_subdirectory(game)

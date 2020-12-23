@@ -1,4 +1,4 @@
-#include "OpenRS/net/reactor.h"
+#include "openrs/net/reactor.h"
 
 #include <arpa/inet.h>
 #include <fcntl.h>
@@ -10,9 +10,9 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "OpenRS/net/session.h"
-#include "OpenRS/net/io/channel.h"
-#include "OpenRS/net/io/socket.h"
+#include "openrs/net/session.h"
+#include "openrs/net/io/channel.h"
+#include "openrs/net/io/socket.h"
 #include "common/log.h"
 
 constexpr int openrs::net::Reactor::kDefaultPort;

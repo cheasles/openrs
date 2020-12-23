@@ -1,9 +1,8 @@
-#include "OpenRS/net/codec/decoder/global/logindecoder.h"
+#include "openrs/net/codec/decoder/global/logindecoder.h"
 
 #include <iostream>
 
-#include "OpenRS/net/codec/packet.h"
-#include "common/log.h"
+#include "openrs/net/codec/packet.h"
 
 constexpr frozen::map<uint8_t, openrs::net::codec::PacketType, 3>
     openrs::net::codec::decoder::global::LoginDecoder::code_mapping_;

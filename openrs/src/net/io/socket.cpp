@@ -1,4 +1,4 @@
-#include "OpenRS/net/io/socket.h"
+#include "openrs/net/io/socket.h"
 
 #include <arpa/inet.h>
 #include <fcntl.h>

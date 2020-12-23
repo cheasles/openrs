@@ -3,10 +3,10 @@
 
 #include <iostream>
 
-#include "OpenRS/manager/cache/cachemanager.h"
-#include "OpenRS/manager/configmanager.h"
-#include "OpenRS/manager/databasemanager.h"
-#include "OpenRS/net/reactor.h"
+#include "openrs/manager/cache/cachemanager.h"
+#include "openrs/manager/configmanager.h"
+#include "openrs/manager/databasemanager.h"
+#include "openrs/net/reactor.h"
 
 int main() {
   struct timeval start, end;
@@ -14,7 +14,7 @@ int main() {
   bool quit = false;
   constexpr int kTickRate = 600;
 
-  std::cout << "OpenRS Server" << std::endl;
+  std::cout << "openrs Server" << std::endl;
 
   if (!openrs::manager::ConfigManager::get().Init()) {
     std::cerr << "Failed to init config manager." << std::endl;

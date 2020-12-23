@@ -1,9 +1,10 @@
-#include "OpenRS/net/codec/encoder/global/grabencoder.h"
+#include "openrs/net/codec/encoder/global/grabencoder.h"
+
+#include <common/log.h>
 
 #include <iostream>
 
-#include "OpenRS/net/codec/packet.h"
-#include "common/log.h"
+#include "openrs/net/codec/packet.h"
 
 constexpr frozen::map<openrs::net::codec::PacketType, uint8_t, 2>
     openrs::net::codec::encoder::global::GrabEncoder::code_mapping_;

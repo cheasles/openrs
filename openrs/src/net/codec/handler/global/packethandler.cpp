@@ -1,18 +1,18 @@
-#include "OpenRS/net/codec/handler/global/packethandler.h"
+#include "openrs/net/codec/handler/global/packethandler.h"
 
 #include <common/io/buffer.h>
+#include <common/log.h>
 #include <endian.h>
 
 #include <string>
 
-#include "OpenRS/manager/cache/grabmanager.h"
-#include "OpenRS/net/codec/decoder/global/grabdecoder.h"
-#include "OpenRS/net/codec/handler/global/grabpackethandler.h"
-#include "OpenRS/net/codec/handler/global/loginpackethandler.h"
-#include "OpenRS/net/codec/decoder/global/logindecoder.h"
-#include "OpenRS/net/codec/encoder/global/grabencoder.h"
-#include "OpenRS/net/codec/encoder/global/loginencoder.h"
-#include "common/log.h"
+#include "openrs/manager/cache/grabmanager.h"
+#include "openrs/net/codec/decoder/global/grabdecoder.h"
+#include "openrs/net/codec/decoder/global/logindecoder.h"
+#include "openrs/net/codec/encoder/global/grabencoder.h"
+#include "openrs/net/codec/encoder/global/loginencoder.h"
+#include "openrs/net/codec/handler/global/grabpackethandler.h"
+#include "openrs/net/codec/handler/global/loginpackethandler.h"
 
 void openrs::net::codec::handler::global::PacketHandler::Handle(
     openrs::net::codec::Packet& packet, openrs::net::Session* session) {
@@ -66,7 +66,8 @@ void openrs::net::codec::handler::global::PacketHandler::Handle(
     // Make sure the next packets are handled correctly.
     session->SetDecoder(std::make_unique<decoder::global::LoginDecoder>());
     session->SetEncoder(std::make_unique<encoder::global::LoginEncoder>());
-    session->SetHandler(std::make_unique<handler::global::LoginPacketHandler>());
+    session->SetHandler(
+        std::make_unique<handler::global::LoginPacketHandler>());
 
     session->SendOpCode(PacketType::kStartUp);
   } else {

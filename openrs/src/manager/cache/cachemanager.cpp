@@ -1,11 +1,12 @@
-#include "OpenRS/manager/cache/cachemanager.h"
+#include "openrs/manager/cache/cachemanager.h"
+
+#include <openrs/cache/cache.h>
+#include <openrs/cache/filestore.h>
+#include <common/log.h>
 
 #include <iostream>
 #include <limits>
 
-#include "OpenRS/cache/cache.h"
-#include "OpenRS/cache/filestore.h"
-#include "common/log.h"
 #include "options.h"
 
 const std::string openrs::manager::cache::CacheManager::kCachePath =

@@ -1,8 +1,8 @@
-#include "OpenRS/net/codec/decoder/global/grabdecoder.h"
+#include "openrs/net/codec/decoder/global/grabdecoder.h"
 
 #include <iostream>
 
-#include "OpenRS/net/codec/packet.h"
+#include "openrs/net/codec/packet.h"
 
 bool openrs::net::codec::decoder::global::GrabDecoder::Decode(
     openrs::common::io::Buffer<>& buffer, openrs::net::codec::Packet* packet) {

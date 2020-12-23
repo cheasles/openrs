@@ -1,5 +1,7 @@
-#include "OpenRS/net/codec/handler/global/loginpackethandler.h"
+#include "openrs/net/codec/handler/global/loginpackethandler.h"
 
+#include <openrs/database/models/player.h>
+#include <openrs/game/player.h>
 #include <common/log.h>
 #include <endian.h>
 #include <integer.h>
@@ -10,12 +12,10 @@
 
 #include <string>
 
-#include "OpenRS/database/models/player.h"
-#include "OpenRS/game/player.h"
-#include "OpenRS/manager/cache/cachemanager.h"
-#include "OpenRS/manager/cache/grabmanager.h"
-#include "OpenRS/manager/configmanager.h"
-#include "OpenRS/manager/databasemanager.h"
+#include "openrs/manager/cache/cachemanager.h"
+#include "openrs/manager/cache/grabmanager.h"
+#include "openrs/manager/configmanager.h"
+#include "openrs/manager/databasemanager.h"
 
 void DecodeXTEA(const std::vector<uint32_t>& keys,
                 openrs::common::io::Buffer<>& input,
@@ -230,8 +230,7 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
     // Validate the password.
     if (!player.CheckPassword(password)) {
       // TODO: Add IP to anti-spam filter.
-      session->SendOpCode(
-          openrs::net::codec::PacketType::kErrorInvalidLogin);
+      session->SendOpCode(openrs::net::codec::PacketType::kErrorInvalidLogin);
       return;
     }
   }

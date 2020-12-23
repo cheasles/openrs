@@ -1,13 +1,14 @@
-#include "OpenRS/manager/databasemanager.h"
+#include "openrs/manager/databasemanager.h"
+
+#include <openrs/database/models/player.h>
+#include <common/log.h>
 
 #include <iomanip>
 #include <nlohmann/json.hpp>
 #include <qtl_mysql.hpp>
 #include <qtl_sqlite.hpp>
 
-#include "OpenRS/database/models/player.h"
-#include "OpenRS/manager/configmanager.h"
-#include "common/log.h"
+#include "openrs/manager/configmanager.h"
 #include "options.h"
 
 openrs::manager::DatabaseManager::~DatabaseManager() {
@@ -21,8 +22,8 @@ bool openrs::manager::DatabaseManager::Init() {
   if (database_config["mode"].get<std::string>() == "mysql") {
     if (!this->InitMySQL()) return false;
     try {
-      openrs::database::models::PlayerModel::CreateModelTable<qtl::mysql::database>(
-          *this->db_mysql.get());
+      openrs::database::models::PlayerModel::CreateModelTable<
+          qtl::mysql::database>(*this->db_mysql.get());
     } catch (const qtl::mysql::error& ex) {
       common::Log(common::Log::LogLevel::kError)
           << "[DatabaseManager] Failed to initialized database table: "
@@ -32,8 +33,8 @@ bool openrs::manager::DatabaseManager::Init() {
   } else {
     if (!this->InitSqlite()) return false;
     try {
-      openrs::database::models::PlayerModel::CreateModelTable<qtl::sqlite::database>(
-          *this->db_sqlite.get());
+      openrs::database::models::PlayerModel::CreateModelTable<
+          qtl::sqlite::database>(*this->db_sqlite.get());
     } catch (const qtl::sqlite::error& ex) {
       common::Log(common::Log::LogLevel::kError)
           << "[DatabaseManager] Failed to initialized database table: "

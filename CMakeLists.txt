@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.1)
-project (OpenRS)
+project (openrs)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 include(cmake/genrev.cmake)
@@ -21,6 +21,8 @@ option(BUILD_TESTS "Compile test modules" ON)
 add_subdirectory(external)
 add_subdirectory(common)
 add_subdirectory(cache)
+add_subdirectory(database)
+add_subdirectory(game)
 add_subdirectory(openrs)
 
 if(BUILD_TESTS)

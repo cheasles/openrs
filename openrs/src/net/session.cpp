@@ -1,8 +1,8 @@
-#include "OpenRS/net/session.h"
+#include "openrs/net/session.h"
 
 #include <sys/socket.h>
 
-#include "OpenRS/net/codec/packet.h"
+#include "openrs/net/codec/packet.h"
 #include "common/log.h"
 
 openrs::net::Session::Session()

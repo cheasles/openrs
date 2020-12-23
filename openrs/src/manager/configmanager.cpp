@@ -1,9 +1,10 @@
-#include "OpenRS/manager/configmanager.h"
+#include "openrs/manager/configmanager.h"
+
+#include <common/log.h>
 
 #include <iomanip>
 #include <nlohmann/json.hpp>
 
-#include "common/log.h"
 #include "options.h"
 
 const std::string openrs::manager::ConfigManager::kDefaultConfigPath =

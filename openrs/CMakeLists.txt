@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.1)
-set(PROJECT_SUBNAME OpenRS)
+set(PROJECT_SUBNAME openrs)
 project (${CMAKE_PROJECT_NAME}-${PROJECT_SUBNAME} CXX)
 
 # pthread
@@ -56,4 +56,6 @@ target_link_libraries(${PROJECT_NAME}
     ${SQLite3_LIBRARIES}
     cryptopp-static
     ${CMAKE_PROJECT_NAME}-common
-    ${CMAKE_PROJECT_NAME}-cache)
+    ${CMAKE_PROJECT_NAME}-cache
+    ${CMAKE_PROJECT_NAME}-database
+    ${CMAKE_PROJECT_NAME}-game)
