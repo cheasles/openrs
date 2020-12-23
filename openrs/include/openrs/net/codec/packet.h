@@ -1,6 +1,6 @@
 #pragma once
 
-#include <common/io/buffer.h>
+#include <openrs/common/io/buffer.h>
 #include <stdint.h>
 
 namespace openrs {

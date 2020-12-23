@@ -1,6 +1,6 @@
 #pragma once
 
-#include <common/io/buffer.h>
+#include <openrs/common/io/buffer.h>
 #include <frozen/map.h>
 #include <stdint.h>
 

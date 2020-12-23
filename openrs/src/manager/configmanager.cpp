@@ -1,6 +1,6 @@
 #include "openrs/manager/configmanager.h"
 
-#include <common/log.h>
+#include <openrs/common/log.h>
 
 #include <iomanip>
 #include <nlohmann/json.hpp>

@@ -1,7 +1,7 @@
 #include "openrs/net/codec/handler/global/packethandler.h"
 
-#include <common/io/buffer.h>
-#include <common/log.h>
+#include <openrs/common/io/buffer.h>
+#include <openrs/common/log.h>
 #include <endian.h>
 
 #include <string>

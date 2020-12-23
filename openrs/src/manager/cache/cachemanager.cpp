@@ -2,7 +2,7 @@
 
 #include <openrs/cache/cache.h>
 #include <openrs/cache/filestore.h>
-#include <common/log.h>
+#include <openrs/common/log.h>
 
 #include <iostream>
 #include <limits>

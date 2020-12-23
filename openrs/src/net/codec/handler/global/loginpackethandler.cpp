@@ -2,7 +2,7 @@
 
 #include <openrs/database/models/player.h>
 #include <openrs/game/player.h>
-#include <common/log.h>
+#include <openrs/common/log.h>
 #include <endian.h>
 #include <integer.h>
 #include <modes.h>

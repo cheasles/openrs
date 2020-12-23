@@ -1,11 +1,11 @@
 #pragma once
 
-#include <common/io/buffer.h>
 #include <inttypes.h>
+#include <openrs/common/io/buffer.h>
+#include <openrs/common/singleton.h>
 
-#include "openrs/manager/manager.h"
 #include "openrs/manager/configmanager.h"
-#include "common/singleton.h"
+#include "openrs/manager/manager.h"
 
 namespace openrs {
 

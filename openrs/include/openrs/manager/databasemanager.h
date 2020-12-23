@@ -1,15 +1,15 @@
 #pragma once
 
-#include <common/io/buffer.h>
-#include <common/singleton.h>
 #include <inttypes.h>
+#include <openrs/common/io/buffer.h>
+#include <openrs/common/singleton.h>
+#include <openrs/database/model.h>
 
 #include <memory>
 #include <nlohmann/json.hpp>
 #include <qtl_mysql.hpp>
 #include <qtl_sqlite.hpp>
 
-#include "openrs/database/model.h"
 #include "openrs/manager/configmanager.h"
 #include "openrs/manager/manager.h"
 
@@ -51,8 +51,9 @@ class DatabaseManager : public openrs::manager::Manager,
                        std::vector<Model>* output) const {
     const auto& database_config =
         openrs::manager::ConfigManager::get()["database"];
-    const std::string kQuery =
-        std::string("select * from ") + Model::TABLE_NAME + " WHERE " + kWhereField + "=?;";
+    const std::string kQuery = std::string("select * from ") +
+                               Model::TABLE_NAME + " WHERE " + kWhereField +
+                               "=?;";
     if (database_config["mode"].get<std::string>() == "mysql") {
       for (auto& record : this->db_mysql->result<Model>(kQuery, kWhereValue)) {
         output->emplace_back(record);

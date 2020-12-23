@@ -1,7 +1,7 @@
 #include "openrs/manager/databasemanager.h"
 
 #include <openrs/database/models/player.h>
-#include <common/log.h>
+#include <openrs/common/log.h>
 
 #include <iomanip>
 #include <nlohmann/json.hpp>

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <inttypes.h>
+#include <openrs/common/ifstream.h>
 
 #include <array>
 #include <fstream>
@@ -10,7 +11,6 @@
 #include <vector>
 
 #include "openrs/cache/referencetable.h"
-#include "common/ifstream.h"
 
 namespace openrs {
 namespace cache {

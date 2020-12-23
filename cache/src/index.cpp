@@ -1,12 +1,12 @@
 #include "openrs/cache/index.h"
 
+#include <openrs/common/crc.h>
+#include <openrs/common/ifstream.h>
 #include <whrlpool.h>
 
 #include <iterator>
 
 #include "openrs/cache/archive.h"
-#include "common/crc.h"
-#include "common/ifstream.h"
 
 const uint32_t openrs::cache::Index::kIdxBlockLength = 6;
 const uint32_t openrs::cache::Index::kHeaderLength = 8;

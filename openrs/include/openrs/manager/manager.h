@@ -1,8 +1,7 @@
 #pragma once
 
 #include <inttypes.h>
-
-#include "common/singleton.h"
+#include <openrs/common/singleton.h>
 
 namespace openrs {
 

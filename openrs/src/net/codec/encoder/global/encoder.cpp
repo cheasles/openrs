@@ -1,6 +1,6 @@
 #include "openrs/net/codec/encoder/global/encoder.h"
 
-#include <common/log.h>
+#include <openrs/common/log.h>
 
 #include <iostream>
 

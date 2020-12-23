@@ -1,4 +1,4 @@
-#include <common/log.h>
+#include <openrs/common/log.h>
 
 #include "gtest/gtest.h"
 

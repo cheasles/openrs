@@ -1,13 +1,14 @@
 #pragma once
 
+#include <openrs/cache/cache.h>
+#include <openrs/common/singleton.h>
+
 #include <fstream>
 #include <map>
 #include <memory>
 #include <string>
 
-#include "openrs/cache/cache.h"
 #include "openrs/manager/manager.h"
-#include "common/singleton.h"
 
 namespace openrs {
 

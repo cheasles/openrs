@@ -1,12 +1,12 @@
 #pragma once
 
-#include <common/io/buffer.h>
 #include <inttypes.h>
+#include <openrs/common/io/buffer.h>
+#include <openrs/common/singleton.h>
 
 #include <nlohmann/json.hpp>
 
 #include "openrs/manager/manager.h"
-#include "common/singleton.h"
 
 namespace openrs {
 

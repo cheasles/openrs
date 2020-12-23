@@ -1,9 +1,9 @@
 #include "openrs/net/session.h"
 
+#include <openrs/common/log.h>
 #include <sys/socket.h>
 
 #include "openrs/net/codec/packet.h"
-#include "common/log.h"
 
 openrs::net::Session::Session()
     : status_(SessionStatus::kConnected),
