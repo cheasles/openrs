@@ -151,8 +151,8 @@ void openrs::net::Reactor::SessionDisconnect(
   openrs::common::Log(openrs::common::Log::LogLevel::kDebug)
       << "  Recv: " << session->bytes_received();
 
-  if (0 != session->player_id()) {
-    openrs::manager::WorldManager::get().remove_player(1, session->player_id());
+  if (auto player = session->player().lock()) {
+    openrs::manager::WorldManager::get().remove_player(1, player);
   }
   this->epoll_.RemovePollEvent(session->socket().getSocketId());
   this->sessions_.erase(session->socket().getSocketId());

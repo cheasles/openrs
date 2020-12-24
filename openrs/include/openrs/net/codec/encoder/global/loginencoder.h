@@ -1,7 +1,7 @@
 #pragma once
 
-#include <openrs/common/io/buffer.h>
 #include <frozen/map.h>
+#include <openrs/common/io/buffer.h>
 #include <stdint.h>
 
 #include <map>
@@ -21,7 +21,7 @@ namespace global {
 
 class LoginEncoder : public Encoder {
  private:
-  static constexpr frozen::map<PacketType, uint8_t, 4> code_mapping_{
+  static inline constexpr frozen::map<PacketType, uint8_t, 4> code_mapping_{
       {PacketType::kStartUp, 0},
       {PacketType::kErrorSession, 10},
       {PacketType::kErrorInvalidLogin, 3},
@@ -29,6 +29,7 @@ class LoginEncoder : public Encoder {
 
  public:
   bool Encode(const openrs::net::codec::Packet& packet,
+              const std::weak_ptr<openrs::game::Player>& player,
               openrs::common::io::Buffer<>* buffer) override;
 };
 

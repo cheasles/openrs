@@ -11,6 +11,7 @@ constexpr frozen::map<openrs::net::codec::PacketType, uint8_t, 1>
 
 bool openrs::net::codec::encoder::global::Encoder::Encode(
     const openrs::net::codec::Packet& packet,
+    const std::weak_ptr<openrs::game::Player>&,
     openrs::common::io::Buffer<>* buffer) {
   if (!buffer) {
     return false;

@@ -17,7 +17,7 @@ namespace global {
 
 class WorldDecoder : public Decoder {
  private:
-  static constexpr frozen::map<uint8_t, PacketType, 3> code_mapping_{
+  static inline constexpr frozen::map<uint8_t, PacketType, 3> code_mapping_{
       {16, PacketType::kLoginWorld},
       {18, PacketType::kLoginWorld},
       {19, PacketType::kLoginLobby},

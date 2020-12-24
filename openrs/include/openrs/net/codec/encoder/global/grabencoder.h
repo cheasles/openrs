@@ -1,7 +1,7 @@
 #pragma once
 
-#include <openrs/common/io/buffer.h>
 #include <frozen/map.h>
+#include <openrs/common/io/buffer.h>
 #include <stdint.h>
 
 #include <map>
@@ -21,12 +21,13 @@ namespace global {
 
 class GrabEncoder : public Encoder {
  private:
-  static constexpr frozen::map<PacketType, uint8_t, 2> code_mapping_{
+  static inline constexpr frozen::map<PacketType, uint8_t, 2> code_mapping_{
       {PacketType::kStartUp, 0},
       {PacketType::kGrabCache, static_cast<uint8_t>(PacketOpCode::kNone)}};
 
  public:
   bool Encode(const openrs::net::codec::Packet& packet,
+              const std::weak_ptr<openrs::game::Player>& player,
               openrs::common::io::Buffer<>* buffer) override;
 };
 

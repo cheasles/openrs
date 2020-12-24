@@ -1,6 +1,7 @@
 #pragma once
 
 #include <openrs/common/io/buffer.h>
+#include <openrs/game/player.h>
 #include <sys/epoll.h>
 
 #include <memory>
@@ -61,7 +62,7 @@ class Session {
   std::size_t bytes_sent_;
 
   uint32_t client_build_;
-  uint32_t player_id_;
+  std::weak_ptr<openrs::game::Player> player_;
 
   static constexpr size_t kReadSize = 1024;
 
@@ -76,7 +77,7 @@ class Session {
 
   inline void Send(const openrs::net::codec::Packet& packet) {
     openrs::common::io::Buffer<> buffer;
-    this->encoder_->Encode(packet, &buffer);
+    this->encoder_->Encode(packet, this->player_, &buffer);
     this->Send(buffer);
   }
 
@@ -128,7 +129,7 @@ class Session {
   inline std::size_t bytes_sent() const { return this->bytes_sent_; }
 
   inline uint32_t client_build() const { return this->client_build_; }
-  inline auto player_id() const { return this->player_id_; }
+  inline auto player() const { return this->player_; }
 
   inline void set_socket(io::DataSocket& socket) {
     this->socket_ = std::move(socket);
@@ -141,8 +142,8 @@ class Session {
   inline void set_client_build(const uint32_t& client_build) {
     this->client_build_ = client_build;
   }
-  inline void set_player_id(const uint32_t& player_id) {
-    this->player_id_ = player_id;
+  inline void set_player(const std::weak_ptr<openrs::game::Player>& player) {
+    this->player_ = player;
   }
 };
 

@@ -128,6 +128,26 @@ class Buffer : public Container {
     return this->PutData(data);
   }
 
+  bool PutString(char* input) {
+    char index = *input;
+    while (index != '\n' && index != 0) {
+      if (!this->PutData<char>(index)) {
+        return false;
+      }
+    }
+
+    return this->PutData<char>(0);
+  }
+
+  bool PutString(const std::string& kInput) {
+    for (auto it = kInput.cbegin(); it != kInput.cend(); ++it) {
+      if (!this->PutData(*it)) {
+        return false;
+      }
+    }
+    return this->PutData<char>(0);
+  }
+
   inline void ClearOldData() {
     this->erase(this->cbegin(), this->cbegin() + this->position());
     this->position_ = 0;

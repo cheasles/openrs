@@ -4,7 +4,6 @@
 
 #include <fstream>
 #include <iostream>
-#include <limits>
 
 const uint32_t openrs::cache::Cache::kMetadataId = 255;
 

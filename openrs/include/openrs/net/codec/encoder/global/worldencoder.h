@@ -1,7 +1,7 @@
 #pragma once
 
-#include <openrs/common/io/buffer.h>
 #include <frozen/map.h>
+#include <openrs/common/io/buffer.h>
 #include <stdint.h>
 
 #include <map>
@@ -17,11 +17,16 @@ namespace global {
 
 class WorldEncoder : public Encoder {
  private:
-  static constexpr frozen::map<PacketType, uint8_t, 1> code_mapping_{
+  enum struct PacketHeaderType : uint8_t { kNone, kUint8, kUint16 };
+
+  static inline constexpr frozen::map<PacketType, uint8_t, 1> code_mapping_{
       {PacketType::kLoginDetails, 2}};
+  static inline constexpr frozen::map<PacketType, PacketHeaderType, 1>
+      type_mapping_{{PacketType::kLoginDetails, PacketHeaderType::kUint8}};
 
  public:
   bool Encode(const openrs::net::codec::Packet& packet,
+              const std::weak_ptr<openrs::game::Player>& player,
               openrs::common::io::Buffer<>* buffer) override;
 };
 

@@ -30,20 +30,17 @@ class WorldManager : public openrs::manager::Manager,
   }
 
   inline void add_player(const uint32_t& kWorldId,
-                         const openrs::game::Player& kPlayer) {
+                         const std::shared_ptr<openrs::game::Player>& kPlayer) {
     this->worlds_[kWorldId].add_player(kPlayer);
-  }
-  inline void add_player(const uint32_t& kWorldId,
-                         openrs::game::Player&& player) {
-    this->worlds_[kWorldId].add_player(std::move(player));
   }
   inline void remove_player(const uint32_t& kWorldId,
                             const uint32_t& kPlayerId) {
     this->worlds_[kWorldId].remove_player(kPlayerId);
   }
-  inline void remove_player(const uint32_t& kWorldId,
-                            const openrs::game::Player& kPlayer) {
-    this->remove_player(kWorldId, kPlayer.id);
+  inline void remove_player(
+      const uint32_t& kWorldId,
+      const std::shared_ptr<openrs::game::Player>& kPlayer) {
+    this->remove_player(kWorldId, kPlayer->id);
   }
 };
 

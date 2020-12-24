@@ -1,10 +1,12 @@
 #pragma once
 
 #include <openrs/common/io/buffer.h>
+#include <openrs/game/player.h>
 #include <frozen/map.h>
 #include <stdint.h>
 
 #include <map>
+#include <memory>
 
 #include "openrs/net/codec/packet.h"
 
@@ -25,6 +27,7 @@ class Encoder {
 
  public:
   virtual bool Encode(const openrs::net::codec::Packet& packet,
+                      const std::weak_ptr<openrs::game::Player>& player,
                       openrs::common::io::Buffer<>* buffer);
 };
 

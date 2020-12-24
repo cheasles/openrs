@@ -20,7 +20,7 @@ namespace global {
 
 class Decoder {
  private:
-  static constexpr frozen::map<uint8_t, PacketType, 3> code_mapping_{
+  static inline constexpr frozen::map<uint8_t, PacketType, 3> code_mapping_{
       {15, PacketType::kHandshake},
       {14, PacketType::kLogin},
       {6, PacketType::kGrabCache},

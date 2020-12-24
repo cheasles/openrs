@@ -19,6 +19,7 @@ struct PlayerModel : public openrs::database::Model {
   std::string username;
   std::string password;
   std::string salt;
+  int rights;
 
   inline static const std::string TABLE_NAME = "players";
 
@@ -60,7 +61,8 @@ inline void PlayerModel::CreateModelTable<qtl::sqlite::database>(
                                     "id INTEGER PRIMARY KEY, "
                                     "username TEXT NOT NULL UNIQUE, "
                                     "password TEXT NOT NULL, "
-                                    "salt TEXT NOT NULL );";
+                                    "salt TEXT NOT NULL , "
+                                    "rights INTEGER NOT NULL DEFAULT 0 );";
   database.simple_execute(kQuery.c_str());
 }
 

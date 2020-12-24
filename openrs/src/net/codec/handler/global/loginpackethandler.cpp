@@ -7,8 +7,10 @@
 #include <openrs/common/log.h>
 #include <openrs/database/models/player.h>
 #include <openrs/game/player.h>
+#include <openrs/game/world.h>
 #include <rsa.h>
 
+#include <limits>
 #include <string>
 
 #include "openrs/manager/cache/cachemanager.h"
@@ -19,6 +21,37 @@
 #include "openrs/net/codec/decoder/global/worlddecoder.h"
 #include "openrs/net/codec/encoder/global/worldencoder.h"
 #include "openrs/net/codec/handler/global/worldpackethandler.h"
+
+void SendLoginDetails(const std::shared_ptr<openrs::game::Player>& player,
+                      openrs::net::Session* session) {
+  if (std::numeric_limits<uint8_t>::max() < player->rights) {
+    throw new std::logic_error("Invalid player.rights value.");
+  }
+  if (std::numeric_limits<uint16_t>::max() < player->id) {
+    throw new std::logic_error("Invalid player.id value.");
+  }
+
+  openrs::common::io::Buffer<> buffer;
+  buffer.PutDataBE<uint8_t>(static_cast<uint8_t>(player->rights));
+  buffer.PutDataBE<uint8_t>(0);
+  buffer.PutDataBE<uint8_t>(0);
+  buffer.PutDataBE<uint8_t>(0);
+  buffer.PutDataBE<uint8_t>(1);
+  buffer.PutDataBE<uint8_t>(0);
+  buffer.PutDataBE(static_cast<uint16_t>(player->id));
+  buffer.PutDataBE<uint8_t>(1);
+  buffer.PutDataBE<uint8_t>(0);
+  buffer.PutDataBE<uint8_t>(0);
+  buffer.PutDataBE<uint8_t>(0);
+  buffer.PutDataBE(static_cast<uint8_t>(
+      openrs::manager::WorldManager::get().worlds().at(1).world_type()));
+  buffer.PutString(player->username);
+
+  openrs::net::codec::Packet details_packet;
+  details_packet.type = openrs::net::codec::PacketType::kLoginDetails;
+  details_packet.data = buffer;
+  session->Send(details_packet);
+}
 
 void HandleLoginWorld(openrs::net::codec::Packet& packet,
                       openrs::net::Session* session) {
@@ -184,16 +217,16 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
   }
 
   // TODO: Validate username.
-  openrs::game::Player player;
+  auto player = std::make_shared<openrs::game::Player>();
   auto& database_manager = openrs::manager::DatabaseManager::get();
   std::vector<openrs::database::models::PlayerModel> players;
   if (!database_manager.GetModel<openrs::database::models::PlayerModel>(
           &players)) {
-    player.username = username;
-    openrs::game::Player::GenerateRandomString(24, &player.salt);
-    openrs::game::Player::EncodePassword(password, player.salt,
-                                         &player.password);
-    database_manager.CreateModel(player);
+    player->username = username;
+    openrs::game::Player::GenerateRandomString(24, &player->salt);
+    openrs::game::Player::EncodePassword(password, player->salt,
+                                         &player->password);
+    database_manager.CreateModel(*player);
     openrs::common::Log(openrs::common::Log::LogLevel::kInfo)
         << "Player " << username << " has registered.";
   } else {
@@ -203,10 +236,10 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
       return;
     }
 
-    player = players.at(0);
+    *player = players.at(0);
 
     // Validate the password.
-    if (!player.CheckPassword(password)) {
+    if (!player->CheckPassword(password)) {
       // TODO: Add IP to anti-spam filter.
       session->SendOpCode(openrs::net::codec::PacketType::kErrorInvalidLogin);
       return;
@@ -214,12 +247,11 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
   }
 
   openrs::common::Log(openrs::common::Log::LogLevel::kInfo)
-      << "Player " << player.username << " logged in.";
-  player.set_display_mode(*display_mode_ptr);
-  player.set_screen_width(::be16toh(*screen_width_ptr));
-  player.set_screen_height(::be16toh(*screen_height_ptr));
-  session->set_player_id(player.id);
-  openrs::manager::WorldManager::get().add_player(1, std::move(player));
+      << "Player " << player->username << " logged in.";
+  player->set_display_mode(*display_mode_ptr);
+  player->set_screen_width(::be16toh(*screen_width_ptr));
+  player->set_screen_height(::be16toh(*screen_height_ptr));
+  session->set_player(player);
 
   // Make sure the next packets are handled correctly.
   session->SetDecoder(
@@ -230,16 +262,9 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
       std::make_unique<
           openrs::net::codec::handler::global::WorldPacketHandler>());
 
-  // Send the grab data back to the client.
-  // openrs::common::io::Buffer<> buffer;
-  // manager::cache::GrabManager::WriteKeysToBuffer(&buffer);
-
-  // Packet grab_packet;
-  // grab_packet.type = PacketType::kStartUp;
-  // grab_packet.data = buffer;
-  // session->Send(grab_packet);
-
   // Start the game.
+  SendLoginDetails(player, session);
+  openrs::manager::WorldManager::get().add_player(1, player);
 }
 
 void openrs::net::codec::handler::global::LoginPacketHandler::Handle(
