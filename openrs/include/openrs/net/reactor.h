@@ -6,9 +6,9 @@
 #include <memory>
 #include <mutex>
 
-#include "openrs/net/session.h"
 #include "openrs/net/io/epoll.h"
 #include "openrs/net/io/socket.h"
+#include "openrs/net/session.h"
 
 namespace openrs {
 
@@ -24,7 +24,11 @@ class Reactor {
   /**
    * The amount of time in ms to wait before timing out a client.
    */
+#ifndef NDEBUG
   static constexpr int kDefaultTimeout = 500;
+#else  // _DEBUG
+  static constexpr int kDefaultTimeout = 5000;
+#endif  // _DEBUG
 
   openrs::net::io::ServerSocket socket_;
   openrs::net::io::EPoll<> epoll_;

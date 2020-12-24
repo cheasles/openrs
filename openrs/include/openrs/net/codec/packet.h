@@ -22,6 +22,7 @@ enum struct PacketType : uint8_t {
   kErrorSession,
   kErrorInvalidLogin,
   kErrorInvalidLoginServer,
+  kLoginDetails,
 };
 
 enum struct PacketOpCode : uint8_t {

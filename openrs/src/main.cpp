@@ -6,6 +6,7 @@
 #include "openrs/manager/cache/cachemanager.h"
 #include "openrs/manager/configmanager.h"
 #include "openrs/manager/databasemanager.h"
+#include "openrs/manager/worldmanager.h"
 #include "openrs/net/reactor.h"
 
 int main() {
@@ -28,6 +29,11 @@ int main() {
 
   if (!openrs::manager::cache::CacheManager::get().Init()) {
     std::cerr << "Failed to init cache manager." << std::endl;
+    return 1;
+  }
+
+  if (!openrs::manager::WorldManager::get().Init()) {
+    std::cerr << "Failed to init world manager." << std::endl;
     return 1;
   }
 

@@ -6,8 +6,8 @@
 #include <memory>
 
 #include "openrs/net/codec/decoder/global/decoder.h"
-#include "openrs/net/codec/handler/global/packethandler.h"
 #include "openrs/net/codec/encoder/global/encoder.h"
+#include "openrs/net/codec/handler/global/packethandler.h"
 #include "openrs/net/io/socket.h"
 
 namespace openrs {
@@ -61,6 +61,7 @@ class Session {
   std::size_t bytes_sent_;
 
   uint32_t client_build_;
+  uint32_t player_id_;
 
   static constexpr size_t kReadSize = 1024;
 
@@ -98,8 +99,7 @@ class Session {
   }
 
   inline void SetHandler(
-      std::unique_ptr<
-          openrs::net::codec::handler::global::PacketHandler>&&
+      std::unique_ptr<openrs::net::codec::handler::global::PacketHandler>&&
           handler) {
     this->packet_handler_ = std::move(handler);
   }
@@ -115,8 +115,8 @@ class Session {
   }
 
   inline void ResetHandler() {
-    this->packet_handler_ = std::make_unique<
-        openrs::net::codec::handler::global::PacketHandler>();
+    this->packet_handler_ =
+        std::make_unique<openrs::net::codec::handler::global::PacketHandler>();
   }
 
   inline SessionStatus status() const { return this->status_; }
@@ -128,15 +128,21 @@ class Session {
   inline std::size_t bytes_sent() const { return this->bytes_sent_; }
 
   inline uint32_t client_build() const { return this->client_build_; }
+  inline auto player_id() const { return this->player_id_; }
 
   inline void set_socket(io::DataSocket& socket) {
     this->socket_ = std::move(socket);
   }
 
-  inline void set_status(const SessionStatus& status) { this->status_ = status; }
+  inline void set_status(const SessionStatus& status) {
+    this->status_ = status;
+  }
 
   inline void set_client_build(const uint32_t& client_build) {
     this->client_build_ = client_build;
+  }
+  inline void set_player_id(const uint32_t& player_id) {
+    this->player_id_ = player_id;
   }
 };
 

@@ -1,4 +1,4 @@
-#include "openrs/net/codec/encoder/global/loginencoder.h"
+#include "openrs/net/codec/encoder/global/worldencoder.h"
 
 #include <openrs/common/log.h>
 
@@ -6,18 +6,18 @@
 
 #include "openrs/net/codec/packet.h"
 
-constexpr frozen::map<openrs::net::codec::PacketType, uint8_t, 4>
-    openrs::net::codec::encoder::global::LoginEncoder::code_mapping_;
+constexpr frozen::map<openrs::net::codec::PacketType, uint8_t, 1>
+    openrs::net::codec::encoder::global::WorldEncoder::code_mapping_;
 
-bool openrs::net::codec::encoder::global::LoginEncoder::Encode(
+bool openrs::net::codec::encoder::global::WorldEncoder::Encode(
     const openrs::net::codec::Packet& packet,
     openrs::common::io::Buffer<>* buffer) {
   if (!buffer) {
     return false;
   }
 
-  const auto kPacketCode = LoginEncoder::code_mapping_.find(packet.type);
-  if (LoginEncoder::code_mapping_.cend() == kPacketCode) {
+  const auto kPacketCode = WorldEncoder::code_mapping_.find(packet.type);
+  if (WorldEncoder::code_mapping_.cend() == kPacketCode) {
     return Encoder::Encode(packet, buffer);
   }
 

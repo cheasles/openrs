@@ -15,6 +15,10 @@
 #include "openrs/manager/cache/grabmanager.h"
 #include "openrs/manager/configmanager.h"
 #include "openrs/manager/databasemanager.h"
+#include "openrs/manager/worldmanager.h"
+#include "openrs/net/codec/decoder/global/worlddecoder.h"
+#include "openrs/net/codec/encoder/global/worldencoder.h"
+#include "openrs/net/codec/handler/global/worldpackethandler.h"
 
 void HandleLoginWorld(openrs::net::codec::Packet& packet,
                       openrs::net::Session* session) {
@@ -211,6 +215,31 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
 
   openrs::common::Log(openrs::common::Log::LogLevel::kInfo)
       << "Player " << player.username << " logged in.";
+  player.set_display_mode(*display_mode_ptr);
+  player.set_screen_width(::be16toh(*screen_width_ptr));
+  player.set_screen_height(::be16toh(*screen_height_ptr));
+  session->set_player_id(player.id);
+  openrs::manager::WorldManager::get().add_player(1, std::move(player));
+
+  // Make sure the next packets are handled correctly.
+  session->SetDecoder(
+      std::make_unique<openrs::net::codec::decoder::global::WorldDecoder>());
+  session->SetEncoder(
+      std::make_unique<openrs::net::codec::encoder::global::WorldEncoder>());
+  session->SetHandler(
+      std::make_unique<
+          openrs::net::codec::handler::global::WorldPacketHandler>());
+
+  // Send the grab data back to the client.
+  // openrs::common::io::Buffer<> buffer;
+  // manager::cache::GrabManager::WriteKeysToBuffer(&buffer);
+
+  // Packet grab_packet;
+  // grab_packet.type = PacketType::kStartUp;
+  // grab_packet.data = buffer;
+  // session->Send(grab_packet);
+
+  // Start the game.
 }
 
 void openrs::net::codec::handler::global::LoginPacketHandler::Handle(
