@@ -21,10 +21,15 @@
             "label": "CMake Build",
             "type": "shell",
             "command": "cmake --build . --parallel 4",
-            "dependsOn": ["CMake Generation Debug"],
+            "dependsOn": [
+                "CMake Generation Debug"
+            ],
             "options": {
                 "cwd": "${workspaceFolder}/build"
-            }
+            },
+            "problemMatcher": [
+                "$gcc"
+            ]
         }
     ]
 }
