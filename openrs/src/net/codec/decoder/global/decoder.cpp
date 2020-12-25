@@ -37,5 +37,9 @@ bool openrs::net::codec::decoder::global::Decoder::Decode(
     packet->data.assign(cbegin, cend);
   }
 
+  common::Log(common::Log::LogLevel::kDebug)
+      << "Decoded packet of type "
+      << std::to_string(static_cast<uint8_t>(kPacketType->second));
+
   return true;
 }

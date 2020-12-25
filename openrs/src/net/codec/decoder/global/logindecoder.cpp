@@ -1,5 +1,7 @@
 #include "openrs/net/codec/decoder/global/logindecoder.h"
 
+#include <openrs/common/log.h>
+
 #include <iostream>
 
 #include "openrs/net/codec/packet.h"
@@ -23,6 +25,10 @@ bool openrs::net::codec::decoder::global::LoginDecoder::Decode(
   if (buffer.size() > 1) {
     packet->data.assign(buffer.cbegin() + sizeof(uint8_t), buffer.cend());
   }
+
+  common::Log(common::Log::LogLevel::kDebug)
+      << "[Login] Decoded packet of type "
+      << std::to_string(static_cast<uint8_t>(kPacketType->second));
 
   return true;
 }

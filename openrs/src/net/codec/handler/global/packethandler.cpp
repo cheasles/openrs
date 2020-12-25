@@ -1,8 +1,8 @@
 #include "openrs/net/codec/handler/global/packethandler.h"
 
+#include <endian.h>
 #include <openrs/common/io/buffer.h>
 #include <openrs/common/log.h>
-#include <endian.h>
 
 #include <string>
 
@@ -35,6 +35,8 @@ void openrs::net::codec::handler::global::PacketHandler::Handle(
         break;
       default:
         // Client version is not supported.
+        common::Log(common::Log::LogLevel::kDebug)
+            << "Rejecting out of date client build.";
         session->SendOpCode(PacketType::kClientOutdated);
         return;
     }

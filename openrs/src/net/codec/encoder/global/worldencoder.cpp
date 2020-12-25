@@ -38,5 +38,9 @@ bool openrs::net::codec::encoder::global::WorldEncoder::Encode(
     buffer->insert(buffer->cend(), packet.data.cbegin(), packet.data.cend());
   }
 
+  common::Log(common::Log::LogLevel::kDebug)
+      << "[World] Encoded packet of type "
+      << std::to_string(kPacketCode->second);
+
   return true;
 }

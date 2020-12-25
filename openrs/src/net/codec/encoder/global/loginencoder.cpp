@@ -26,5 +26,9 @@ bool openrs::net::codec::encoder::global::LoginEncoder::Encode(
     buffer->insert(buffer->cend(), packet.data.cbegin(), packet.data.cend());
   }
 
+  common::Log(common::Log::LogLevel::kDebug)
+      << "[Login] Encoded packet of type "
+      << std::to_string(kPacketCode->second);
+
   return true;
 }
