@@ -9,14 +9,22 @@ namespace openrs {
 namespace game {
 
 class Player : public database::models::PlayerModel {
+ public:
+  enum struct DisplayMode : uint8_t {
+    kUnknown = 0,
+    kUnknown1 = 1,
+    kUnknown2 = 2,
+    kUnknown3 = 3
+  };
+
  private:
-  uint8_t display_mode_;
+  DisplayMode display_mode_;
   uint16_t screen_width_;
   uint16_t screen_height_;
 
  public:
   Player()
-      : display_mode_(0),
+      : display_mode_(DisplayMode::kUnknown),
         screen_width_(0),
         screen_height_(0),
         database::models::PlayerModel() {}
@@ -67,7 +75,7 @@ class Player : public database::models::PlayerModel {
   inline auto screen_width() const { return this->screen_width_; }
   inline auto screen_height() const { return this->screen_height_; }
 
-  inline void set_display_mode(const uint8_t& kDisplayMode) {
+  inline void set_display_mode(const DisplayMode& kDisplayMode) {
     this->display_mode_ = kDisplayMode;
   }
   inline void set_screen_width(const uint16_t& kScreenWidth) {

@@ -131,7 +131,7 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
     return;
   }
 
-  uint8_t* display_mode_ptr = nullptr;
+  openrs::game::Player::DisplayMode* display_mode_ptr = nullptr;
   uint16_t* screen_width_ptr = nullptr;
   uint16_t* screen_height_ptr = nullptr;
   if (!decoded_packet.GetData(&display_mode_ptr) ||
