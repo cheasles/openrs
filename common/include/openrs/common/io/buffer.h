@@ -188,6 +188,32 @@ class Buffer : public Container {
     return this->PutDataLE(this->ShiftPositive(kValue, kShift));
   }
 
+  template <typename Type>
+  inline bool PutDataVBE(const Type& kValue) {
+    static_assert(sizeof(Type) % 2 == 0);
+    const uint8_t* p = reinterpret_cast<const uint8_t*>(&kValue);
+    for (int i = 0; i < sizeof(Type); i += 2) {
+      if (!this->PutData(p[i + 1]) || !this->PutData(p[i])) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  template <typename Type>
+  inline bool PutDataVLE(const Type& kValue) {
+    static_assert(sizeof(Type) % 2 == 0);
+    const uint8_t* p = reinterpret_cast<const uint8_t*>(&kValue);
+    for (int i = sizeof(Type); i != 0; i -= 2) {
+      if (!this->PutData(p[i - 2]) || !this->PutData(p[i - 1])) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   inline void ClearOldData() {
     this->erase(this->cbegin(), this->cbegin() + this->position());
     this->position_ = 0;
