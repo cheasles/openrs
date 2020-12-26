@@ -13,7 +13,7 @@ class Player : public database::models::PlayerModel {
   enum struct DisplayMode : uint8_t {
     kUnknown = 0,
     kUnknown1 = 1,
-    kUnknown2 = 2,
+    kResizable = 2,
     kUnknown3 = 3
   };
 

@@ -9,6 +9,7 @@
 #include <openrs/game/player.h>
 #include <openrs/game/world.h>
 #include <rsa.h>
+#include <tea.h>
 
 #include <limits>
 #include <string>
