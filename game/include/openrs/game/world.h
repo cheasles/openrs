@@ -24,7 +24,7 @@ class World {
   std::unordered_map<uint32_t, openrs::game::Entity> npcs_;
 
  public:
-  World() : world_type_(WorldType::kFree) {}
+  World() : world_type_(WorldType::kMembers) {}
 
   inline const auto& world_type() const { return this->world_type_; }
   inline const auto& npcs() const { return this->npcs_; }
