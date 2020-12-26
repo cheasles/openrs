@@ -25,6 +25,8 @@ enum struct PacketType : uint8_t {
   kLoginDetails,
   kInterfaceWindowPane,
   kInterfaceTab,
+  kConfigGlobal1,
+  kConfigGlobal2,
 };
 
 enum struct PacketOpCode : uint8_t {

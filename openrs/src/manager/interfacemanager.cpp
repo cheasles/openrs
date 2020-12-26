@@ -3,6 +3,8 @@
 #include <openrs/common/io/buffer.h>
 #include <tea.h>
 
+#include "openrs/manager/configmanager.h"
+
 bool openrs::manager::InterfaceManager::Init() { return true; }
 
 void openrs::manager::InterfaceManager::SendInterfaces(
@@ -90,7 +92,8 @@ void openrs::manager::InterfaceManager::SendResizableInterfaces(
                 InterfaceID::k137);
   this->SendTab(player, session, PaneID::kResizable, TabID::k119,
                 InterfaceID::k1139);
-  // player.getPackets().sendGlobalConfig(823, 1);
+  openrs::manager::ConfigManager::get().SendGlobalConfig(
+      player, session, ConfigManager::GlobalConfig::k823, 1);
   // sendCombatStyles();
   // sendTaskSystem();
   // sendSkills();

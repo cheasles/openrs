@@ -1,5 +1,6 @@
 #include "openrs/manager/configmanager.h"
 
+#include <openrs/common/io/buffer.h>
 #include <openrs/common/log.h>
 
 #include <iomanip>
@@ -66,4 +67,32 @@ void openrs::manager::ConfigManager::GenerateDefaultConfig() {
 
   std::ofstream output_config(this->config_path_);
   output_config << std::setw(4) << this->json_config_ << std::endl;
+}
+
+void openrs::manager::ConfigManager::SendGlobalConfig1(
+    const std::shared_ptr<openrs::game::Player>& player,
+    openrs::net::Session* session, const GlobalConfig& kId,
+    const uint8_t& kValue) const {
+  openrs::common::io::Buffer<> buffer;
+  buffer.PutData<uint8_t>(-1 * kValue);
+  buffer.PutShiftedPosDataBE<uint16_t>(static_cast<uint16_t>(kId));
+
+  openrs::net::codec::Packet config_packet;
+  config_packet.type = openrs::net::codec::PacketType::kConfigGlobal1;
+  config_packet.data = buffer;
+  session->Send(config_packet);
+}
+
+void openrs::manager::ConfigManager::SendGlobalConfig2(
+    const std::shared_ptr<openrs::game::Player>& player,
+    openrs::net::Session* session, const GlobalConfig& kId,
+    const uint32_t& kValue) const {
+  openrs::common::io::Buffer<> buffer;
+  buffer.PutShiftedPosDataBE<uint16_t>(static_cast<uint16_t>(kId));
+  buffer.PutData<uint32_t>(kValue);
+
+  openrs::net::codec::Packet config_packet;
+  config_packet.type = openrs::net::codec::PacketType::kConfigGlobal2;
+  config_packet.data = buffer;
+  session->Send(config_packet);
 }
