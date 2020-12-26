@@ -3,6 +3,7 @@
 #include <endian.h>
 
 #include <fstream>
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -146,6 +147,45 @@ class Buffer : public Container {
       }
     }
     return this->PutData<char>(0);
+  }
+
+  template <typename Type>
+  inline Type ShiftNegative(const Type& kValue, const uint8_t& kShift) const {
+    return (kValue & ~std::numeric_limits<uint8_t>::max()) +
+           (kShift -
+            static_cast<uint8_t>(kValue & std::numeric_limits<uint8_t>::max()));
+  }
+
+  template <typename Type>
+  inline Type ShiftPositive(const Type& kValue, const uint8_t& kShift) const {
+    return (kValue & ~std::numeric_limits<uint8_t>::max()) +
+           static_cast<uint8_t>(
+               kShift + static_cast<uint8_t>(
+                            kValue & std::numeric_limits<uint8_t>::max()));
+  }
+
+  template <typename Type>
+  inline bool PutShiftedNegDataBE(const Type& kValue,
+                                  const uint8_t& kShift = 128) {
+    return this->PutDataBE(this->ShiftNegative(kValue, kShift));
+  }
+
+  template <typename Type>
+  inline bool PutShiftedNegDataLE(const Type& kValue,
+                                  const uint8_t& kShift = 128) {
+    return this->PutDataLE(this->ShiftNegative(kValue, kShift));
+  }
+
+  template <typename Type>
+  inline bool PutShiftedPosDataBE(const Type& kValue,
+                                  const uint8_t& kShift = 128) {
+    return this->PutDataBE(this->ShiftPositive(kValue, kShift));
+  }
+
+  template <typename Type>
+  inline bool PutShiftedPosDataLE(const Type& kValue,
+                                  const uint8_t& kShift = 128) {
+    return this->PutDataLE(this->ShiftPositive(kValue, kShift));
   }
 
   inline void ClearOldData() {
