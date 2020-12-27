@@ -25,6 +25,8 @@ enum struct PacketType : uint8_t {
   kLoginDetails,
   kInterfaceWindowPane,
   kInterfaceTab,
+  kInterfaceComponentAnimation,
+  kInterfaceComponentText,
   kConfigGlobal1,
   kConfigGlobal2,
 };

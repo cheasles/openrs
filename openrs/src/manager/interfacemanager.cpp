@@ -10,9 +10,7 @@ bool openrs::manager::InterfaceManager::Init() { return true; }
 void openrs::manager::InterfaceManager::SendInterfaces(
     const std::shared_ptr<openrs::game::Player>& player,
     openrs::net::Session* session) const {
-  const auto kResizable =
-      player->display_mode() == openrs::game::Player::DisplayMode::kResizable ||
-      player->display_mode() == openrs::game::Player::DisplayMode::kUnknown3;
+  const auto kResizable = this->IsResizable(player);
   const auto kWindow = kResizable ? PaneID::kResizable : PaneID::kFixed;
   this->SendWindowPane(player, session, kWindow, PaneType::kNone);
   if (kResizable) {
@@ -41,14 +39,12 @@ void openrs::manager::InterfaceManager::SendFixedInterfaces(
   this->SendTab(player, session, PaneID::kUnknown, TabID::k9,
                 InterfaceID::k137);
   this->SendTab(player, session, PaneID::kFixed, TabID::k9, InterfaceID::k167);
-  this->SendTab(player, session, PaneID::kFixed, TabID::k119,
-                InterfaceID::k1139);
   // sendMagicBook();
-  // sendPrayerBook();
-  // sendEquipment();
-  // sendInventory();
-  // sendQuestTab();
-  // sendSof();
+  this->SendTabPrayerBook(player, session);
+  this->SendTabEquipment(player, session);
+  this->SendTabInventory(player, session);
+  this->SendTabQuests(player, session);
+  this->SendTabSqueelOfFortune(player, session);
   this->SendTab(player, session, PaneID::kFixed, TabID::k181,
                 InterfaceID::k1109);
   this->SendTab(player, session, PaneID::kFixed, TabID::k182,
@@ -61,11 +57,11 @@ void openrs::manager::InterfaceManager::SendFixedInterfaces(
                 InterfaceID::kNotes);
   this->SendTab(player, session, PaneID::kFixed, TabID::kLogoutFixed,
                 InterfaceID::kLogout);
-  // sendSkills();
-  // sendEmotes();
-  // sendSettings();
-  // sendTaskSystem();
-  // sendCombatStyles();
+  this->SendTabSkills(player, session);
+  this->SendTabEmotes(player, session);
+  this->SendTabSettings(player, session);
+  this->SendTabTaskSystem(player, session);
+  this->SendTabCombatStyles(player, session);
   // sendTimerInterface();
 }
 
@@ -90,17 +86,16 @@ void openrs::manager::InterfaceManager::SendResizableInterfaces(
                 InterfaceID::k747);
   this->SendTab(player, session, PaneID::kUnknown, TabID::k9,
                 InterfaceID::k137);
-  this->SendTab(player, session, PaneID::kResizable, TabID::k119,
-                InterfaceID::k1139);
+  this->SendTabSqueelOfFortune(player, session);
   openrs::manager::ConfigManager::get().SendGlobalConfig(
       player, session, ConfigManager::GlobalConfig::k823, 1);
-  // sendCombatStyles();
-  // sendTaskSystem();
-  // sendSkills();
-  // sendQuestTab();
-  // sendInventory();
-  // sendEquipment();
-  // sendPrayerBook();
+  this->SendTabCombatStyles(player, session);
+  this->SendTabTaskSystem(player, session);
+  this->SendTabSkills(player, session);
+  this->SendTabQuests(player, session);
+  this->SendTabInventory(player, session);
+  this->SendTabEquipment(player, session);
+  this->SendTabPrayerBook(player, session);
   // sendMagicBook();
   this->SendTab(player, session, PaneID::kResizable, TabID::k120,
                 InterfaceID::kFriendsList);
@@ -108,8 +103,8 @@ void openrs::manager::InterfaceManager::SendResizableInterfaces(
                 InterfaceID::k1109);
   this->SendTab(player, session, PaneID::kResizable, TabID::k122,
                 InterfaceID::k1110);
-  // sendSettings();
-  // sendEmotes();
+  this->SendTabSettings(player, session);
+  this->SendTabEmotes(player, session);
   this->SendTab(player, session, PaneID::kResizable, TabID::kMusic,
                 InterfaceID::kMusic);
   this->SendTab(player, session, PaneID::kResizable, TabID::kNotes,
@@ -138,6 +133,37 @@ void openrs::manager::InterfaceManager::SendTab(
   pane_packet.type = openrs::net::codec::PacketType::kInterfaceTab;
   pane_packet.data = buffer;
   session->Send(pane_packet);
+}
+
+void openrs::manager::InterfaceManager::SendInterfaceComponentText(
+    const std::shared_ptr<openrs::game::Player>& player,
+    openrs::net::Session* session, const InterfaceID& kInterfaceId,
+    const ComponentID& kComponentId, const std::string& kText) const {
+  openrs::common::io::Buffer<> buffer;
+  buffer.PutString(kText);
+  buffer.PutDataBE<uint32_t>((static_cast<uint32_t>(kInterfaceId) << 16) |
+                             static_cast<uint32_t>(kComponentId));
+
+  openrs::net::codec::Packet text_packet;
+  text_packet.type = openrs::net::codec::PacketType::kInterfaceComponentText;
+  text_packet.data = buffer;
+  session->Send(text_packet);
+}
+
+void openrs::manager::InterfaceManager::SendInterfaceComponentAnimation(
+    const std::shared_ptr<openrs::game::Player>& player,
+    openrs::net::Session* session, const InterfaceID& kInterfaceId,
+    const ComponentID& kComponentId, const EmoteID& kEmote) const {
+  openrs::common::io::Buffer<> buffer;
+  buffer.PutDataVBE<uint32_t>(static_cast<uint32_t>(kEmote));
+  buffer.PutDataBE<uint32_t>((static_cast<uint32_t>(kInterfaceId) << 16) |
+                             static_cast<uint32_t>(kComponentId));
+
+  openrs::net::codec::Packet animation_packet;
+  animation_packet.type =
+      openrs::net::codec::PacketType::kInterfaceComponentAnimation;
+  animation_packet.data = buffer;
+  session->Send(animation_packet);
 }
 
 void openrs::manager::InterfaceManager::SendWindowPane(
