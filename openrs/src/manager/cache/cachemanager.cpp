@@ -7,6 +7,7 @@
 #include <iostream>
 #include <limits>
 
+#include "openrs/manager/configmanager.h"
 #include "options.h"
 
 const std::string openrs::manager::cache::CacheManager::kCachePath =
@@ -15,6 +16,8 @@ const std::string openrs::manager::cache::CacheManager::kCachePath =
 bool openrs::manager::cache::CacheManager::Init() {
   try {
     this->cache_ = std::make_shared<openrs::cache::Cache>(kCachePath);
+    openrs::manager::ConfigManager::get().InitCacheConfig(
+        718, kCachePath + "config.json");
   } catch (const std::runtime_error& ex) {
     openrs::common::Log(openrs::common::Log::LogLevel::kError)
         << "[CacheManager] " << ex.what();

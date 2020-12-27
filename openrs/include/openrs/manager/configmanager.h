@@ -27,12 +27,14 @@ class ConfigManager : public openrs::manager::Manager,
 
   std::string config_path_;
   nlohmann::json json_config_;
+  std::unordered_map<uint32_t, nlohmann::json> cache_config_;
 
  public:
   ConfigManager(void) : config_path_(kDefaultConfigPath) {}
   ConfigManager(std::string config_path) : config_path_(config_path) {}
 
   bool Init() override;
+  bool InitCacheConfig(const uint32_t& kVersion, const std::string& kPath);
 
   void GenerateDefaultConfig();
 
@@ -58,6 +60,7 @@ class ConfigManager : public openrs::manager::Manager,
 
   inline const auto& config() const { return this->json_config_; }
   auto operator[](std::string key) const { return config()[key]; }
+  inline const auto& cache_config() const { return this->cache_config_; }
 };
 
 }  // namespace manager

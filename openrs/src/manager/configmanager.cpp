@@ -29,6 +29,23 @@ bool openrs::manager::ConfigManager::Init() {
   return true;
 }
 
+bool openrs::manager::ConfigManager::InitCacheConfig(const uint32_t& kVersion,
+                                                     const std::string& kPath) {
+  std::ifstream input_config(kPath);
+  try {
+    input_config >> this->cache_config_[kVersion];
+  } catch (const nlohmann::detail::parse_error& ex) {
+    common::Log(common::Log::LogLevel::kWarning)
+        << "[ConfigManager] Failed to parse cache config file: " << ex.what();
+    return false;
+  }
+
+  common::Log(common::Log::LogLevel::kInfo)
+      << "[ConfigManager] Loaded " << this->cache_config_[kVersion].size()
+      << " config entries for cache " << std::to_string(kVersion) << ".";
+  return true;
+}
+
 void openrs::manager::ConfigManager::GenerateDefaultConfig() {
   this->json_config_.clear();
   this->json_config_["database"]["mode"] = "sqlite";
