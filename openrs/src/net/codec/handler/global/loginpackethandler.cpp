@@ -55,6 +55,8 @@ void SendLoginDetails(const std::shared_ptr<openrs::game::Player>& player,
   details_packet.data = buffer;
   session->Send(details_packet);
 
+  const auto& world_manager = openrs::manager::WorldManager::get();
+  world_manager.SendMapRegion(player, session);
   const auto& interface_manager = openrs::manager::InterfaceManager::get();
   interface_manager.SendInterfaces(player, session);
 }
@@ -228,10 +230,16 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
   std::vector<openrs::database::models::PlayerModel> players;
   if (!database_manager.GetModel<openrs::database::models::PlayerModel>(
           &players)) {
+    const auto& kStartingLocation =
+        openrs::manager::ConfigManager::get()["game"]["starting_location"]
+            .get<std::vector<uint32_t>>();
     player->username = username;
     openrs::game::Player::GenerateRandomString(24, &player->salt);
     openrs::game::Player::EncodePassword(password, player->salt,
                                          &player->password);
+    player->set_x(kStartingLocation[0]);
+    player->set_y(kStartingLocation[1]);
+    player->set_z(kStartingLocation[2]);
     database_manager.CreateModel(*player);
     openrs::common::Log(openrs::common::Log::LogLevel::kInfo)
         << "Player " << username << " has registered.";

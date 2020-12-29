@@ -7,6 +7,7 @@
 #include <unordered_map>
 
 #include "openrs/manager/manager.h"
+#include "openrs/net/session.h"
 
 namespace openrs {
 namespace manager {
@@ -20,6 +21,9 @@ class WorldManager : public openrs::manager::Manager,
   WorldManager(void) {}
 
   bool Init() override;
+
+  void SendMapRegion(const std::shared_ptr<openrs::game::Player>& kPlayer,
+                     openrs::net::Session* session) const;
 
   inline const auto& worlds() const { return this->worlds_; }
   inline void add_world(const uint32_t& id, const openrs::game::World& world) {

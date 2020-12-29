@@ -29,6 +29,7 @@ enum struct PacketType : uint8_t {
   kInterfaceComponentText,
   kConfigGlobal1,
   kConfigGlobal2,
+  kMapRegion,
 };
 
 enum struct PacketOpCode : uint8_t {

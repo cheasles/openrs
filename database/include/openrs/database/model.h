@@ -1,6 +1,5 @@
 #pragma once
 
-#include <fstream>
 #include <qtl_common.hpp>
 #include <qtl_mysql.hpp>
 #include <qtl_sqlite.hpp>

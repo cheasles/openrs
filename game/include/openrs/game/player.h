@@ -5,10 +5,13 @@
 #include <openrs/database/models/player.h>
 #include <osrng.h>
 
+#include "openrs/game/entity.h"
+
 namespace openrs {
 namespace game {
 
-class Player : public database::models::PlayerModel {
+class Player : public database::models::PlayerModel,
+               public openrs::game::Entity {
  public:
   enum struct DisplayMode : uint8_t {
     kUnknown = 0,
@@ -35,6 +38,9 @@ class Player : public database::models::PlayerModel {
     this->username = other.username;
     this->password = other.password;
     this->salt = other.salt;
+    this->rights = other.rights;
+    this->position_x = other.position_x;
+    this->position_y = other.position_y;
     return *this;
   }
 

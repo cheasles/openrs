@@ -51,6 +51,7 @@ void openrs::manager::ConfigManager::GenerateDefaultConfig() {
   this->json_config_["database"]["mode"] = "sqlite";
   this->json_config_["database"]["filename"] = "database.db";
   this->json_config_["logging"]["level"] = 0;
+  this->json_config_["game"]["starting_location"] = {3087, 3496, 0};
   this->json_config_["network"]["ip_address"] = "0.0.0.0";
   this->json_config_["network"]["port"] = 43594;
   this->json_config_["grab"]["keys"] = {

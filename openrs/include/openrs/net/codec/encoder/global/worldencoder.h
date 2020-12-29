@@ -19,19 +19,21 @@ class WorldEncoder : public Encoder {
  private:
   enum struct PacketHeaderType : uint8_t { kNone, kUint8, kUint16 };
 
-  static inline constexpr frozen::map<PacketType, uint8_t, 7> code_mapping_{
+  static inline constexpr frozen::map<PacketType, uint8_t, 8> code_mapping_{
       {PacketType::kLoginDetails, 2},
       {PacketType::kInterfaceTab, 14},
       {PacketType::kInterfaceWindowPane, 39},
+      {PacketType::kMapRegion, 42},
       {PacketType::kConfigGlobal2, 63},
       {PacketType::kInterfaceComponentAnimation, 103},
       {PacketType::kInterfaceComponentText, 135},
       {PacketType::kConfigGlobal1, 154}};
-  static inline constexpr frozen::map<PacketType, PacketHeaderType, 7>
+  static inline constexpr frozen::map<PacketType, PacketHeaderType, 8>
       type_mapping_{
           {PacketType::kLoginDetails, PacketHeaderType::kUint8},
           {PacketType::kInterfaceTab, PacketHeaderType::kNone},
           {PacketType::kInterfaceWindowPane, PacketHeaderType::kNone},
+          {PacketType::kMapRegion, PacketHeaderType::kUint16},
           {PacketType::kInterfaceComponentAnimation, PacketHeaderType::kNone},
           {PacketType::kInterfaceComponentText, PacketHeaderType::kNone},
           {PacketType::kConfigGlobal2, PacketHeaderType::kNone},

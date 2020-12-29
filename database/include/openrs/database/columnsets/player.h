@@ -21,6 +21,12 @@ class PlayerColumnSet : public ColumnSet {
 
  public:
   PlayerColumnSet() : rights(0) {}
+  PlayerColumnSet(const PlayerColumnSet& other)
+      : ColumnSet(other),
+        username(other.username),
+        password(other.password),
+        salt(other.salt),
+        rights(other.rights) {}
 
  public:
   static inline const std::vector<

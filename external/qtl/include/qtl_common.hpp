@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <fstream>
 #include "apply_tuple.h"
 
 #if ((defined(_MSVC_LANG) && _MSVC_LANG >= 201703L) || __cplusplus >= 201703L)

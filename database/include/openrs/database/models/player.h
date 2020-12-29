@@ -1,8 +1,5 @@
 #pragma once
 
-#include <endian.h>
-
-#include <fstream>
 #include <functional>
 #include <qtl_common.hpp>
 #include <qtl_mysql.hpp>

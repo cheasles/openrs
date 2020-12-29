@@ -1,3 +1,4 @@
+#include <openrs/database/model.h>
 #include <sys/time.h>
 #include <unistd.h>
 
