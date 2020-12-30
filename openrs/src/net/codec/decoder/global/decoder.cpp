@@ -12,29 +12,34 @@ bool openrs::net::codec::decoder::global::Decoder::Decode(
     return false;
   }
 
-  if (buffer.size() < 1) {
+  uint8_t* packet_type_ptr = nullptr;
+  if (!buffer.GetData(&packet_type_ptr)) {
     return false;
   }
 
-  const auto kPacketType = Decoder::code_mapping_.find(buffer.at(0));
+  const auto kPacketType = Decoder::code_mapping_.find(*packet_type_ptr);
   if (Decoder::code_mapping_.cend() == kPacketType) {
     common::Log(common::Log::LogLevel::kWarning)
-        << "Invalid packet code: " << std::to_string(buffer.at(0));
+        << "Invalid packet code: " << std::to_string(*packet_type_ptr);
     return false;
   }
 
   packet->type = kPacketType->second;
-  if (buffer.size() > 1) {
-    const uint8_t kSize = buffer.at(1);
+  if (buffer.remaining() > 0) {
+    uint8_t* packet_size_ptr = nullptr;
+    if (!buffer.GetData(&packet_size_ptr)) {
+      return false;
+    }
 
-    const auto cbegin = buffer.cbegin() + sizeof(uint8_t) + sizeof(uint8_t);
-    const auto cend = cbegin + kSize;
+    const auto cbegin = buffer.cbegin() + buffer.position();
+    const auto cend = cbegin + *packet_size_ptr;
 
     if (cbegin >= buffer.cend() || cend > buffer.cend()) {
       return false;
     }
 
     packet->data.assign(cbegin, cend);
+    buffer.seek(SEEK_CUR, packet->data.size());
   }
 
   common::Log(common::Log::LogLevel::kDebug)

@@ -10,17 +10,18 @@ bool openrs::net::codec::decoder::global::GrabDecoder::Decode(
     return false;
   }
 
-  if (buffer.size() < 6) {
+  if (buffer.remaining() < 6) {
     return false;
   }
 
   // Validate the priority.
-  if (buffer.at(0) > 7) {
+  if (buffer.at(buffer.position()) > 7) {
     return false;
   }
 
   packet->type = PacketType::kGrabCache;
   packet->data.assign(buffer.cbegin(), buffer.cend());
+  buffer.seek(SEEK_CUR, packet->data.size());
 
   return true;
 }

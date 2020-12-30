@@ -31,14 +31,16 @@ void openrs::net::Session::Read() {
   this->buffer_input_.insert(this->buffer_input_.cend(), buffer.cbegin(),
                              buffer.cbegin() + amount_read);
 
-  codec::Packet packet;
-  if (!this->decoder_->Decode(this->buffer_input_, &packet)) {
-    common::Log(common::Log::LogLevel::kWarning)
-        << "Failed to decode a packet from a client.";
-    return;
-  }
+  while (0 != this->buffer_input_.remaining()) {
+    codec::Packet packet;
+    if (!this->decoder_->Decode(this->buffer_input_, &packet)) {
+      common::Log(common::Log::LogLevel::kWarning)
+          << "Failed to decode a packet from a client.";
+      return;
+    }
 
-  this->packet_handler_->Handle(packet, this);
+    this->packet_handler_->Handle(packet, this);
+  }
   this->buffer_input_.clear();
 
   this->bytes_received_ += amount_read;

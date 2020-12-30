@@ -265,6 +265,11 @@ class Buffer : public Container {
     }
   }
 
+  inline void clear() {
+    this->position_ = 0;
+    Container::clear();
+  }
+
   inline typename Container::size_type position() const {
     return this->position_;
   }

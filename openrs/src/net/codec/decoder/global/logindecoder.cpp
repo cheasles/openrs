@@ -12,18 +12,21 @@ bool openrs::net::codec::decoder::global::LoginDecoder::Decode(
     return false;
   }
 
-  if (buffer.size() < 1) {
+  uint8_t* packet_type_ptr = nullptr;
+  if (!buffer.GetData(&packet_type_ptr)) {
     return false;
   }
 
-  const auto kPacketType = LoginDecoder::code_mapping_.find(buffer.at(0));
+  const auto kPacketType = LoginDecoder::code_mapping_.find(*packet_type_ptr);
   if (LoginDecoder::code_mapping_.cend() == kPacketType) {
+    buffer.seek(SEEK_CUR, -1 * sizeof(uint8_t));
     return Decoder::Decode(buffer, packet);
   }
 
   packet->type = kPacketType->second;
-  if (buffer.size() > 1) {
-    packet->data.assign(buffer.cbegin() + sizeof(uint8_t), buffer.cend());
+  if (buffer.remaining() >= 1) {
+    packet->data.assign(buffer.cbegin() + buffer.position(), buffer.cend());
+    buffer.seek(SEEK_CUR, packet->data.size());
   }
 
   common::Log(common::Log::LogLevel::kDebug)
