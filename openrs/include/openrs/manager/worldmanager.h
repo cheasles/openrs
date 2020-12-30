@@ -1,6 +1,7 @@
 #pragma once
 
 #include <inttypes.h>
+#include <openrs/common/io/buffer.h>
 #include <openrs/common/singleton.h>
 #include <openrs/game/world.h>
 
@@ -22,8 +23,15 @@ class WorldManager : public openrs::manager::Manager,
 
   bool Init() override;
 
+  void GetLocalPlayerUpdate(
+      const uint32_t& kWorldId,
+      const std::shared_ptr<openrs::game::Player>& kPlayer,
+      openrs::net::Session* session,
+      openrs::common::io::Buffer<>* buffer) const;
+
   void SendMapRegion(const std::shared_ptr<openrs::game::Player>& kPlayer,
-                     openrs::net::Session* session) const;
+                     openrs::net::Session* session,
+                     const bool kSendLocalPlayerUpdate = false) const;
 
   inline const auto& worlds() const { return this->worlds_; }
   inline void add_world(const uint32_t& id, const openrs::game::World& world) {
@@ -33,9 +41,10 @@ class WorldManager : public openrs::manager::Manager,
     this->worlds_.insert_or_assign(id, std::move(world));
   }
 
-  inline void add_player(const uint32_t& kWorldId,
-                         const std::shared_ptr<openrs::game::Player>& kPlayer) {
-    this->worlds_[kWorldId].add_player(kPlayer);
+  inline uint32_t add_player(
+      const uint32_t& kWorldId,
+      const std::shared_ptr<openrs::game::Player>& kPlayer) {
+    return this->worlds_[kWorldId].add_player(kPlayer);
   }
   inline void remove_player(const uint32_t& kWorldId,
                             const uint32_t& kPlayerId) {

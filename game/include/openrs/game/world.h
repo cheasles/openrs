@@ -2,6 +2,7 @@
 
 #include <inttypes.h>
 
+#include <map>
 #include <unordered_map>
 
 #include "openrs/game/entity.h"
@@ -20,7 +21,7 @@ class World {
 
  private:
   WorldType world_type_;
-  std::unordered_map<uint32_t, std::shared_ptr<openrs::game::Player>> players_;
+  std::map<uint32_t, std::shared_ptr<openrs::game::Player>> players_;
   std::unordered_map<uint32_t, openrs::game::Entity> npcs_;
 
  public:
@@ -30,16 +31,40 @@ class World {
   inline const auto& npcs() const { return this->npcs_; }
   inline const auto& players() const { return this->players_; }
 
-  inline void add_player(const std::shared_ptr<openrs::game::Player>& kPlayer) {
-    this->players_.insert_or_assign(static_cast<uint32_t>(kPlayer->id),
-                                    kPlayer);
-  }
-  inline void remove_player(const uint32_t& kPlayerId) {
-    this->players_.erase(kPlayerId);
-  }
-  inline void remove_player(
+  inline uint32_t add_player(
       const std::shared_ptr<openrs::game::Player>& kPlayer) {
-    this->players_.erase(kPlayer->id);
+    uint32_t index = 0;
+    // Check if there are any gaps in the list:
+    if (this->players_.empty() ||
+        this->players_.crbegin()->first == this->players_.size() - 1) {
+      // No gaps, insert new player at the end.
+      index =
+          this->players_
+              .insert(
+                  this->players_.end(),
+                  std::pair<uint32_t, std::shared_ptr<openrs::game::Player>>(
+                      static_cast<uint32_t>(this->players_.size()), kPlayer))
+              ->first;
+    } else {
+      // There are gaps. Find an empty slot to insert the new player.
+      for (const auto& kIndex : this->players_) {
+        if (kIndex.first != index++) {
+          break;
+        }
+      }
+      index =
+          this->players_
+              .insert(
+                  this->players_.end(),
+                  std::pair<uint32_t, std::shared_ptr<openrs::game::Player>>(
+                      static_cast<uint32_t>(index), kPlayer))
+              ->first;
+    }
+
+    return index;
+  }
+  inline void remove_player(const uint32_t& kPlayerIndex) {
+    this->players_.erase(kPlayerIndex);
   }
 };
 

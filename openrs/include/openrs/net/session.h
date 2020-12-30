@@ -62,6 +62,7 @@ class Session {
   std::size_t bytes_sent_;
 
   uint32_t client_build_;
+  uint32_t player_index_;
   std::weak_ptr<openrs::game::Player> player_;
 
   static constexpr size_t kReadSize = 1024;
@@ -129,6 +130,7 @@ class Session {
   inline std::size_t bytes_sent() const { return this->bytes_sent_; }
 
   inline uint32_t client_build() const { return this->client_build_; }
+  inline uint32_t player_index() const { return this->player_index_; }
   inline auto player() const { return this->player_; }
 
   inline void set_socket(io::DataSocket& socket) {
@@ -141,6 +143,9 @@ class Session {
 
   inline void set_client_build(const uint32_t& client_build) {
     this->client_build_ = client_build;
+  }
+  inline void set_player_index(const uint32_t& player_index) {
+    this->player_index_ = player_index;
   }
   inline void set_player(const std::weak_ptr<openrs::game::Player>& player) {
     this->player_ = player;

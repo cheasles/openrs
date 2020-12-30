@@ -2,6 +2,7 @@
 
 #include <endian.h>
 
+#include <bitset>
 #include <fstream>
 #include <limits>
 #include <string>
@@ -147,6 +148,40 @@ class Buffer : public Container {
       }
     }
     return this->PutData<char>(0);
+  }
+
+  template <int Length>
+  bool PutBitSetLE(const std::bitset<Length>& kInput) {
+    std::vector<uint8_t> bytes;
+    bytes.resize((kInput.size() + 7) / 8, 0);
+    for (int i = 0; i < kInput.size(); ++i) {
+      if (kInput[i]) {
+        bytes[bytes.size() - i / 8 - 1] |= 1 << (i % 8);
+      }
+    }
+    for (int i = 0; i < bytes.size(); ++i) {
+      if (!this->PutData(bytes[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  template <int Length>
+  bool PutBitSetBE(const std::bitset<Length>& kInput) {
+    std::vector<uint8_t> bytes;
+    bytes.resize((kInput.size() + 7) / 8, 0);
+    for (int i = 0; i < kInput.size(); ++i) {
+      if (kInput[i]) {
+        bytes[i / 8] |= 1 << (7 - i % 8);
+      }
+    }
+    for (int i = 0; i < bytes.size(); ++i) {
+      if (!this->PutData(bytes[i])) {
+        return false;
+      }
+    }
+    return true;
   }
 
   template <typename Type>
