@@ -24,12 +24,17 @@ class Player : public database::models::PlayerModel,
   DisplayMode display_mode_;
   uint16_t screen_width_;
   uint16_t screen_height_;
+  bool force_next_map_load_refresh_;
+  uint8_t run_energy_;
+  uint32_t hit_points_;
 
  public:
   Player()
       : display_mode_(DisplayMode::kUnknown),
         screen_width_(0),
         screen_height_(0),
+        force_next_map_load_refresh_(false),
+        run_energy_(0),
         database::models::PlayerModel() {}
 
   Player& operator=(const Player&) = default;
@@ -80,6 +85,11 @@ class Player : public database::models::PlayerModel,
   inline auto display_mode() const { return this->display_mode_; }
   inline auto screen_width() const { return this->screen_width_; }
   inline auto screen_height() const { return this->screen_height_; }
+  inline auto force_next_map_load_refresh() const {
+    return this->force_next_map_load_refresh_;
+  }
+  inline auto run_energy() const { return this->run_energy_; }
+  inline auto hit_points() const { return this->hit_points_; }
 
   inline void set_display_mode(const DisplayMode& kDisplayMode) {
     this->display_mode_ = kDisplayMode;
@@ -89,6 +99,16 @@ class Player : public database::models::PlayerModel,
   }
   inline void set_screen_height(const uint16_t& kScreenHeight) {
     this->screen_height_ = kScreenHeight;
+  }
+  inline void set_force_next_map_load_refresh(
+      const bool& kSkForceNextMapLoadRefresh) {
+    this->force_next_map_load_refresh_ = kSkForceNextMapLoadRefresh;
+  }
+  inline void set_run_energy(const uint8_t& kRunEnergy) {
+    this->run_energy_ = kRunEnergy;
+  }
+  inline void set_hit_points(const uint8_t& kHitPoints) {
+    this->hit_points_ = kHitPoints;
   }
 };
 

@@ -19,24 +19,34 @@ class WorldEncoder : public Encoder {
  private:
   enum struct PacketHeaderType : uint8_t { kNone, kUint8, kUint16 };
 
-  static inline constexpr frozen::map<PacketType, uint8_t, 9> code_mapping_{
+  static inline constexpr frozen::map<PacketType, uint8_t, 14> code_mapping_{
       {PacketType::kLoginDetails, 2},
       {PacketType::kInterfaceTab, 14},
+      {PacketType::kRunEnergy, 25},
       {PacketType::kInterfaceWindowPane, 39},
       {PacketType::kMapRegion, 42},
       {PacketType::kConfigGlobal2, 63},
+      {PacketType::kConfigFile1, 81},
       {PacketType::kInterfaceComponentAnimation, 103},
+      {PacketType::kConfigFile1, 111},
+      {PacketType::kPlayerOption, 118},
       {PacketType::kInterfaceComponentText, 135},
+      {PacketType::kDynamicMapRegion, 144},
       {PacketType::kPing, 153},
       {PacketType::kConfigGlobal1, 154}};
-  static inline constexpr frozen::map<PacketType, PacketHeaderType, 9>
+  static inline constexpr frozen::map<PacketType, PacketHeaderType, 14>
       type_mapping_{
           {PacketType::kLoginDetails, PacketHeaderType::kUint8},
           {PacketType::kInterfaceTab, PacketHeaderType::kNone},
+          {PacketType::kRunEnergy, PacketHeaderType::kNone},
           {PacketType::kInterfaceWindowPane, PacketHeaderType::kNone},
           {PacketType::kMapRegion, PacketHeaderType::kUint16},
+          {PacketType::kConfigFile1, PacketHeaderType::kNone},
           {PacketType::kInterfaceComponentAnimation, PacketHeaderType::kNone},
+          {PacketType::kConfigFile1, PacketHeaderType::kNone},
+          {PacketType::kPlayerOption, PacketHeaderType::kUint8},
           {PacketType::kInterfaceComponentText, PacketHeaderType::kNone},
+          {PacketType::kDynamicMapRegion, PacketHeaderType::kUint16},
           {PacketType::kConfigGlobal2, PacketHeaderType::kNone},
           {PacketType::kConfigGlobal1, PacketHeaderType::kNone},
           {PacketType::kPing, PacketHeaderType::kNone}};

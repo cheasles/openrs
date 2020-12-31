@@ -13,6 +13,9 @@
 namespace openrs {
 namespace manager {
 
+/**
+ * Manages each world the server is currently hosting.
+ */
 class WorldManager : public openrs::manager::Manager,
                      public openrs::common::Singleton<WorldManager> {
  private:
@@ -21,17 +24,105 @@ class WorldManager : public openrs::manager::Manager,
  public:
   WorldManager(void) {}
 
+  /**
+   * Creates the required world objects for us to manage.
+   *
+   * @return Always returns true.
+   */
   bool Init() override;
 
+  /**
+   * Populate a buffer with information about local players.
+   *
+   * @note Players are considered local to one another if they are within a
+   *  short distance. This distance changes depending on the player's viewport.
+   *
+   * @param kWorldId The world the player belongs to.
+   * @param kPlayerIndex The current player index.
+   * @param kPlayer The player to find other local players for.
+   * @param buffer The buffer object to populate.
+   */
   void GetLocalPlayerUpdate(
-      const uint32_t& kWorldId,
+      const uint32_t& kWorldId, const uint32_t& kPlayerIndex,
       const std::shared_ptr<openrs::game::Player>& kPlayer,
-      openrs::net::Session* session,
       openrs::common::io::Buffer<>* buffer) const;
 
+  /**
+   * Sends either a dynamic or fixed map to the client.
+   *
+   * @param kPlayer The player to generate map data for.
+   * @param session The client session to send the data to.
+   * @param kSendLocalPlayerUpdate Send the local player information too.
+   */
+  inline void SendMap(const std::shared_ptr<openrs::game::Player>& kPlayer,
+                      openrs::net::Session* session,
+                      const bool kSendLocalPlayerUpdate = false) const {
+    if (false) {
+      this->SendDynamicMapRegion(kPlayer, session, kSendLocalPlayerUpdate);
+    } else {
+      this->SendMapRegion(kPlayer, session, kSendLocalPlayerUpdate);
+    }
+
+    kPlayer->set_force_next_map_load_refresh(false);
+  }
+
+  /**
+   * Sends fixed map to the client.
+   *
+   * @param kPlayer The player to generate map data for.
+   * @param session The client session to send the data to.
+   * @param kSendLocalPlayerUpdate Send the local player information too.
+   */
   void SendMapRegion(const std::shared_ptr<openrs::game::Player>& kPlayer,
                      openrs::net::Session* session,
                      const bool kSendLocalPlayerUpdate = false) const;
+
+  /**
+   * Sends a dynamic map to the client.
+   *
+   * @param kPlayer The player to generate map data for.
+   * @param session The client session to send the data to.
+   * @param kSendLocalPlayerUpdate Send the local player information too.
+   */
+  void SendDynamicMapRegion(
+      const std::shared_ptr<openrs::game::Player>& kPlayer,
+      openrs::net::Session* session,
+      const bool kSendLocalPlayerUpdate = false) const;
+
+  /**
+   * Sends the players run energy to them.
+   *
+   * @param kPlayer The player to get run energy data for.
+   * @param session The client session to send the data to.
+   */
+  void SendRunEnergy(const std::shared_ptr<openrs::game::Player>& kPlayer,
+                     openrs::net::Session* session) const;
+
+  /**
+   * Sends the players hitpoints to them.
+   *
+   * @param kPlayer The player to get hitpoint data for.
+   * @param session The client session to send the data to.
+   */
+  void SendPlayerHitPoints(const std::shared_ptr<openrs::game::Player>& kPlayer,
+                           openrs::net::Session* session) const;
+
+  /**
+   * Sends a string-based player option to the client.
+   *
+   * @note A player option is a selectable value when right-clicking a player.
+   *
+   * @param kPlayer The player to send the option to.
+   * @param session The client session to send the data to.
+   * @param kOption The string name of the option to send.
+   * @param kSlot The slot the new option should take.
+   * @param kTop Unknown.
+   * @param kCursor The cursor to show when hovering over the item.
+   */
+  void SendPlayerOption(const std::shared_ptr<openrs::game::Player>& kPlayer,
+                        openrs::net::Session* session,
+                        const std::string kOption, const uint8_t& kSlot,
+                        const bool& kTop, const uint16_t& kCursor = -1) const;
 
   inline const auto& worlds() const { return this->worlds_; }
   inline void add_world(const uint32_t& id, const openrs::game::World& world) {
