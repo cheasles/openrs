@@ -33,6 +33,8 @@ enum struct PacketType : uint8_t {
   kScreen,
   kPing,
   kAFK,
+  kFinishedLoadingRegion,
+  kReceivedPacketCount,
 };
 
 enum struct PacketOpCode : uint8_t {

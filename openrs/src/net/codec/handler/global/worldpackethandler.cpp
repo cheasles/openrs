@@ -2,6 +2,8 @@
 
 #include <openrs/common/log.h>
 
+#include "openrs/manager/interfacemanager.h"
+
 void openrs::net::codec::handler::global::WorldPacketHandler::Handle(
     openrs::net::codec::Packet& packet, openrs::net::Session* session) {
   switch (packet.type) {
@@ -28,6 +30,9 @@ void openrs::net::codec::handler::global::WorldPacketHandler::Handle(
         player->set_display_mode(*display_mode_ptr);
         player->set_screen_width(::be16toh(*screen_width_ptr));
         player->set_screen_height(::be16toh(*screen_height_ptr));
+        const auto& interface_manager =
+            openrs::manager::InterfaceManager::get();
+        interface_manager.SendInterfaces(player, session);
       }
 
       break;
