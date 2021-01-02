@@ -48,6 +48,8 @@ enum struct PacketType : uint8_t {
   kCustomPacket161,
   kMessage,
   kCreateTile,
+  kMusic,
+  kMusicEffect,
 };
 
 enum struct PacketOpCode : uint8_t {

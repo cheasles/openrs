@@ -26,6 +26,20 @@ class WorldManager : public openrs::manager::Manager,
     kDefault = 0,
   };
 
+  /**
+   * Music track IDs.
+   */
+  enum struct MusicTrackID : uint16_t {
+
+  };
+
+  /**
+   * Music effect IDs.
+   */
+  enum struct MusicEffectID : uint16_t {
+
+  };
+
  private:
   std::unordered_map<uint32_t, openrs::game::World> worlds_;
 
@@ -173,6 +187,33 @@ class WorldManager : public openrs::manager::Manager,
   void SendCreateWorldTile(const std::shared_ptr<openrs::game::Player>& kPlayer,
                            openrs::net::Session* session,
                            const openrs::game::WorldTile& kTile) const;
+
+  /**
+   * Sends a music track to the client.
+   *
+   * @param kPlayer The player to send interface settings to.
+   * @param session The client session to send the data to.
+   * @param kMusicId The track ID.
+   * @param kDelay How long to wait before the client plays the track.
+   * @param kVolume The volumne to play the track at. 255 is max volume.
+   */
+  void SendMusic(const std::shared_ptr<openrs::game::Player>& player,
+                 openrs::net::Session* session, const MusicTrackID& kMusicId,
+                 const uint8_t& kDelay = 100,
+                 const uint8_t& kVolume = 255) const;
+
+  /**
+   * Sends a music effect to the client.
+   *
+   * @param kPlayer The player to send interface settings to.
+   * @param session The client session to send the data to.
+   * @param kMusicId The effect ID.
+   * @param kVolume The volumne to play the effect at. 255 is max volume.
+   */
+  void SendMusicEffect(const std::shared_ptr<openrs::game::Player>& player,
+                       openrs::net::Session* session,
+                       const MusicEffectID& kMusicId,
+                       const uint8_t& kVolume = 255) const;
 
   inline const auto& worlds() const { return this->worlds_; }
   inline void add_world(const uint32_t& id, const openrs::game::World& world) {

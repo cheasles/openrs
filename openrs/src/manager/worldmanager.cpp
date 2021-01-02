@@ -243,3 +243,35 @@ void openrs::manager::WorldManager::SendCreateWorldTile(
   packet.data = buffer;
   session->Send(packet);
 }
+
+void openrs::manager::WorldManager::SendMusic(
+    const std::shared_ptr<openrs::game::Player>& player,
+    openrs::net::Session* session, const MusicTrackID& kMusicId,
+    const uint8_t& kDelay, const uint8_t& kVolume) const {
+  openrs::common::io::Buffer<> buffer;
+  buffer.PutDataBE<uint8_t>(kDelay);
+  buffer.PutShiftedPosDataLE(static_cast<uint16_t>(kMusicId));
+  buffer.PutShiftedPosDataLE(kVolume);
+
+  openrs::net::codec::Packet packet;
+  packet.type = openrs::net::codec::PacketType::kMusic;
+  packet.data = buffer;
+  session->Send(packet);
+}
+
+void openrs::manager::WorldManager::SendMusicEffect(
+    const std::shared_ptr<openrs::game::Player>& player,
+    openrs::net::Session* session, const MusicEffectID& kMusicId,
+    const uint8_t& kVolume) const {
+  openrs::common::io::Buffer<> buffer;
+  buffer.PutShiftedNegDataLE(kVolume);
+  buffer.PutData<uint8_t>(0);
+  buffer.PutData<uint8_t>(0);
+  buffer.PutData<uint8_t>(0);
+  buffer.PutDataBE(static_cast<uint16_t>(kMusicId));
+
+  openrs::net::codec::Packet packet;
+  packet.type = openrs::net::codec::PacketType::kMusicEffect;
+  packet.data = buffer;
+  session->Send(packet);
+}
