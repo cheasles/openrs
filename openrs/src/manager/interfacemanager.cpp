@@ -18,6 +18,8 @@ void openrs::manager::InterfaceManager::SendInterfaces(
   } else {
     this->SendFixedInterfaces(player, session);
   }
+
+  this->SendTabTimer(player, session);
 }
 
 void openrs::manager::InterfaceManager::SendFixedInterfaces(
@@ -62,7 +64,6 @@ void openrs::manager::InterfaceManager::SendFixedInterfaces(
   this->SendTabSettings(player, session);
   this->SendTabTaskSystem(player, session);
   this->SendTabCombatStyles(player, session);
-  // sendTimerInterface();
 }
 
 void openrs::manager::InterfaceManager::SendResizableInterfaces(
@@ -148,6 +149,39 @@ void openrs::manager::InterfaceManager::SendInterfaceComponentText(
   text_packet.type = openrs::net::codec::PacketType::kInterfaceComponentText;
   text_packet.data = buffer;
   session->Send(text_packet);
+}
+
+void openrs::manager::InterfaceManager::SendInterfaceComponentSettings(
+    const std::shared_ptr<openrs::game::Player>& player,
+    openrs::net::Session* session, const InterfaceID& kInterfaceId,
+    const ComponentID& kComponentId, const uint16_t& kFromSlot,
+    const uint16_t& kToSlot, const uint32_t& kSettingsHash) const {
+  openrs::common::io::Buffer<> buffer;
+  buffer.PutDataVBE(kSettingsHash);
+  buffer.PutDataBE<uint32_t>((static_cast<uint32_t>(kInterfaceId) << 16) |
+                             static_cast<uint32_t>(kComponentId));
+  buffer.PutShiftedPosDataBE(kFromSlot);
+  buffer.PutDataLE(kToSlot);
+
+  openrs::net::codec::Packet packet;
+  packet.type = openrs::net::codec::PacketType::kInterfaceComponentSetting;
+  packet.data = buffer;
+  session->Send(packet);
+}
+
+void openrs::manager::InterfaceManager::SendHideInterfaceComponent(
+    const std::shared_ptr<openrs::game::Player>& player,
+    openrs::net::Session* session, const InterfaceID& kInterfaceId,
+    const ComponentID& kComponentId, const bool& kHidden) const {
+  openrs::common::io::Buffer<> buffer;
+  buffer.PutDataVBE<uint32_t>((static_cast<uint32_t>(kInterfaceId) << 16) |
+                              static_cast<uint32_t>(kComponentId));
+  buffer.PutData<uint8_t>(kHidden ? 1 : 0);
+
+  openrs::net::codec::Packet packet;
+  packet.type = openrs::net::codec::PacketType::kInterfaceHide;
+  packet.data = buffer;
+  session->Send(packet);
 }
 
 void openrs::manager::InterfaceManager::SendInterfaceComponentAnimation(

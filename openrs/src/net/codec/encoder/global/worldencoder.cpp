@@ -30,12 +30,7 @@ bool openrs::net::codec::encoder::global::WorldEncoder::Encode(
         buffer->PutData<uint8_t>(kPacketCode->second);
       }
     } else {
-      if (kPacketCode->second >= 128) {
-        buffer->PutDataBE<uint16_t>(static_cast<uint16_t>(kPacketCode->second) +
-                                    32768);
-      } else {
-        buffer->PutData<uint8_t>(kPacketCode->second);
-      }
+      buffer->PutSmartBE(kPacketCode->second);
     }
   }
   switch (kPacketType->second) {

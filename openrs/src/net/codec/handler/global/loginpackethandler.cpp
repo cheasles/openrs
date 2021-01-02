@@ -61,6 +61,11 @@ void SendLoginDetails(const std::shared_ptr<openrs::game::Player>& player,
   interface_manager.SendInterfaces(player, session);
   world_manager.SendRunEnergy(player, session);
   world_manager.SendPlayerHitPoints(player, session);
+  world_manager.SendItemLook(player, session);
+  world_manager.SendCustom161(player, session);
+  world_manager.SendMessage(
+      player, session, openrs::manager::WorldManager::MessageType::kDefault,
+      "Welcome");
 }
 
 void HandleLoginWorld(openrs::net::codec::Packet& packet,

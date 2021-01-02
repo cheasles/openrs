@@ -184,6 +184,31 @@ class Buffer : public Container {
     return true;
   }
 
+  bool PutBitSetBE(const std::vector<bool>& kInput) {
+    std::vector<uint8_t> bytes;
+    bytes.resize((kInput.size() + 7) / 8, 0);
+    for (int i = 0; i < kInput.size(); ++i) {
+      if (kInput[i]) {
+        bytes[i / 8] |= 1 << (7 - i % 8);
+      }
+    }
+    for (int i = 0; i < bytes.size(); ++i) {
+      if (!this->PutData(bytes[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  template <typename Type>
+  bool PutSmartBE(const Type& kValue) {
+    if (kValue >= std::numeric_limits<int8_t>::max()) {
+      return this->PutDataBE<Type>(static_cast<Type>(kValue) + 32768);
+    } else {
+      return this->PutDataBE<uint8_t>(kValue);
+    }
+  }
+
   template <typename Type>
   inline Type ShiftNegative(const Type& kValue, const uint8_t& kShift) const {
     return (kValue & ~std::numeric_limits<uint8_t>::max()) +

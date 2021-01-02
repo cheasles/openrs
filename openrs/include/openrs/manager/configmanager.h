@@ -61,6 +61,49 @@ class ConfigManager : public openrs::manager::Manager,
   void GenerateDefaultConfig();
 
   /**
+   * Sends a variable option to the client.
+   *
+   * @param kPlayer The player to send the variable for.
+   * @param session The client session to send the data to.
+   * @param kId The ID of the variable option.
+   * @param kValue The new value.
+   */
+  inline void SendVariable(const std::shared_ptr<openrs::game::Player>& kPlayer,
+                           openrs::net::Session* session,
+                           const GlobalConfig& kId,
+                           const uint32_t& kValue) const {
+    if (kValue > std::numeric_limits<uint8_t>::max()) {
+      this->SendVariable2(kPlayer, session, kId, kValue);
+    } else {
+      this->SendVariable1(kPlayer, session, kId, static_cast<uint8_t>(kValue));
+    }
+  }
+
+  /**
+   * Sends a byte-sized global variable to the client.
+   *
+   * @param kPlayer The player to send the variable for.
+   * @param session The client session to send the data to.
+   * @param kId The ID of the variable option.
+   * @param kValue The new value.
+   */
+  void SendVariable1(const std::shared_ptr<openrs::game::Player>& kPlayer,
+                     openrs::net::Session* session, const GlobalConfig& kId,
+                     const uint8_t& kValue) const;
+
+  /**
+   * Sends an int-sized variable option to the client.
+   *
+   * @param kPlayer The player to send the variable for.
+   * @param session The client session to send the data to.
+   * @param kId The ID of the variable option.
+   * @param kValue The new value.
+   */
+  void SendVariable2(const std::shared_ptr<openrs::game::Player>& kPlayer,
+                     openrs::net::Session* session, const GlobalConfig& kId,
+                     const uint32_t& kValue) const;
+
+  /**
    * Sends a global config option to the client.
    *
    * @param kPlayer The player to send the config option for.
@@ -119,7 +162,8 @@ class ConfigManager : public openrs::manager::Manager,
     if (kValue > std::numeric_limits<uint8_t>::max()) {
       this->SendFileConfig2(kPlayer, session, kId, kValue);
     } else {
-      this->SendFileConfig1(kPlayer, session, kId, static_cast<uint8_t>(kValue));
+      this->SendFileConfig1(kPlayer, session, kId,
+                            static_cast<uint8_t>(kValue));
     }
   }
 

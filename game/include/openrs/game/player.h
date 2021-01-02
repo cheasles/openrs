@@ -27,6 +27,10 @@ class Player : public database::models::PlayerModel,
   bool force_next_map_load_refresh_;
   uint8_t run_energy_;
   uint32_t hit_points_;
+  bool old_items_look_;
+  bool is_shift_drop_;
+  bool is_slow_drag_;
+  bool is_zoom_;
 
  public:
   Player()
@@ -35,6 +39,11 @@ class Player : public database::models::PlayerModel,
         screen_height_(0),
         force_next_map_load_refresh_(false),
         run_energy_(0),
+        hit_points_(0),
+        old_items_look_(false),
+        is_shift_drop_(false),
+        is_slow_drag_(false),
+        is_zoom_(false),
         database::models::PlayerModel() {}
 
   Player& operator=(const Player&) = default;
@@ -90,6 +99,10 @@ class Player : public database::models::PlayerModel,
   }
   inline auto run_energy() const { return this->run_energy_; }
   inline auto hit_points() const { return this->hit_points_; }
+  inline auto old_items_look() const { return this->old_items_look_; }
+  inline auto is_shift_drop() const { return this->is_shift_drop_; }
+  inline auto is_slow_drag() const { return this->is_slow_drag_; }
+  inline auto is_zoom() const { return this->is_zoom_; }
 
   inline void set_display_mode(const DisplayMode& kDisplayMode) {
     this->display_mode_ = kDisplayMode;
@@ -109,6 +122,9 @@ class Player : public database::models::PlayerModel,
   }
   inline void set_hit_points(const uint8_t& kHitPoints) {
     this->hit_points_ = kHitPoints;
+  }
+  inline void set_old_items_look(const bool& kOldItemsLook) {
+    this->old_items_look_ = kOldItemsLook;
   }
 };
 

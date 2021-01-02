@@ -23,12 +23,16 @@ class InterfaceManager : public openrs::manager::Manager,
     kNone = 0,
   };
   enum struct TabID : uint16_t {
+    kOverlay = 1,
     k9 = 9,
+    kOverlayFixed = 11,
+    kTimerFixed = 11,
     k15 = 15,
     k21 = 21,
     k22 = 22,
     k23 = 23,
     k25 = 25,
+    kTimer = 26,
     k37 = 37,
     kCombatStyles = 111,
     kTaskSystem = 112,
@@ -103,10 +107,16 @@ class InterfaceManager : public openrs::manager::Manager,
     kSqueelOfFortune = 1139,
     kTaskSystem = 3002,
     kQuests = 3002,
+    kTimer = 3039,
   };
 
   enum struct ComponentID : uint16_t {
-    kNotes = 34,
+    k5 = 5,
+    k6 = 6,
+    k7 = 7,
+    k8 = 8,
+    k9 = 9,
+    k12 = 12,
   };
 
   enum struct EmoteID : uint32_t {
@@ -152,6 +162,37 @@ class InterfaceManager : public openrs::manager::Manager,
       openrs::net::Session* session, const InterfaceID& kInterfaceId,
       const ComponentID& kComponentId, const std::string& kText) const;
 
+  /**
+   * Sends an interface component settings value to the client.
+   *
+   * @param kPlayer The player to send interface settings to.
+   * @param session The client session to send the data to.
+   * @param kInterfaceId The interface the setting applies to.
+   * @param kComponentId The component the setting applies to.
+   * @param kFromSlot
+   * @param kToSlot
+   * @param kSettingsHash The new settings value.
+   */
+  void SendInterfaceComponentSettings(
+      const std::shared_ptr<openrs::game::Player>& player,
+      openrs::net::Session* session, const InterfaceID& kInterfaceId,
+      const ComponentID& kComponentId, const uint16_t& kFromSlot,
+      const uint16_t& kToSlot, const uint32_t& kSettingsHash) const;
+
+  /**
+   * Hides (or unhides) an interface component for the client.
+   *
+   * @param kPlayer The player to send interface hidden values to.
+   * @param session The client session to send the data to.
+   * @param kInterfaceId The interface the setting applies to.
+   * @param kComponentId The component the setting applies to.
+   * @param kHidden Whether to hide or unhide the interface component.
+   */
+  void SendHideInterfaceComponent(
+      const std::shared_ptr<openrs::game::Player>& player,
+      openrs::net::Session* session, const InterfaceID& kInterfaceId,
+      const ComponentID& kComponentId, const bool& kHidden) const;
+
   inline void SendTab(const std::shared_ptr<openrs::game::Player>& player,
                       openrs::net::Session* session,
                       const TabID& kTabIdResizable, const TabID& kTabIdFixed,
@@ -160,6 +201,20 @@ class InterfaceManager : public openrs::manager::Manager,
         this->IsResizable(player) ? PaneID::kResizable : PaneID::kFixed;
     this->SendTab(player, session, kWindow,
                   this->IsResizable(player) ? kTabIdResizable : kTabIdFixed,
+                  kInterfaceId);
+  }
+
+  /**
+   * Sends an overlay interface to the client.
+   *
+   * @param kPlayer The player to send interface settings to.
+   * @param session The client session to send the data to.
+   * @param kInterfaceId The interface the setting applies to.
+   */
+  inline void SendOverlay(const std::shared_ptr<openrs::game::Player>& player,
+                          openrs::net::Session* session,
+                          const InterfaceID& kInterfaceId) const {
+    this->SendTab(player, session, TabID::kOverlay, TabID::kOverlayFixed,
                   kInterfaceId);
   }
 
@@ -235,6 +290,16 @@ class InterfaceManager : public openrs::manager::Manager,
       openrs::net::Session* session) const {
     this->SendTab(player, session, TabID::kSqueelOfFortune,
                   TabID::kSqueelOfFortuneFixed, InterfaceID::kSqueelOfFortune);
+    this->SendHideInterfaceComponent(
+        player, session, InterfaceID::kSqueelOfFortune, ComponentID::k8, true);
+    this->SendHideInterfaceComponent(
+        player, session, InterfaceID::kSqueelOfFortune, ComponentID::k12, true);
+  }
+
+  inline void SendTabTimer(const std::shared_ptr<openrs::game::Player>& player,
+                           openrs::net::Session* session) const {
+    this->SendTab(player, session, TabID::kTimer, TabID::kTimerFixed,
+                  InterfaceID::kTimer);
   }
 
   void SendWindowPane(const std::shared_ptr<openrs::game::Player>& player,

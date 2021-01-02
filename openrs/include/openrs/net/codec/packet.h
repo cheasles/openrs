@@ -27,6 +27,10 @@ enum struct PacketType : uint8_t {
   kInterfaceTab,
   kInterfaceComponentAnimation,
   kInterfaceComponentText,
+  kInterfaceComponentSetting,
+  kInterfaceHide,
+  kVariable1,
+  kVariable2,
   kConfigGlobal1,
   kConfigGlobal2,
   kConfigFile1,
@@ -40,6 +44,10 @@ enum struct PacketType : uint8_t {
   kReceivedPacketCount,
   kRunEnergy,
   kPlayerOption,
+  kItemLook,
+  kCustomPacket161,
+  kMessage,
+  kCreateTile,
 };
 
 enum struct PacketOpCode : uint8_t {

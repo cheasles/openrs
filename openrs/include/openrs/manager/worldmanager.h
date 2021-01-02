@@ -18,6 +18,14 @@ namespace manager {
  */
 class WorldManager : public openrs::manager::Manager,
                      public openrs::common::Singleton<WorldManager> {
+ public:
+  /**
+   * Supported message types to send to clients.
+   */
+  enum struct MessageType : uint16_t {
+    kDefault = 0,
+  };
+
  private:
   std::unordered_map<uint32_t, openrs::game::World> worlds_;
 
@@ -123,6 +131,48 @@ class WorldManager : public openrs::manager::Manager,
                         openrs::net::Session* session,
                         const std::string kOption, const uint8_t& kSlot,
                         const bool& kTop, const uint16_t& kCursor = -1) const;
+
+  /**
+   * Sends the item look packet to the client.
+   *
+   * @param kPlayer The player to get the item look information from.
+   * @param session The client session to send the data to.
+   */
+  void SendItemLook(const std::shared_ptr<openrs::game::Player>& kPlayer,
+                    openrs::net::Session* session) const;
+
+  /**
+   * Sends custom packet to the client.
+   *
+   * @param kPlayer The player to generate map data for.
+   * @param session The client session to send the data to.
+   */
+  void SendCustom161(const std::shared_ptr<openrs::game::Player>& kPlayer,
+                     openrs::net::Session* session) const;
+
+  /**
+   * Sends a text message to the client.
+   *
+   * @param kPlayer The player to send the message to.
+   * @param session The client session to send the data to.
+   * @param kMessageType The type of message to send.
+   * @param kMessage The string message to send.
+   */
+  void SendMessage(const std::shared_ptr<openrs::game::Player>& kPlayer,
+                   openrs::net::Session* session,
+                   const MessageType& kMessageType,
+                   const std::string& kMessage) const;
+
+  /**
+   * Sends a text message to the client.
+   *
+   * @param kPlayer The player to grab map information from.
+   * @param session The client session to send the data to.
+   * @param kTile The tile to send.
+   */
+  void SendCreateWorldTile(const std::shared_ptr<openrs::game::Player>& kPlayer,
+                           openrs::net::Session* session,
+                           const openrs::game::WorldTile& kTile) const;
 
   inline const auto& worlds() const { return this->worlds_; }
   inline void add_world(const uint32_t& id, const openrs::game::World& world) {

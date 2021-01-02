@@ -90,11 +90,49 @@ void openrs::manager::WorldManager::SendDynamicMapRegion(
   }
 
   buffer.PutShiftedNegDataBE<uint8_t>(2);
-  buffer.PutDataLE<uint16_t>(kPlayer->region_y());
-  buffer.PutShiftedPosDataLE<uint16_t>(kPlayer->region_x());
+  buffer.PutDataLE<uint16_t>(kPlayer->chunk_y());
+  buffer.PutShiftedPosDataLE<uint16_t>(kPlayer->chunk_x());
   buffer.PutShiftedNegDataBE<uint8_t>(
       kPlayer->force_next_map_load_refresh() ? 1 : 0);
   buffer.PutData<uint8_t>(-1 * kPlayer->map_size());
+
+  std::vector<uint32_t> map_regions;
+  std::set<uint32_t> real_map_regions;
+  kPlayer->GetDynamicMapRegions(
+      openrs::game::WorldTile::MAP_SIZES[kPlayer->map_size()] >> 4,
+      &map_regions, &real_map_regions);
+  auto bitset = new std::vector<bool>();
+  for (const auto& kMapRegion : map_regions) {
+    if (kMapRegion == 0) {
+      bitset->emplace_back(false);
+    } else {
+      const auto kRegionHash = std::bitset<18>(kMapRegion);
+      bitset->emplace_back(true);
+      for (size_t i = 0; i < kRegionHash.size(); ++i) {
+        bitset->emplace_back(kRegionHash[i]);
+      }
+    }
+  }
+
+  buffer.PutBitSetBE(*bitset);
+  delete bitset;
+
+  const auto& kCacheConfig =
+      openrs::manager::ConfigManager::get().cache_config().at(718);
+  for (const auto& kMapRegion : real_map_regions) {
+    if (kCacheConfig["map_archive_keys"].contains(std::to_string(kMapRegion))) {
+      for (const auto& kXteaKey :
+           kCacheConfig["map_archive_keys"][std::to_string(kMapRegion)]
+               .get<std::vector<uint32_t>>()) {
+        buffer.PutDataBE<uint32_t>(kXteaKey);
+      }
+    } else {
+      buffer.PutDataBE<uint32_t>(0);
+      buffer.PutDataBE<uint32_t>(0);
+      buffer.PutDataBE<uint32_t>(0);
+      buffer.PutDataBE<uint32_t>(0);
+    }
+  }
 
   openrs::net::codec::Packet region_packet;
   region_packet.type = openrs::net::codec::PacketType::kDynamicMapRegion;
@@ -134,6 +172,74 @@ void openrs::manager::WorldManager::SendPlayerOption(
 
   openrs::net::codec::Packet packet;
   packet.type = openrs::net::codec::PacketType::kPlayerOption;
+  packet.data = buffer;
+  session->Send(packet);
+}
+
+void openrs::manager::WorldManager::SendItemLook(
+    const std::shared_ptr<openrs::game::Player>& kPlayer,
+    openrs::net::Session* session) const {
+  openrs::common::io::Buffer<> buffer;
+  buffer.PutData<uint8_t>(kPlayer->old_items_look() ? 1 : 0);
+
+  openrs::net::codec::Packet packet;
+  packet.type = openrs::net::codec::PacketType::kItemLook;
+  packet.data = buffer;
+  session->Send(packet);
+}
+
+void openrs::manager::WorldManager::SendCustom161(
+    const std::shared_ptr<openrs::game::Player>& kPlayer,
+    openrs::net::Session* session) const {
+  openrs::common::io::Buffer<> buffer;
+  uint8_t flag = 0;
+  if (kPlayer->is_shift_drop()) {
+    flag |= 1;
+  }
+  if (kPlayer->is_slow_drag()) {
+    flag |= 2;
+  }
+  if (kPlayer->is_zoom()) {
+    flag |= 4;
+  }
+
+  buffer.PutData<uint8_t>(flag);
+
+  openrs::net::codec::Packet packet;
+  packet.type = openrs::net::codec::PacketType::kCustomPacket161;
+  packet.data = buffer;
+  session->Send(packet);
+}
+
+void openrs::manager::WorldManager::SendMessage(
+    const std::shared_ptr<openrs::game::Player>& kPlayer,
+    openrs::net::Session* session, const MessageType& kMessageType,
+    const std::string& kMessage) const {
+  openrs::common::io::Buffer<> buffer;
+  buffer.PutSmartBE(static_cast<uint16_t>(kMessageType));
+  buffer.PutDataBE<uint32_t>(kPlayer->tile_hash());
+  buffer.PutDataBE<uint8_t>(1);
+  buffer.PutString(kPlayer->username);
+  buffer.PutString(kMessage);
+
+  openrs::net::codec::Packet packet;
+  packet.type = openrs::net::codec::PacketType::kMessage;
+  packet.data = buffer;
+  session->Send(packet);
+}
+
+void openrs::manager::WorldManager::SendCreateWorldTile(
+    const std::shared_ptr<openrs::game::Player>& kPlayer,
+    openrs::net::Session* session, const openrs::game::WorldTile& kTile) const {
+  openrs::common::io::Buffer<> buffer;
+  buffer.PutShiftedPosDataBE<uint8_t>(kTile.GetLocalY(
+      *kPlayer, openrs::game::WorldTile::MAP_SIZES[kPlayer->map_size()] >> 4));
+  buffer.PutDataBE<uint8_t>(-1 * kTile.plane());
+  buffer.PutShiftedNegDataBE<uint8_t>(kTile.GetLocalX(
+      *kPlayer, openrs::game::WorldTile::MAP_SIZES[kPlayer->map_size()] >> 4));
+
+  openrs::net::codec::Packet packet;
+  packet.type = openrs::net::codec::PacketType::kCreateTile;
   packet.data = buffer;
   session->Send(packet);
 }

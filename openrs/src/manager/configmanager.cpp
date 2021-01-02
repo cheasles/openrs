@@ -87,6 +87,34 @@ void openrs::manager::ConfigManager::GenerateDefaultConfig() {
   output_config << std::setw(4) << this->json_config_ << std::endl;
 }
 
+void openrs::manager::ConfigManager::SendVariable1(
+    const std::shared_ptr<openrs::game::Player>& player,
+    openrs::net::Session* session, const GlobalConfig& kId,
+    const uint8_t& kValue) const {
+  openrs::common::io::Buffer<> buffer;
+  buffer.PutShiftedPosDataLE<uint16_t>(static_cast<uint16_t>(kId));
+  buffer.PutShiftedPosDataLE<uint8_t>(kValue);
+
+  openrs::net::codec::Packet packet;
+  packet.type = openrs::net::codec::PacketType::kVariable1;
+  packet.data = buffer;
+  session->Send(packet);
+}
+
+void openrs::manager::ConfigManager::SendVariable2(
+    const std::shared_ptr<openrs::game::Player>& player,
+    openrs::net::Session* session, const GlobalConfig& kId,
+    const uint32_t& kValue) const {
+  openrs::common::io::Buffer<> buffer;
+  buffer.PutShiftedPosDataBE<uint16_t>(static_cast<uint16_t>(kId));
+  buffer.PutDataLE(kValue);
+
+  openrs::net::codec::Packet packet;
+  packet.type = openrs::net::codec::PacketType::kVariable2;
+  packet.data = buffer;
+  session->Send(packet);
+}
+
 void openrs::manager::ConfigManager::SendGlobalConfig1(
     const std::shared_ptr<openrs::game::Player>& player,
     openrs::net::Session* session, const GlobalConfig& kId,

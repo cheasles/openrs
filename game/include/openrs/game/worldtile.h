@@ -4,6 +4,7 @@
 #include <openrs/database/columnsets/worldtile.h>
 
 #include <array>
+#include <set>
 #include <vector>
 
 namespace openrs {
@@ -35,8 +36,25 @@ class WorldTile
     return *this;
   }
 
+  /**
+   * Calculates all fixed map region IDs for the current tile.
+   *
+   * @param kMapSize The number of surrounding tiles to include.
+   * @param output Output storage for regions.
+   */
   void GetMapRegions(const uint8_t& kMapSize,
                      std::vector<uint32_t>* output) const;
+
+  /**
+   * Calculates all dynamic map region IDs for the current tile.
+   *
+   * @param kMapSize The number of surrounding tiles to include.
+   * @param output Output storage for regions as a list of pairs of region IDs,
+   *  the first being the client ID and the second the 'real' one.
+   */
+  void GetDynamicMapRegions(const uint8_t& kMapSize,
+                            std::vector<uint32_t>* output_client,
+                            std::set<uint32_t>* output_real) const;
 
   inline bool WithinDistance(const WorldTile& kPoint,
                              const uint32_t& kDistance = 14) const {
@@ -48,6 +66,14 @@ class WorldTile
     const int32_t kDeltaY = kPoint.y() - this->y();
     return kDeltaX <= kDistance && kDeltaX >= -1 * kDistance &&
            kDeltaY <= kDistance && kDeltaY >= -1 * kDistance;
+  }
+
+  inline uint32_t GetLocalX(const WorldTile& local, const uint8_t& kMapSize) const {
+    return this->x() - 8 * (local.chunk_x() - kMapSize);
+  }
+
+  inline uint32_t GetLocalY(const WorldTile& local, const uint8_t& kMapSize) const {
+    return this->y() - 8 * (local.chunk_y() - kMapSize);
   }
 
   inline uint32_t x() const { return this->position_x; }
