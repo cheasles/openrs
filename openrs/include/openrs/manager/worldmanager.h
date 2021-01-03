@@ -54,6 +54,22 @@ class WorldManager : public openrs::manager::Manager,
   bool Init() override;
 
   /**
+   * Starts a game session for a player.
+   *
+   * When a player first logs into the server, we have to send a few different
+   * bits of information to them. This method calls all the appropriate parts
+   * to make sure the client gets everything they need to start.
+   *
+   * @note The player object should have already been added to the world using
+   *  `WorldManager::add_player`.
+   *
+   * @param kPlayer The player to generate map data for.
+   * @param session The client session to send the data to.
+   */
+  void StartPlayer(const std::shared_ptr<openrs::game::Player>& kPlayer,
+                   openrs::net::Session* session) const;
+
+  /**
    * Populate a buffer with information about local players.
    *
    * @note Players are considered local to one another if they are within a

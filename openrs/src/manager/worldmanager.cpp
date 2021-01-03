@@ -1,11 +1,12 @@
 #include "openrs/manager/worldmanager.h"
 
-#include <openrs/common/log.h>
 #include <openrs/common/io/buffer.h>
+#include <openrs/common/log.h>
 
 #include <bitset>
 
 #include "openrs/manager/configmanager.h"
+#include "openrs/manager/interfacemanager.h"
 
 bool openrs::manager::WorldManager::Init() {
   this->add_world(1, openrs::game::World());
@@ -13,6 +14,21 @@ bool openrs::manager::WorldManager::Init() {
   common::Log(common::Log::LogLevel::kInfo)
       << "[WorldManager] Initialized " << this->worlds_.size() << " worlds.";
   return true;
+}
+
+void openrs::manager::WorldManager::StartPlayer(
+    const std::shared_ptr<openrs::game::Player>& kPlayer,
+    openrs::net::Session* session) const {
+  this->SendMap(kPlayer, session, true);
+  const auto& interface_manager = openrs::manager::InterfaceManager::get();
+  interface_manager.SendInterfaces(kPlayer, session);
+  this->SendRunEnergy(kPlayer, session);
+  this->SendPlayerHitPoints(kPlayer, session);
+  this->SendItemLook(kPlayer, session);
+  this->SendCustom161(kPlayer, session);
+  this->SendMessage(kPlayer, session,
+                    openrs::manager::WorldManager::MessageType::kDefault,
+                    "Welcome");
 }
 
 void openrs::manager::WorldManager::GetLocalPlayerUpdate(

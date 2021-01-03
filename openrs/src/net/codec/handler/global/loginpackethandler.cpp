@@ -18,7 +18,6 @@
 #include "openrs/manager/cache/grabmanager.h"
 #include "openrs/manager/configmanager.h"
 #include "openrs/manager/databasemanager.h"
-#include "openrs/manager/interfacemanager.h"
 #include "openrs/manager/worldmanager.h"
 #include "openrs/net/codec/decoder/global/worlddecoder.h"
 #include "openrs/net/codec/encoder/global/worldencoder.h"
@@ -56,16 +55,7 @@ void SendLoginDetails(const std::shared_ptr<openrs::game::Player>& player,
   session->Send(details_packet);
 
   const auto& world_manager = openrs::manager::WorldManager::get();
-  world_manager.SendMap(player, session, true);
-  const auto& interface_manager = openrs::manager::InterfaceManager::get();
-  interface_manager.SendInterfaces(player, session);
-  world_manager.SendRunEnergy(player, session);
-  world_manager.SendPlayerHitPoints(player, session);
-  world_manager.SendItemLook(player, session);
-  world_manager.SendCustom161(player, session);
-  world_manager.SendMessage(
-      player, session, openrs::manager::WorldManager::MessageType::kDefault,
-      "Welcome");
+  world_manager.StartPlayer(player, session);
 }
 
 void HandleLoginWorld(openrs::net::codec::Packet& packet,
