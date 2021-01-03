@@ -1,7 +1,7 @@
 #pragma once
 
 #include <inttypes.h>
-#include <openrs/common/io/buffer.h>
+#include <openrs/common/io/bitbuffer.h>
 #include <openrs/common/singleton.h>
 #include <openrs/game/world.h>
 
@@ -67,7 +67,7 @@ class WorldManager : public openrs::manager::Manager,
   void GetLocalPlayerUpdate(
       const uint32_t& kWorldId, const uint32_t& kPlayerIndex,
       const std::shared_ptr<openrs::game::Player>& kPlayer,
-      openrs::common::io::Buffer<>* buffer) const;
+      openrs::common::io::BitBuffer<>* buffer) const;
 
   /**
    * Sends either a dynamic or fixed map to the client.

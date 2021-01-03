@@ -1,6 +1,7 @@
 #include "openrs/manager/worldmanager.h"
 
 #include <openrs/common/log.h>
+#include <openrs/common/io/buffer.h>
 
 #include <bitset>
 
@@ -17,34 +18,23 @@ bool openrs::manager::WorldManager::Init() {
 void openrs::manager::WorldManager::GetLocalPlayerUpdate(
     const uint32_t& kWorldId, const uint32_t& kPlayerIndex,
     const std::shared_ptr<openrs::game::Player>& kPlayer,
-    openrs::common::io::Buffer<>* buffer) const {
-  auto bitset = new std::bitset<30 + 2046 * 18>();
-  size_t bitset_offset = 0;
-  const auto kTileHash = std::bitset<30>(kPlayer->tile_hash());
-  for (size_t i = 0; i < kTileHash.size(); ++i) {
-    (*bitset)[bitset_offset++] = kTileHash[i];
-  }
+    openrs::common::io::BitBuffer<>* buffer) const {
+  buffer->resize((30 + 2046 * 18 + 7) / 8);
+  buffer->PutData(30, kPlayer->tile_hash());
   for (const auto& kLocalPlayer : this->worlds_.at(kWorldId).players()) {
     if (kLocalPlayer.first == kPlayerIndex) {
       continue;
     }
 
-    bitset_offset = 30 + 18 * kLocalPlayer.first;
-    const auto kRegionHash =
-        std::bitset<18>(kLocalPlayer.second->region_hash());
-    for (size_t i = 0; i < kRegionHash.size(); ++i) {
-      (*bitset)[bitset_offset++] = kRegionHash[i];
-    }
+    buffer->seek(SEEK_SET, 30 + 18 * kLocalPlayer.first);
+    buffer->PutData(18, kLocalPlayer.second->region_hash());
   }
-
-  buffer->PutBitSetBE<30 + 2046 * 18>(*bitset);
-  delete bitset;
 }
 
 void openrs::manager::WorldManager::SendMapRegion(
     const std::shared_ptr<openrs::game::Player>& kPlayer,
     openrs::net::Session* session, const bool kSendLocalPlayerUpdate) const {
-  openrs::common::io::Buffer<> buffer;
+  openrs::common::io::BitBuffer<> buffer;
   if (kSendLocalPlayerUpdate) {
     this->GetLocalPlayerUpdate(1, session->player_index(), kPlayer, &buffer);
   }
@@ -84,7 +74,7 @@ void openrs::manager::WorldManager::SendMapRegion(
 void openrs::manager::WorldManager::SendDynamicMapRegion(
     const std::shared_ptr<openrs::game::Player>& kPlayer,
     openrs::net::Session* session, const bool kSendLocalPlayerUpdate) const {
-  openrs::common::io::Buffer<> buffer;
+  openrs::common::io::BitBuffer<> buffer;
   if (kSendLocalPlayerUpdate) {
     this->GetLocalPlayerUpdate(1, session->player_index(), kPlayer, &buffer);
   }

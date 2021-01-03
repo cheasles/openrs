@@ -280,7 +280,7 @@ class Buffer : public Container {
   }
 
   inline void seek(const int& dir,
-                   const std::vector<uint8_t>::size_type& offset) {
+                   const typename Container::size_type& offset) {
     if (dir == SEEK_SET) {
       this->position_ = offset;
     } else if (dir == SEEK_END) {
