@@ -48,6 +48,9 @@ bool openrs::manager::ConfigManager::InitCacheConfig(const uint32_t& kVersion,
 
 void openrs::manager::ConfigManager::GenerateDefaultConfig() {
   this->json_config_.clear();
+  this->json_config_["server"]["name"] = "OpenRS";
+  this->json_config_["server"]["url"] = "";
+  this->json_config_["server"]["source_url"] = "";
   this->json_config_["database"]["mode"] = "sqlite";
   this->json_config_["database"]["filename"] = "database.db";
   this->json_config_["logging"]["level"] = 0;
@@ -87,37 +90,62 @@ void openrs::manager::ConfigManager::GenerateDefaultConfig() {
   output_config << std::setw(4) << this->json_config_ << std::endl;
 }
 
-void openrs::manager::ConfigManager::SendVariable1(
+void openrs::manager::ConfigManager::SendGameBarStagesOther(
+    const std::shared_ptr<openrs::game::Player>& kPlayer,
+    openrs::net::Session* session) const {
+  openrs::common::io::Buffer<> buffer;
+  buffer.PutShiftedNegDataLE<uint8_t>(0);
+  buffer.PutData<uint8_t>(0);
+
+  openrs::net::codec::Packet packet;
+  packet.type = openrs::net::codec::PacketType::kConfigGameBarOther;
+  packet.data = buffer;
+  session->Send(packet);
+}
+
+void openrs::manager::ConfigManager::SendGameBarStagesPrivate(
+    const std::shared_ptr<openrs::game::Player>& kPlayer,
+    openrs::net::Session* session) const {
+  openrs::common::io::Buffer<> buffer;
+  buffer.PutData<uint8_t>(0);
+
+  openrs::net::codec::Packet packet;
+  packet.type = openrs::net::codec::PacketType::kConfigGameBarPrivate;
+  packet.data = buffer;
+  session->Send(packet);
+}
+
+void openrs::manager::ConfigManager::SendConfig1(
     const std::shared_ptr<openrs::game::Player>& player,
-    openrs::net::Session* session, const GlobalConfig& kId,
+    openrs::net::Session* session, const Config& kId,
     const uint8_t& kValue) const {
   openrs::common::io::Buffer<> buffer;
   buffer.PutShiftedPosDataLE<uint16_t>(static_cast<uint16_t>(kId));
   buffer.PutShiftedPosDataLE<uint8_t>(kValue);
 
   openrs::net::codec::Packet packet;
-  packet.type = openrs::net::codec::PacketType::kVariable1;
+  packet.type = openrs::net::codec::PacketType::kConfig1;
   packet.data = buffer;
   session->Send(packet);
 }
 
-void openrs::manager::ConfigManager::SendVariable2(
+void openrs::manager::ConfigManager::SendConfig2(
     const std::shared_ptr<openrs::game::Player>& player,
-    openrs::net::Session* session, const GlobalConfig& kId,
+    openrs::net::Session* session, const Config& kId,
     const uint32_t& kValue) const {
   openrs::common::io::Buffer<> buffer;
   buffer.PutShiftedPosDataBE<uint16_t>(static_cast<uint16_t>(kId));
   buffer.PutDataLE(kValue);
 
   openrs::net::codec::Packet packet;
-  packet.type = openrs::net::codec::PacketType::kVariable2;
+  packet.type = openrs::net::codec::PacketType::kConfig2;
   packet.data = buffer;
   session->Send(packet);
 }
 
 void openrs::manager::ConfigManager::SendGlobalConfig1(
     const std::shared_ptr<openrs::game::Player>& player,
-    openrs::net::Session* session, const GlobalConfig& kId,
+    openrs::net::Session* session, const ConfigGlobal& kId,
     const uint8_t& kValue) const {
   openrs::common::io::Buffer<> buffer;
   buffer.PutData<uint8_t>(-1 * kValue);
@@ -131,7 +159,7 @@ void openrs::manager::ConfigManager::SendGlobalConfig1(
 
 void openrs::manager::ConfigManager::SendGlobalConfig2(
     const std::shared_ptr<openrs::game::Player>& player,
-    openrs::net::Session* session, const GlobalConfig& kId,
+    openrs::net::Session* session, const ConfigGlobal& kId,
     const uint32_t& kValue) const {
   openrs::common::io::Buffer<> buffer;
   buffer.PutShiftedPosDataBE<uint16_t>(static_cast<uint16_t>(kId));
@@ -145,7 +173,7 @@ void openrs::manager::ConfigManager::SendGlobalConfig2(
 
 void openrs::manager::ConfigManager::SendFileConfig1(
     const std::shared_ptr<openrs::game::Player>& player,
-    openrs::net::Session* session, const FileConfig& kId,
+    openrs::net::Session* session, const ConfigFile& kId,
     const uint8_t& kValue) const {
   openrs::common::io::Buffer<> buffer;
   buffer.PutShiftedPosDataBE<uint16_t>(static_cast<uint16_t>(kId));
@@ -159,7 +187,7 @@ void openrs::manager::ConfigManager::SendFileConfig1(
 
 void openrs::manager::ConfigManager::SendFileConfig2(
     const std::shared_ptr<openrs::game::Player>& player,
-    openrs::net::Session* session, const FileConfig& kId,
+    openrs::net::Session* session, const ConfigFile& kId,
     const uint8_t& kValue) const {
   openrs::common::io::Buffer<> buffer;
   buffer.PutDataVBE<uint32_t>(kValue);

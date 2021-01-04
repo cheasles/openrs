@@ -231,6 +231,16 @@ class WorldManager : public openrs::manager::Manager,
                        const MusicEffectID& kMusicId,
                        const uint8_t& kVolume = 255) const;
 
+  /**
+   * Inform the client whether or not they're in a multi-combat area.
+   *
+   * @param kPlayer The player to check the combat area type for.
+   * @param session The client session to send the data to.
+   */
+  void SendMultiCombatArea(
+      const std::shared_ptr<openrs::game::Player>& kPlayer,
+      openrs::net::Session* session) const;
+
   inline const auto& worlds() const { return this->worlds_; }
   inline void add_world(const uint32_t& id, const openrs::game::World& world) {
     this->worlds_.insert_or_assign(id, world);

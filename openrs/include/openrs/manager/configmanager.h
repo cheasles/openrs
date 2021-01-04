@@ -18,12 +18,23 @@ namespace manager {
 class ConfigManager : public openrs::manager::Manager,
                       public openrs::common::Singleton<ConfigManager> {
  public:
-  enum struct GlobalConfig : uint16_t {
+  enum struct ConfigGlobal : uint16_t {
+    kCombatMode = 616,
     k823 = 823,
   };
 
-  enum struct FileConfig : uint16_t {
+  enum struct ConfigFile : uint16_t {
     kHitPoints = 7198,
+  };
+
+  enum struct Config : uint16_t {
+    k281 = 281,
+    kClanStatus = 1054,
+    kAssistStatus = 1055,
+    kFilterStatus = 1056,
+    k1159 = 1159,
+    k1160 = 1160,
+    kFriendChatStatus = 2159,
   };
 
  private:
@@ -61,6 +72,43 @@ class ConfigManager : public openrs::manager::Manager,
   void GenerateDefaultConfig();
 
   /**
+   * Sends the game bar stages variables to a player.
+   *
+   * @param kPlayer The player to send the variables from.
+   * @param session The client session to send the data to.
+   */
+  inline void SendGameBarStages(
+      const std::shared_ptr<openrs::game::Player>& kPlayer,
+      openrs::net::Session* session) const {
+    this->SendConfig(kPlayer, session, Config::kClanStatus, 0);
+    this->SendConfig(kPlayer, session, Config::kAssistStatus, 0);
+    this->SendConfig(kPlayer, session, Config::kFilterStatus, 0);
+    this->SendConfig(kPlayer, session, Config::kFriendChatStatus, 0);
+    this->SendGameBarStagesOther(kPlayer, session);
+    this->SendGameBarStagesPrivate(kPlayer, session);
+  }
+
+  /**
+   * Sends the trade and public game bar stage variables to a player.
+   *
+   * @param kPlayer The player to send the variables from.
+   * @param session The client session to send the data to.
+   */
+  void SendGameBarStagesOther(
+      const std::shared_ptr<openrs::game::Player>& kPlayer,
+      openrs::net::Session* session) const;
+
+  /**
+   * Sends the private game bar stage variables to a player.
+   *
+   * @param kPlayer The player to send the variables from.
+   * @param session The client session to send the data to.
+   */
+  void SendGameBarStagesPrivate(
+      const std::shared_ptr<openrs::game::Player>& kPlayer,
+      openrs::net::Session* session) const;
+
+  /**
    * Sends a variable option to the client.
    *
    * @param kPlayer The player to send the variable for.
@@ -68,14 +116,13 @@ class ConfigManager : public openrs::manager::Manager,
    * @param kId The ID of the variable option.
    * @param kValue The new value.
    */
-  inline void SendVariable(const std::shared_ptr<openrs::game::Player>& kPlayer,
-                           openrs::net::Session* session,
-                           const GlobalConfig& kId,
-                           const uint32_t& kValue) const {
+  inline void SendConfig(const std::shared_ptr<openrs::game::Player>& kPlayer,
+                         openrs::net::Session* session, const Config& kId,
+                         const uint32_t& kValue) const {
     if (kValue > std::numeric_limits<uint8_t>::max()) {
-      this->SendVariable2(kPlayer, session, kId, kValue);
+      this->SendConfig2(kPlayer, session, kId, kValue);
     } else {
-      this->SendVariable1(kPlayer, session, kId, static_cast<uint8_t>(kValue));
+      this->SendConfig1(kPlayer, session, kId, static_cast<uint8_t>(kValue));
     }
   }
 
@@ -87,9 +134,9 @@ class ConfigManager : public openrs::manager::Manager,
    * @param kId The ID of the variable option.
    * @param kValue The new value.
    */
-  void SendVariable1(const std::shared_ptr<openrs::game::Player>& kPlayer,
-                     openrs::net::Session* session, const GlobalConfig& kId,
-                     const uint8_t& kValue) const;
+  void SendConfig1(const std::shared_ptr<openrs::game::Player>& kPlayer,
+                   openrs::net::Session* session, const Config& kId,
+                   const uint8_t& kValue) const;
 
   /**
    * Sends an int-sized variable option to the client.
@@ -99,9 +146,9 @@ class ConfigManager : public openrs::manager::Manager,
    * @param kId The ID of the variable option.
    * @param kValue The new value.
    */
-  void SendVariable2(const std::shared_ptr<openrs::game::Player>& kPlayer,
-                     openrs::net::Session* session, const GlobalConfig& kId,
-                     const uint32_t& kValue) const;
+  void SendConfig2(const std::shared_ptr<openrs::game::Player>& kPlayer,
+                   openrs::net::Session* session, const Config& kId,
+                   const uint32_t& kValue) const;
 
   /**
    * Sends a global config option to the client.
@@ -113,7 +160,7 @@ class ConfigManager : public openrs::manager::Manager,
    */
   inline void SendGlobalConfig(
       const std::shared_ptr<openrs::game::Player>& kPlayer,
-      openrs::net::Session* session, const GlobalConfig& kId,
+      openrs::net::Session* session, const ConfigGlobal& kId,
       const uint32_t& kValue) const {
     if (kValue > std::numeric_limits<uint8_t>::max()) {
       this->SendGlobalConfig2(kPlayer, session, kId, kValue);
@@ -132,7 +179,7 @@ class ConfigManager : public openrs::manager::Manager,
    * @param kValue The new value.
    */
   void SendGlobalConfig1(const std::shared_ptr<openrs::game::Player>& kPlayer,
-                         openrs::net::Session* session, const GlobalConfig& kId,
+                         openrs::net::Session* session, const ConfigGlobal& kId,
                          const uint8_t& kValue) const;
 
   /**
@@ -144,7 +191,7 @@ class ConfigManager : public openrs::manager::Manager,
    * @param kValue The new value.
    */
   void SendGlobalConfig2(const std::shared_ptr<openrs::game::Player>& kPlayer,
-                         openrs::net::Session* session, const GlobalConfig& kId,
+                         openrs::net::Session* session, const ConfigGlobal& kId,
                          const uint32_t& kValue) const;
 
   /**
@@ -157,7 +204,7 @@ class ConfigManager : public openrs::manager::Manager,
    */
   inline void SendFileConfig(
       const std::shared_ptr<openrs::game::Player>& kPlayer,
-      openrs::net::Session* session, const FileConfig& kId,
+      openrs::net::Session* session, const ConfigFile& kId,
       const uint8_t& kValue) const {
     if (kValue > std::numeric_limits<uint8_t>::max()) {
       this->SendFileConfig2(kPlayer, session, kId, kValue);
@@ -176,7 +223,7 @@ class ConfigManager : public openrs::manager::Manager,
    * @param kValue The new value.
    */
   void SendFileConfig1(const std::shared_ptr<openrs::game::Player>& player,
-                       openrs::net::Session* session, const FileConfig& kId,
+                       openrs::net::Session* session, const ConfigFile& kId,
                        const uint8_t& kValue) const;
 
   /**
@@ -188,7 +235,7 @@ class ConfigManager : public openrs::manager::Manager,
    * @param kValue The new value.
    */
   void SendFileConfig2(const std::shared_ptr<openrs::game::Player>& player,
-                       openrs::net::Session* session, const FileConfig& kId,
+                       openrs::net::Session* session, const ConfigFile& kId,
                        const uint8_t& kValue) const;
 
   inline const auto& config() const { return this->json_config_; }

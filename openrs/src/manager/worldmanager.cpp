@@ -19,16 +19,33 @@ bool openrs::manager::WorldManager::Init() {
 void openrs::manager::WorldManager::StartPlayer(
     const std::shared_ptr<openrs::game::Player>& kPlayer,
     openrs::net::Session* session) const {
+  const auto& kInterfaceManager = openrs::manager::InterfaceManager::get();
+  const auto& kConfigManager = openrs::manager::ConfigManager::get();
+
   this->SendMap(kPlayer, session, true);
-  const auto& interface_manager = openrs::manager::InterfaceManager::get();
-  interface_manager.SendInterfaces(kPlayer, session);
+  kInterfaceManager.SendInterfaces(kPlayer, session);
   this->SendRunEnergy(kPlayer, session);
   this->SendPlayerHitPoints(kPlayer, session);
   this->SendItemLook(kPlayer, session);
   this->SendCustom161(kPlayer, session);
-  this->SendMessage(kPlayer, session,
-                    openrs::manager::WorldManager::MessageType::kDefault,
-                    "Welcome");
+  this->SendMessage(
+      kPlayer, session, openrs::manager::WorldManager::MessageType::kDefault,
+      "Welcome to " + kConfigManager["server"]["name"].get<std::string>());
+  this->SendMessage(
+      kPlayer, session, openrs::manager::WorldManager::MessageType::kDefault,
+      kConfigManager["server"]["name"].get<std::string>() +
+          " is distributed under the GNU AGPL license. Please visit " +
+          kConfigManager["server"]["source_url"].get<std::string>() +
+          " to view the source code.");
+
+  this->SendMultiCombatArea(kPlayer, session);
+  kConfigManager.SendConfig(kPlayer, session,
+                            openrs::manager::ConfigManager::Config::k281, 1000);
+  kConfigManager.SendConfig(kPlayer, session,
+                            openrs::manager::ConfigManager::Config::k1159, 1);
+  kConfigManager.SendConfig(kPlayer, session,
+                            openrs::manager::ConfigManager::Config::k1160, -1);
+  kConfigManager.SendGameBarStages(kPlayer, session);
 }
 
 void openrs::manager::WorldManager::GetLocalPlayerUpdate(
@@ -162,7 +179,7 @@ void openrs::manager::WorldManager::SendPlayerHitPoints(
     const std::shared_ptr<openrs::game::Player>& kPlayer,
     openrs::net::Session* session) const {
   openrs::manager::ConfigManager::get().SendFileConfig(
-      kPlayer, session, openrs::manager::ConfigManager::FileConfig::kHitPoints,
+      kPlayer, session, openrs::manager::ConfigManager::ConfigFile::kHitPoints,
       kPlayer->hit_points());
 }
 
@@ -280,4 +297,19 @@ void openrs::manager::WorldManager::SendMusicEffect(
   packet.type = openrs::net::codec::PacketType::kMusicEffect;
   packet.data = buffer;
   session->Send(packet);
+}
+
+void openrs::manager::WorldManager::SendMultiCombatArea(
+    const std::shared_ptr<openrs::game::Player>& kPlayer,
+    openrs::net::Session* session) const {
+  const auto& kConfigManager = openrs::manager::ConfigManager::get();
+  if (this->worlds().at(1).IsMultiCombatArea(*kPlayer)) {
+    kConfigManager.SendGlobalConfig(
+        kPlayer, session,
+        openrs::manager::ConfigManager::ConfigGlobal::kCombatMode, 1);
+  } else {
+    kConfigManager.SendGlobalConfig(
+        kPlayer, session,
+        openrs::manager::ConfigManager::ConfigGlobal::kCombatMode, 0);
+  }
 }

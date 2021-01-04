@@ -91,7 +91,7 @@ void openrs::manager::InterfaceManager::SendResizableInterfaces(
                 InterfaceID::k137);
   this->SendTabSqueelOfFortune(player, session);
   openrs::manager::ConfigManager::get().SendGlobalConfig(
-      player, session, ConfigManager::GlobalConfig::k823, 1);
+      player, session, ConfigManager::ConfigGlobal::k823, 1);
   this->SendTabCombatStyles(player, session);
   this->SendTabTaskSystem(player, session);
   this->SendTabSkills(player, session);

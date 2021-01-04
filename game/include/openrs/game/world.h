@@ -27,6 +27,14 @@ class World {
  public:
   World() : world_type_(WorldType::kMembers) {}
 
+  /**
+   * Determines if the input WorldTile is within a mutli-combat area.
+   *
+   * @param tile The tile to check.
+   * @return True if multi-combat, false otherwise.
+   */
+  bool IsMultiCombatArea(const WorldTile& tile) const;
+
   inline const auto& world_type() const { return this->world_type_; }
   inline const auto& npcs() const { return this->npcs_; }
   inline const auto& players() const { return this->players_; }
