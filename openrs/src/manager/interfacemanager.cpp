@@ -19,6 +19,8 @@ void openrs::manager::InterfaceManager::SendInterfaces(
     this->SendFixedInterfaces(player, session);
   }
 
+  this->SendUnlockAttackStyleButtons(player, session);
+  this->SendUnlockEmotesBook(player, session);
   this->SendTabTimer(player, session);
 }
 

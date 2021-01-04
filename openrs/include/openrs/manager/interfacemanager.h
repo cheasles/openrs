@@ -116,6 +116,7 @@ class InterfaceManager : public openrs::manager::Manager,
     k7 = 7,
     k8 = 8,
     k9 = 9,
+    k10 = 10,
     k12 = 12,
   };
 
@@ -174,7 +175,7 @@ class InterfaceManager : public openrs::manager::Manager,
    * @param kSettingsHash The new settings value.
    */
   void SendInterfaceComponentSettings(
-      const std::shared_ptr<openrs::game::Player>& player,
+      const std::shared_ptr<openrs::game::Player>& kPlayer,
       openrs::net::Session* session, const InterfaceID& kInterfaceId,
       const ComponentID& kComponentId, const uint16_t& kFromSlot,
       const uint16_t& kToSlot, const uint32_t& kSettingsHash) const;
@@ -189,9 +190,34 @@ class InterfaceManager : public openrs::manager::Manager,
    * @param kHidden Whether to hide or unhide the interface component.
    */
   void SendHideInterfaceComponent(
-      const std::shared_ptr<openrs::game::Player>& player,
+      const std::shared_ptr<openrs::game::Player>& kPlayer,
       openrs::net::Session* session, const InterfaceID& kInterfaceId,
       const ComponentID& kComponentId, const bool& kHidden) const;
+
+  /**
+   * Unlocks specific interface component slots for the client.
+   *
+   * @param kPlayer The player to send interface settings to.
+   * @param session The client session to send the data to.
+   * @param kInterfaceId The interface the setting applies to.
+   * @param kComponentId The component the setting applies to.
+   * @param kFromSlot
+   * @param kToSlot
+   * @param kSlots The slots to unlock as bit indexes.
+   */
+  inline void SendUnlockInterfaceComponentOptionsSlot(
+      const std::shared_ptr<openrs::game::Player>& kPlayer,
+      openrs::net::Session* session, const InterfaceID& kInterfaceId,
+      const ComponentID& kComponentId, const uint16_t& kFromSlot,
+      const uint16_t& kToSlot, const std::vector<uint8_t>& kSlots) const {
+    uint32_t settings_hash = 0;
+    for (const auto& kSlot : kSlots) {
+      settings_hash |= 2 << kSlot;
+    }
+    this->SendInterfaceComponentSettings(kPlayer, session, kInterfaceId,
+                                         kComponentId, kFromSlot, kToSlot,
+                                         settings_hash);
+  }
 
   inline void SendTab(const std::shared_ptr<openrs::game::Player>& player,
                       openrs::net::Session* session,
@@ -300,6 +326,43 @@ class InterfaceManager : public openrs::manager::Manager,
                            openrs::net::Session* session) const {
     this->SendTab(player, session, TabID::kTimer, TabID::kTimerFixed,
                   InterfaceID::kTimer);
+  }
+
+  /**
+   * Unlocks the attack style buttons for a client.
+   *
+   * @param kPlayer The player to send interface settings to.
+   * @param session The client session to send the data to.
+   */
+  inline void SendUnlockAttackStyleButtons(
+      const std::shared_ptr<openrs::game::Player>& kPlayer,
+      openrs::net::Session* session) const {
+    this->SendUnlockInterfaceComponentOptionsSlot(kPlayer, session,
+                                                  InterfaceID::kCombatStyles,
+                                                  ComponentID::k7, -1, 0, {0});
+    this->SendUnlockInterfaceComponentOptionsSlot(kPlayer, session,
+                                                  InterfaceID::kCombatStyles,
+                                                  ComponentID::k8, -1, 0, {0});
+    this->SendUnlockInterfaceComponentOptionsSlot(kPlayer, session,
+                                                  InterfaceID::kCombatStyles,
+                                                  ComponentID::k9, -1, 0, {0});
+    this->SendUnlockInterfaceComponentOptionsSlot(kPlayer, session,
+                                                  InterfaceID::kCombatStyles,
+                                                  ComponentID::k10, -1, 0, {0});
+  }
+
+  /**
+   * Unlocks the emote buttons for a client.
+   *
+   * @param kPlayer The player to send interface settings to.
+   * @param session The client session to send the data to.
+   */
+  inline void SendUnlockEmotesBook(
+      const std::shared_ptr<openrs::game::Player>& kPlayer,
+      openrs::net::Session* session) const {
+    this->SendUnlockInterfaceComponentOptionsSlot(
+        kPlayer, session, InterfaceID::kEmotes, ComponentID::k8, 0, 118,
+        {0, 1});
   }
 
   void SendWindowPane(const std::shared_ptr<openrs::game::Player>& player,
