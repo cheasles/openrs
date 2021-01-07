@@ -69,7 +69,7 @@ class WorldEncoder : public Encoder {
           {PacketType::kInterfaceHide, PacketHeaderType::kNone},
           {PacketType::kPlayerOption, PacketHeaderType::kUint8},
           {PacketType::kMusic, PacketHeaderType::kNone},
-          {PacketType::kInterfaceComponentText, PacketHeaderType::kNone},
+          {PacketType::kInterfaceComponentText, PacketHeaderType::kUint16},
           {PacketType::kMessage, PacketHeaderType::kUint8},
           {PacketType::kDynamicMapRegion, PacketHeaderType::kUint16},
           {PacketType::kPlayerSkill, PacketHeaderType::kNone},
