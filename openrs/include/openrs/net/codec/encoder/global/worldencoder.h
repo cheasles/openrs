@@ -19,7 +19,7 @@ class WorldEncoder : public Encoder {
  private:
   enum struct PacketHeaderType : uint8_t { kNone, kUint8, kUint16 };
 
-  static inline constexpr frozen::map<PacketType, uint8_t, 26> code_mapping_{
+  static inline constexpr frozen::map<PacketType, uint8_t, 28> code_mapping_{
       {PacketType::kLoginDetails, 2},
       {PacketType::kMusicEffect, 9},
       {PacketType::kInterfaceTab, 14},
@@ -32,6 +32,7 @@ class WorldEncoder : public Encoder {
       {PacketType::kConfigGameBarPrivate, 75},
       {PacketType::kConfigFile2, 81},
       {PacketType::kConfigGameBarOther, 89},
+      {PacketType::kLocalPlayerUpdate, 96},
       {PacketType::kInterfaceComponentAnimation, 103},
       {PacketType::kConfig1, 110},
       {PacketType::kConfigFile1, 111},
@@ -41,12 +42,13 @@ class WorldEncoder : public Encoder {
       {PacketType::kInterfaceComponentText, 135},
       {PacketType::kMessage, 136},
       {PacketType::kDynamicMapRegion, 144},
+      {PacketType::kPlayerSkill, 146},
       {PacketType::kPing, 153},
       {PacketType::kConfigGlobal1, 154},
       {PacketType::kCreateTile, 158},
       {PacketType::kItemLook, 159},
       {PacketType::kCustomPacket161, 161}};
-  static inline constexpr frozen::map<PacketType, PacketHeaderType, 26>
+  static inline constexpr frozen::map<PacketType, PacketHeaderType, 28>
       type_mapping_{
           {PacketType::kLoginDetails, PacketHeaderType::kUint8},
           {PacketType::kMusicEffect, PacketHeaderType::kNone},
@@ -60,6 +62,7 @@ class WorldEncoder : public Encoder {
           {PacketType::kConfigGameBarPrivate, PacketHeaderType::kNone},
           {PacketType::kConfigFile2, PacketHeaderType::kNone},
           {PacketType::kConfigGameBarOther, PacketHeaderType::kNone},
+          {PacketType::kLocalPlayerUpdate, PacketHeaderType::kUint16},
           {PacketType::kInterfaceComponentAnimation, PacketHeaderType::kNone},
           {PacketType::kConfig1, PacketHeaderType::kNone},
           {PacketType::kConfigFile1, PacketHeaderType::kNone},
@@ -69,6 +72,7 @@ class WorldEncoder : public Encoder {
           {PacketType::kInterfaceComponentText, PacketHeaderType::kNone},
           {PacketType::kMessage, PacketHeaderType::kUint8},
           {PacketType::kDynamicMapRegion, PacketHeaderType::kUint16},
+          {PacketType::kPlayerSkill, PacketHeaderType::kNone},
           {PacketType::kConfigGlobal1, PacketHeaderType::kNone},
           {PacketType::kPing, PacketHeaderType::kNone},
           {PacketType::kCreateTile, PacketHeaderType::kNone},

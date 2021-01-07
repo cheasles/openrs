@@ -22,6 +22,8 @@ void openrs::manager::InterfaceManager::SendInterfaces(
   this->SendUnlockAttackStyleButtons(player, session);
   this->SendUnlockEmotesBook(player, session);
   this->SendTabTimer(player, session);
+  this->SendPlayerOption(player, session, "Follow", 2);
+  this->SendPlayerOption(player, session, "Trade", 4);
 }
 
 void openrs::manager::InterfaceManager::SendFixedInterfaces(
@@ -200,6 +202,24 @@ void openrs::manager::InterfaceManager::SendInterfaceComponentAnimation(
       openrs::net::codec::PacketType::kInterfaceComponentAnimation;
   animation_packet.data = buffer;
   session->Send(animation_packet);
+}
+
+void openrs::manager::InterfaceManager::SendPlayerOption(
+    const std::shared_ptr<openrs::game::Player>& kPlayer,
+    openrs::net::Session* session, const std::string& kOption,
+    const uint8_t& kSlot, const bool& kTop) const {
+  openrs::common::io::Buffer<> buffer;
+  buffer.PutShiftedPosDataBE(kSlot);
+  buffer.PutString(kOption);
+
+  // Cursor.
+  buffer.PutShiftedPosDataLE<uint16_t>(0);
+  buffer.PutDataBE<uint8_t>(kTop ? -1 : 0);
+
+  openrs::net::codec::Packet packet;
+  packet.type = openrs::net::codec::PacketType::kPlayerOption;
+  packet.data = buffer;
+  session->Send(packet);
 }
 
 void openrs::manager::InterfaceManager::SendWindowPane(

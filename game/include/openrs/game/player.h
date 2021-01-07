@@ -6,12 +6,16 @@
 #include <osrng.h>
 
 #include "openrs/game/entity.h"
+#include "openrs/game/appearance.h"
+#include "openrs/game/skills.h"
 
 namespace openrs {
 namespace game {
 
 class Player : public database::models::PlayerModel,
-               public openrs::game::Entity {
+               public openrs::game::Entity,
+               public openrs::game::Appearance,
+               public openrs::game::Skills {
  public:
   enum struct DisplayMode : uint8_t {
     kUnknown = 0,
@@ -39,7 +43,7 @@ class Player : public database::models::PlayerModel,
         screen_height_(0),
         force_next_map_load_refresh_(false),
         run_energy_(0),
-        hit_points_(0),
+        hit_points_(100),
         old_items_look_(false),
         is_shift_drop_(false),
         is_slow_drag_(false),
@@ -90,6 +94,13 @@ class Player : public database::models::PlayerModel,
     return std::equal(encoded_password.cbegin(), encoded_password.cend(),
                       this->password.cbegin(), this->password.cend());
   }
+
+  /**
+   * Checks if the player has a skill or not.
+   *
+   * @return True if skulled, false otherwise.
+   */
+  inline bool HasSkull() const { return this->skull_time_left > 0; }
 
   inline auto display_mode() const { return this->display_mode_; }
   inline auto screen_width() const { return this->screen_width_; }

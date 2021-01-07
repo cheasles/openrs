@@ -3,6 +3,7 @@
 #include <inttypes.h>
 #include <openrs/common/io/bitbuffer.h>
 #include <openrs/common/singleton.h>
+#include <openrs/game/skills.h>
 #include <openrs/game/world.h>
 
 #include <unordered_map>
@@ -128,6 +129,16 @@ class WorldManager : public openrs::manager::Manager,
       const bool kSendLocalPlayerUpdate = false) const;
 
   /**
+   * Sends information about local players to the client.
+   *
+   * @param kPlayer The player to generate map data for.
+   * @param session The client session to send the data to.
+   */
+  void SendLocalPlayerUpdate(
+      const std::shared_ptr<openrs::game::Player>& kPlayer,
+      openrs::net::Session* session) const;
+
+  /**
    * Sends the players run energy to them.
    *
    * @param kPlayer The player to get run energy data for.
@@ -237,9 +248,19 @@ class WorldManager : public openrs::manager::Manager,
    * @param kPlayer The player to check the combat area type for.
    * @param session The client session to send the data to.
    */
-  void SendMultiCombatArea(
-      const std::shared_ptr<openrs::game::Player>& kPlayer,
-      openrs::net::Session* session) const;
+  void SendMultiCombatArea(const std::shared_ptr<openrs::game::Player>& kPlayer,
+                           openrs::net::Session* session) const;
+
+  /**
+   * Sends player skill information to a client.
+   *
+   * @param kPlayer The player to send interface settings to.
+   * @param session The client session to send the data to.
+   * @param kSkill The skill to send to the player.
+   */
+  void SendPlayerSkill(const std::shared_ptr<openrs::game::Player>& kPlayer,
+                       openrs::net::Session* session,
+                       const openrs::game::Skills::Skill& kSkill) const;
 
   inline const auto& worlds() const { return this->worlds_; }
   inline void add_world(const uint32_t& id, const openrs::game::World& world) {

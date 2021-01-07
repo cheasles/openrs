@@ -111,6 +111,7 @@ class InterfaceManager : public openrs::manager::Manager,
   };
 
   enum struct ComponentID : uint16_t {
+    k1 = 1,
     k5 = 5,
     k6 = 6,
     k7 = 7,
@@ -249,6 +250,9 @@ class InterfaceManager : public openrs::manager::Manager,
       openrs::net::Session* session) const {
     this->SendTab(player, session, TabID::kCombatStyles,
                   TabID::kCombatStylesFixed, InterfaceID::kCombatStyles);
+    this->SendInterfaceComponentText(
+        player, session, InterfaceID::kCombatStyles, ComponentID::k1,
+        "Combat lvl: " + std::to_string(player->GetCombatLevel()));
   }
 
   inline void SendTabTaskSystem(
@@ -364,6 +368,20 @@ class InterfaceManager : public openrs::manager::Manager,
         kPlayer, session, InterfaceID::kEmotes, ComponentID::k8, 0, 118,
         {0, 1});
   }
+
+  /**
+   * Sends a right-click option for a player.
+   *
+   * @param kPlayer The player to send interface settings to.
+   * @param session The client session to send the data to.
+   * @param kOption The string to display to the player.
+   * @param kSlot The slot the option should fit into.
+   * @param kTop Display the option on top.
+   */
+  void SendPlayerOption(const std::shared_ptr<openrs::game::Player>& kPlayer,
+                        openrs::net::Session* session,
+                        const std::string& kOption, const uint8_t& kSlot,
+                        const bool& kTop = false) const;
 
   void SendWindowPane(const std::shared_ptr<openrs::game::Player>& player,
                       openrs::net::Session* session, const PaneID& kId,

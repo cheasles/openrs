@@ -39,6 +39,7 @@ enum struct PacketType : uint8_t {
   kConfigGameBarOther,
   kMapRegion,
   kDynamicMapRegion,
+  kLocalPlayerUpdate,
   kScreen,
   kPing,
   kAFK,
@@ -52,6 +53,7 @@ enum struct PacketType : uint8_t {
   kCreateTile,
   kMusic,
   kMusicEffect,
+  kPlayerSkill,
 };
 
 enum struct PacketOpCode : uint8_t {

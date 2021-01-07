@@ -9,8 +9,10 @@
 #include <vector>
 
 #include "openrs/database/columnset.h"
+#include "openrs/database/columnsets/appearance.h"
 #include "openrs/database/columnsets/id.h"
 #include "openrs/database/columnsets/player.h"
+#include "openrs/database/columnsets/skills.h"
 #include "openrs/database/columnsets/worldtile.h"
 #include "openrs/database/model.h"
 
@@ -18,16 +20,20 @@ namespace openrs {
 namespace database {
 namespace models {
 
-struct PlayerModel : public openrs::database::Model,
-                     virtual public openrs::database::columnsets::PlayerColumnSet,
-                     virtual public openrs::database::columnsets::WorldTileColumnSet {
+struct PlayerModel
+    : public openrs::database::Model,
+      virtual public openrs::database::columnsets::PlayerColumnSet,
+      virtual public openrs::database::columnsets::AppearanceColumnSet,
+      virtual public openrs::database::columnsets::SkillsColumnSet,
+      virtual public openrs::database::columnsets::WorldTileColumnSet {
   inline static const std::string TABLE_NAME = "players";
 
   PlayerModel()
       : openrs::database::Model(),
         openrs::database::columnsets::PlayerColumnSet(),
-        openrs::database::columnsets::WorldTileColumnSet()
-  {}
+        openrs::database::columnsets::AppearanceColumnSet(),
+        openrs::database::columnsets::SkillsColumnSet(),
+        openrs::database::columnsets::WorldTileColumnSet() {}
 
   template <typename Database>
   inline bool Save(Database& database) {
@@ -95,6 +101,12 @@ bind_record<qtl::mysql::statement, openrs::database::models::PlayerModel>(
       qtl::mysql::statement, openrs::database::columnsets::PlayerColumnSet>(
       command, v);
   openrs::database::ColumnSet::BindFields<
+      qtl::mysql::statement, openrs::database::columnsets::AppearanceColumnSet>(
+      command, v);
+  openrs::database::ColumnSet::BindFields<
+      qtl::mysql::statement, openrs::database::columnsets::SkillsColumnSet>(
+      command, v);
+  openrs::database::ColumnSet::BindFields<
       qtl::mysql::statement, openrs::database::columnsets::WorldTileColumnSet>(
       command, v);
 }
@@ -108,6 +120,12 @@ bind_record<qtl::sqlite::statement, openrs::database::models::PlayerModel>(
                                                                std::move(v));
   openrs::database::ColumnSet::BindFields<
       qtl::sqlite::statement, openrs::database::columnsets::PlayerColumnSet>(
+      command, v);
+  openrs::database::ColumnSet::BindFields<
+      qtl::sqlite::statement,
+      openrs::database::columnsets::AppearanceColumnSet>(command, v);
+  openrs::database::ColumnSet::BindFields<
+      qtl::sqlite::statement, openrs::database::columnsets::SkillsColumnSet>(
       command, v);
   openrs::database::ColumnSet::BindFields<
       qtl::sqlite::statement, openrs::database::columnsets::WorldTileColumnSet>(

@@ -37,5 +37,6 @@ target_include_directories (
 
 target_link_libraries(${PROJECT_NAME}
     cryptopp-static
+    frozen
     ${CMAKE_PROJECT_NAME}-common
     ${CMAKE_PROJECT_NAME}-database)

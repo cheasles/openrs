@@ -5,6 +5,7 @@
 
 #include <bitset>
 
+#include "openrs/manager/appearancemanager.h"
 #include "openrs/manager/configmanager.h"
 #include "openrs/manager/interfacemanager.h"
 
@@ -46,6 +47,15 @@ void openrs::manager::WorldManager::StartPlayer(
   kConfigManager.SendConfig(kPlayer, session,
                             openrs::manager::ConfigManager::Config::k1160, -1);
   kConfigManager.SendGameBarStages(kPlayer, session);
+
+  for (std::underlying_type_t<openrs::game::Skills::Skill> skill = 0;
+       skill !=
+       static_cast<std::underlying_type_t<openrs::game::Skills::Skill>>(
+           openrs::game::Skills::Skill::kLast);
+       ++skill) {
+    this->SendPlayerSkill(kPlayer, session,
+                          static_cast<openrs::game::Skills::Skill>(skill));
+  }
 }
 
 void openrs::manager::WorldManager::GetLocalPlayerUpdate(
@@ -161,6 +171,44 @@ void openrs::manager::WorldManager::SendDynamicMapRegion(
   region_packet.type = openrs::net::codec::PacketType::kDynamicMapRegion;
   region_packet.data = buffer;
   session->Send(region_packet);
+}
+
+void openrs::manager::WorldManager::SendLocalPlayerUpdate(
+    const std::shared_ptr<openrs::game::Player>& kPlayer,
+    openrs::net::Session* session) const {
+  openrs::common::io::BitBuffer<> buffer;
+
+  openrs::common::io::Buffer<> appearance_buffer;
+  for (const auto& kWorld : this->worlds_) {
+    for (const auto& kLocalPlayer : kWorld.second.players()) {
+      const uint32_t kDataMask = 0x10;
+      appearance_buffer.PutData(static_cast<uint8_t>(kDataMask));
+      if (kDataMask > std::numeric_limits<uint8_t>::max()) {
+        appearance_buffer.PutData(static_cast<uint8_t>(kDataMask >> 8));
+      }
+      if (kDataMask > std::numeric_limits<uint16_t>::max()) {
+        appearance_buffer.PutData(static_cast<uint8_t>(kDataMask >> 16));
+      }
+
+      openrs::manager::AppearanceManager::GetPlayerAppearance(
+          kLocalPlayer.second, &appearance_buffer);
+
+      // Clan.
+      appearance_buffer.PutData<uint8_t>(0);
+
+      buffer.PutData<uint8_t>(1, 1);
+      buffer.PutData<uint8_t>(1, 1);
+      buffer.PutData<uint8_t>(2, 0);
+    }
+  }
+
+  buffer.insert(buffer.end(), appearance_buffer.begin(),
+                appearance_buffer.end());
+
+  openrs::net::codec::Packet packet;
+  packet.type = openrs::net::codec::PacketType::kLocalPlayerUpdate;
+  packet.data = buffer;
+  session->Send(packet);
 }
 
 void openrs::manager::WorldManager::SendRunEnergy(
@@ -312,4 +360,20 @@ void openrs::manager::WorldManager::SendMultiCombatArea(
         kPlayer, session,
         openrs::manager::ConfigManager::ConfigGlobal::kCombatMode, 0);
   }
+}
+
+void openrs::manager::WorldManager::SendPlayerSkill(
+    const std::shared_ptr<openrs::game::Player>& kPlayer,
+    openrs::net::Session* session,
+    const openrs::game::Skills::Skill& kSkill) const {
+  openrs::common::io::Buffer<> buffer;
+  buffer.PutShiftedNegDataBE(
+      static_cast<std::underlying_type_t<openrs::game::Skills::Skill>>(kSkill));
+  buffer.PutDataBE<uint32_t>(kPlayer->GetSkillExperience(kSkill));
+  buffer.PutShiftedPosDataBE(kPlayer->GetSkillLevel(kSkill));
+
+  openrs::net::codec::Packet packet;
+  packet.type = openrs::net::codec::PacketType::kPlayerSkill;
+  packet.data = buffer;
+  session->Send(packet);
 }

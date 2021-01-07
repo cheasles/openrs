@@ -18,15 +18,17 @@ class PlayerColumnSet : public ColumnSet {
   std::string password;
   std::string salt;
   int rights;
+  int skull_time_left;
 
  public:
-  PlayerColumnSet() : rights(0) {}
+  PlayerColumnSet() : rights(0), skull_time_left(0) {}
   PlayerColumnSet(const PlayerColumnSet& other)
       : ColumnSet(other),
         username(other.username),
         password(other.password),
         salt(other.salt),
-        rights(other.rights) {}
+        rights(other.rights),
+        skull_time_left(other.skull_time_left) {}
 
  public:
   static inline const std::vector<
@@ -39,6 +41,8 @@ class PlayerColumnSet : public ColumnSet {
          std::bind(&PlayerColumnSet::password, std::placeholders::_1)},
         {"salt", std::bind(&PlayerColumnSet::salt, std::placeholders::_1)},
         {"rights", std::bind(&PlayerColumnSet::rights, std::placeholders::_1)},
+        {"skull_time_left",
+         std::bind(&PlayerColumnSet::skull_time_left, std::placeholders::_1)},
     };
   }
 };
