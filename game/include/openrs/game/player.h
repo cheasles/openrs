@@ -6,16 +6,16 @@
 #include <osrng.h>
 
 #include "openrs/game/entity.h"
-#include "openrs/game/appearance.h"
-#include "openrs/game/skills.h"
+#include "openrs/game/player/appearance.h"
+#include "openrs/game/player/skills.h"
 
 namespace openrs {
 namespace game {
 
 class Player : public database::models::PlayerModel,
                public openrs::game::Entity,
-               public openrs::game::Appearance,
-               public openrs::game::Skills {
+               public openrs::game::player::Appearance,
+               public openrs::game::player::Skills {
  public:
   enum struct DisplayMode : uint8_t {
     kUnknown = 0,

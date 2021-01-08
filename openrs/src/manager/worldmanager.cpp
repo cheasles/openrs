@@ -48,13 +48,14 @@ void openrs::manager::WorldManager::StartPlayer(
                             openrs::manager::ConfigManager::Config::k1160, -1);
   kConfigManager.SendGameBarStages(kPlayer, session);
 
-  for (std::underlying_type_t<openrs::game::Skills::Skill> skill = 0;
+  for (std::underlying_type_t<openrs::game::player::Skills::Skill> skill = 0;
        skill !=
-       static_cast<std::underlying_type_t<openrs::game::Skills::Skill>>(
-           openrs::game::Skills::Skill::kLast);
+       static_cast<std::underlying_type_t<openrs::game::player::Skills::Skill>>(
+           openrs::game::player::Skills::Skill::kLast);
        ++skill) {
-    this->SendPlayerSkill(kPlayer, session,
-                          static_cast<openrs::game::Skills::Skill>(skill));
+    this->SendPlayerSkill(
+        kPlayer, session,
+        static_cast<openrs::game::player::Skills::Skill>(skill));
   }
 }
 
@@ -231,22 +232,6 @@ void openrs::manager::WorldManager::SendPlayerHitPoints(
       kPlayer->hit_points());
 }
 
-void openrs::manager::WorldManager::SendPlayerOption(
-    const std::shared_ptr<openrs::game::Player>& kPlayer,
-    openrs::net::Session* session, const std::string kOption,
-    const uint8_t& kSlot, const bool& kTop, const uint16_t& kCursor) const {
-  openrs::common::io::Buffer<> buffer;
-  buffer.PutShiftedPosDataBE(kSlot);
-  buffer.PutString(kOption);
-  buffer.PutShiftedPosDataLE(kCursor);
-  buffer.PutData<uint8_t>(-1 * (kTop ? 1 : 0));
-
-  openrs::net::codec::Packet packet;
-  packet.type = openrs::net::codec::PacketType::kPlayerOption;
-  packet.data = buffer;
-  session->Send(packet);
-}
-
 void openrs::manager::WorldManager::SendItemLook(
     const std::shared_ptr<openrs::game::Player>& kPlayer,
     openrs::net::Session* session) const {
@@ -365,10 +350,11 @@ void openrs::manager::WorldManager::SendMultiCombatArea(
 void openrs::manager::WorldManager::SendPlayerSkill(
     const std::shared_ptr<openrs::game::Player>& kPlayer,
     openrs::net::Session* session,
-    const openrs::game::Skills::Skill& kSkill) const {
+    const openrs::game::player::Skills::Skill& kSkill) const {
   openrs::common::io::Buffer<> buffer;
   buffer.PutShiftedNegDataBE(
-      static_cast<std::underlying_type_t<openrs::game::Skills::Skill>>(kSkill));
+      static_cast<std::underlying_type_t<openrs::game::player::Skills::Skill>>(
+          kSkill));
   buffer.PutDataBE<uint32_t>(kPlayer->GetSkillExperience(kSkill));
   buffer.PutShiftedPosDataBE(kPlayer->GetSkillLevel(kSkill));
 

@@ -377,11 +377,13 @@ class InterfaceManager : public openrs::manager::Manager,
    * @param kOption The string to display to the player.
    * @param kSlot The slot the option should fit into.
    * @param kTop Display the option on top.
+   * @param kCursor The cursor to show when hovering over the item.
    */
   void SendPlayerOption(const std::shared_ptr<openrs::game::Player>& kPlayer,
                         openrs::net::Session* session,
                         const std::string& kOption, const uint8_t& kSlot,
-                        const bool& kTop = false) const;
+                        const bool& kTop = false,
+                        const uint16_t& kCursor = -1) const;
 
   void SendWindowPane(const std::shared_ptr<openrs::game::Player>& player,
                       openrs::net::Session* session, const PaneID& kId,

@@ -8,6 +8,7 @@
 
 namespace openrs {
 namespace game {
+namespace player {
 
 /**
  * Manages the types of prayer spells are available and which are active.
@@ -73,5 +74,6 @@ class PrayerBook {
   inline const auto& active_prayers() const { return this->active_prayers_; }
 };
 
+}  // namespace player
 }  // namespace game
 }  // namespace openrs

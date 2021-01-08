@@ -28,32 +28,32 @@ void openrs::manager::AppearanceManager::GetPlayerAppearance(
 
   // Chest.
   buffer->PutDataBE<uint16_t>(
-      0x0100 +
-      kPlayer->GetAppearanceLook(openrs::game::Appearance::BodyPart::kTorso));
+      0x0100 + kPlayer->GetAppearanceLook(
+                   openrs::game::player::Appearance::BodyPart::kTorso));
   // Shield.
   buffer->PutData<uint8_t>(0);
 
   // Arms.
   buffer->PutDataBE<uint16_t>(
-      0x0100 +
-      kPlayer->GetAppearanceLook(openrs::game::Appearance::BodyPart::kArms));
+      0x0100 + kPlayer->GetAppearanceLook(
+                   openrs::game::player::Appearance::BodyPart::kArms));
   // Legs.
   buffer->PutDataBE<uint16_t>(
-      0x0100 +
-      kPlayer->GetAppearanceLook(openrs::game::Appearance::BodyPart::kLegs));
+      0x0100 + kPlayer->GetAppearanceLook(
+                   openrs::game::player::Appearance::BodyPart::kLegs));
   // Hands.
   buffer->PutDataBE<uint16_t>(
       0x0100 + kPlayer->GetAppearanceLook(
-                   openrs::game::Appearance::BodyPart::kForearms));
+                   openrs::game::player::Appearance::BodyPart::kForearms));
   // Feet.
   buffer->PutDataBE<uint16_t>(
-      0x0100 +
-      kPlayer->GetAppearanceLook(openrs::game::Appearance::BodyPart::kBoots));
+      0x0100 + kPlayer->GetAppearanceLook(
+                   openrs::game::player::Appearance::BodyPart::kBoots));
 
   // Beard.
   buffer->PutDataBE<uint16_t>(
-      0x0100 +
-      kPlayer->GetAppearanceLook(openrs::game::Appearance::BodyPart::kBeard));
+      0x0100 + kPlayer->GetAppearanceLook(
+                   openrs::game::player::Appearance::BodyPart::kBeard));
 
   // Aura.
   buffer->PutData<uint8_t>(0);
@@ -65,16 +65,16 @@ void openrs::manager::AppearanceManager::GetPlayerAppearance(
   buffer->PutDataBE<uint16_t>(0);
 
   // Colours.
-  buffer->PutData<uint8_t>(
-      kPlayer->GetAppearanceColour(openrs::game::Appearance::BodyPart::kHair));
-  buffer->PutData<uint8_t>(
-      kPlayer->GetAppearanceColour(openrs::game::Appearance::BodyPart::kTorso));
-  buffer->PutData<uint8_t>(
-      kPlayer->GetAppearanceColour(openrs::game::Appearance::BodyPart::kLegs));
-  buffer->PutData<uint8_t>(
-      kPlayer->GetAppearanceColour(openrs::game::Appearance::BodyPart::kBoots));
-  buffer->PutData<uint8_t>(
-      kPlayer->GetAppearanceColour(openrs::game::Appearance::BodyPart::kSkin));
+  buffer->PutData<uint8_t>(kPlayer->GetAppearanceColour(
+      openrs::game::player::Appearance::BodyPart::kHair));
+  buffer->PutData<uint8_t>(kPlayer->GetAppearanceColour(
+      openrs::game::player::Appearance::BodyPart::kTorso));
+  buffer->PutData<uint8_t>(kPlayer->GetAppearanceColour(
+      openrs::game::player::Appearance::BodyPart::kLegs));
+  buffer->PutData<uint8_t>(kPlayer->GetAppearanceColour(
+      openrs::game::player::Appearance::BodyPart::kBoots));
+  buffer->PutData<uint8_t>(kPlayer->GetAppearanceColour(
+      openrs::game::player::Appearance::BodyPart::kSkin));
   buffer->PutData<uint8_t>(0);
   buffer->PutData<uint8_t>(0);
   buffer->PutData<uint8_t>(0);

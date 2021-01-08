@@ -25,6 +25,7 @@ TEST(Buffer, ShiftPositive) {
   EXPECT_EQ(128, buffer.ShiftPositive<uint16_t>(0, 128));
   EXPECT_EQ(0, buffer.ShiftPositive<uint16_t>(128, 128));
   EXPECT_EQ(5, buffer.ShiftPositive<uint16_t>(133, 128));
+  EXPECT_EQ(65407, buffer.ShiftPositive<uint16_t>(-1, 128));
 }
 
 TEST(Buffer, PutDataVBE) {

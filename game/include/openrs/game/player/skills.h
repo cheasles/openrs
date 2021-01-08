@@ -9,6 +9,7 @@
 
 namespace openrs {
 namespace game {
+namespace player {
 
 /**
  * Manages the types of skills that are available.
@@ -92,5 +93,6 @@ class Skills : virtual public openrs::database::columnsets::SkillsColumnSet {
   inline uint8_t GetCombatLevel() const { return 99; }
 };
 
+}  // namespace player
 }  // namespace game
 }  // namespace openrs

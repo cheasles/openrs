@@ -3,7 +3,7 @@
 #include <inttypes.h>
 #include <openrs/common/io/bitbuffer.h>
 #include <openrs/common/singleton.h>
-#include <openrs/game/skills.h>
+#include <openrs/game/player/skills.h>
 #include <openrs/game/world.h>
 
 #include <unordered_map>
@@ -157,23 +157,6 @@ class WorldManager : public openrs::manager::Manager,
                            openrs::net::Session* session) const;
 
   /**
-   * Sends a string-based player option to the client.
-   *
-   * @note A player option is a selectable value when right-clicking a player.
-   *
-   * @param kPlayer The player to send the option to.
-   * @param session The client session to send the data to.
-   * @param kOption The string name of the option to send.
-   * @param kSlot The slot the new option should take.
-   * @param kTop Unknown.
-   * @param kCursor The cursor to show when hovering over the item.
-   */
-  void SendPlayerOption(const std::shared_ptr<openrs::game::Player>& kPlayer,
-                        openrs::net::Session* session,
-                        const std::string kOption, const uint8_t& kSlot,
-                        const bool& kTop, const uint16_t& kCursor = -1) const;
-
-  /**
    * Sends the item look packet to the client.
    *
    * @param kPlayer The player to get the item look information from.
@@ -260,7 +243,7 @@ class WorldManager : public openrs::manager::Manager,
    */
   void SendPlayerSkill(const std::shared_ptr<openrs::game::Player>& kPlayer,
                        openrs::net::Session* session,
-                       const openrs::game::Skills::Skill& kSkill) const;
+                       const openrs::game::player::Skills::Skill& kSkill) const;
 
   inline const auto& worlds() const { return this->worlds_; }
   inline void add_world(const uint32_t& id, const openrs::game::World& world) {

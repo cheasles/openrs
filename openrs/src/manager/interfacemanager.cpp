@@ -207,14 +207,12 @@ void openrs::manager::InterfaceManager::SendInterfaceComponentAnimation(
 void openrs::manager::InterfaceManager::SendPlayerOption(
     const std::shared_ptr<openrs::game::Player>& kPlayer,
     openrs::net::Session* session, const std::string& kOption,
-    const uint8_t& kSlot, const bool& kTop) const {
+    const uint8_t& kSlot, const bool& kTop, const uint16_t& kCursor) const {
   openrs::common::io::Buffer<> buffer;
   buffer.PutShiftedPosDataBE(kSlot);
   buffer.PutString(kOption);
-
-  // Cursor.
-  buffer.PutShiftedPosDataLE<uint16_t>(0);
-  buffer.PutDataBE<uint8_t>(kTop ? -1 : 0);
+  buffer.PutShiftedPosDataLE(kCursor);
+  buffer.PutData<uint8_t>(-1 * (kTop ? 1 : 0));
 
   openrs::net::codec::Packet packet;
   packet.type = openrs::net::codec::PacketType::kPlayerOption;

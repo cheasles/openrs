@@ -9,6 +9,7 @@
 
 namespace openrs {
 namespace game {
+namespace player {
 
 /**
  * Manages the appearance options of an entity.
@@ -84,5 +85,6 @@ class Appearance
   }
 };
 
+}  // namespace player
 }  // namespace game
 }  // namespace openrs
