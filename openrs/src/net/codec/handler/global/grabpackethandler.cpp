@@ -53,7 +53,7 @@ bool PackCacheData(const uint8_t& kIndexId, const uint32_t& kArchiveId,
 
 void SendUKeys(std::shared_ptr<openrs::net::Session>& session) {
   openrs::common::io::Buffer<> ukeys_data_packet_buffer;
-  const auto& cache = openrs::manager::cache::CacheManager::get().cache();
+  const auto& cache = openrs::manager::cache::CacheManager::get()->cache();
 
   if (cache->GetTypeCount() >
       static_cast<size_t>(std::numeric_limits<uint8_t>::max())) {
@@ -86,7 +86,7 @@ void SendUKeys(std::shared_ptr<openrs::net::Session>& session) {
 
   // Encrypt the whirlpool hash with RSA.
   CryptoPP::RSA::PublicKey rsa_function;
-  const auto& grab_config = openrs::manager::ConfigManager::get()["grab"];
+  const auto& grab_config = (*openrs::manager::ConfigManager::get())["grab"];
   CryptoPP::Integer private_exponent(
       grab_config["private_exponent"].get<std::string>().c_str());
   CryptoPP::Integer modulus(grab_config["modulus"].get<std::string>().c_str());
@@ -165,8 +165,8 @@ void openrs::net::codec::handler::global::GrabPacketHandler::Handle(
     common::io::Buffer<> cache_data;
     try {
       const auto& store = openrs::manager::cache::CacheManager::get();
-      if (!store.GetArchiveData(*index_id_ptr, ::be32toh(*archive_id_ptr),
-                                &cache_data)) {
+      if (!store->GetArchiveData(*index_id_ptr, ::be32toh(*archive_id_ptr),
+                                 &cache_data)) {
         common::Log(common::Log::LogLevel::kWarning)
             << "Failed to retrieve cache for client "
             << session->socket().getSocketId();

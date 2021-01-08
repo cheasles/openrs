@@ -16,8 +16,9 @@
  */
 #pragma once
 
-namespace openrs {
+#include <memory>
 
+namespace openrs {
 namespace common {
 
 template <typename Type>
@@ -25,12 +26,11 @@ class Singleton {
  public:
   virtual ~Singleton() {}
 
-  static Type& get() {
-    static Type object;
+  static std::shared_ptr<Type>& get() {
+    static std::shared_ptr<Type> object = std::make_shared<Type>();
     return object;
   }
 };
 
 }  // namespace common
-
 }  // namespace openrs

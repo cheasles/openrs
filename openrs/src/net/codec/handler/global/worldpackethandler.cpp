@@ -49,7 +49,7 @@ void openrs::net::codec::handler::global::WorldPacketHandler::Handle(
         player->set_screen_height(::be16toh(*screen_height_ptr));
         const auto& interface_manager =
             openrs::manager::InterfaceManager::get();
-        interface_manager.SendInterfaces(player, session);
+        interface_manager->SendInterfaces(player, session);
       }
 
       break;

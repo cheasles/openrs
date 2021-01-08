@@ -48,7 +48,7 @@ class DatabaseManager : public openrs::manager::Manager,
   template <typename Model>
   inline bool GetModel(std::vector<Model>* output) {
     const auto& database_config =
-        openrs::manager::ConfigManager::get()["database"];
+        (*openrs::manager::ConfigManager::get())["database"];
     if (database_config["mode"].get<std::string>() == "mysql") {
       for (auto& record : this->db_mysql->result<Model>("select * from " +
                                                         Model::TABLE_NAME)) {
@@ -66,7 +66,7 @@ class DatabaseManager : public openrs::manager::Manager,
   inline bool GetModel(const std::string& kWhereField, const Field& kWhereValue,
                        std::vector<Model>* output) const {
     const auto& database_config =
-        openrs::manager::ConfigManager::get()["database"];
+        (*openrs::manager::ConfigManager::get())["database"];
     const std::string kQuery = std::string("select * from ") +
                                Model::TABLE_NAME + " WHERE " + kWhereField +
                                "=?;";
@@ -85,7 +85,7 @@ class DatabaseManager : public openrs::manager::Manager,
   template <typename Model>
   inline bool CreateModel(Model& model) {
     const auto& database_config =
-        openrs::manager::ConfigManager::get()["database"];
+        (*openrs::manager::ConfigManager::get())["database"];
     if (database_config["mode"].get<std::string>() == "mysql") {
       return model.Save(*this->db_mysql.get());
     } else if (database_config["mode"].get<std::string>() == "sqlite") {

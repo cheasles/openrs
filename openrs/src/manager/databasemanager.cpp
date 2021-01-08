@@ -16,8 +16,8 @@
  */
 #include "openrs/manager/databasemanager.h"
 
-#include <openrs/database/models/player.h>
 #include <openrs/common/log.h>
+#include <openrs/database/models/player.h>
 
 #include <iomanip>
 #include <nlohmann/json.hpp>
@@ -34,7 +34,7 @@ openrs::manager::DatabaseManager::~DatabaseManager() {
 
 bool openrs::manager::DatabaseManager::Init() {
   const auto& database_config =
-      openrs::manager::ConfigManager::get()["database"];
+      (*openrs::manager::ConfigManager::get())["database"];
   if (database_config["mode"].get<std::string>() == "mysql") {
     if (!this->InitMySQL()) return false;
     try {
@@ -64,7 +64,7 @@ bool openrs::manager::DatabaseManager::Init() {
 
 bool openrs::manager::DatabaseManager::InitMySQL() {
   const auto& database_config =
-      openrs::manager::ConfigManager::get()["database"];
+      (*openrs::manager::ConfigManager::get())["database"];
   this->db_mysql = std::make_shared<qtl::mysql::database>();
   if (this->db_mysql->open(
           database_config["host"].get<std::string>().c_str(),
@@ -85,7 +85,7 @@ bool openrs::manager::DatabaseManager::InitMySQL() {
 
 bool openrs::manager::DatabaseManager::InitSqlite() {
   const auto& database_config =
-      openrs::manager::ConfigManager::get()["database"];
+      (*openrs::manager::ConfigManager::get())["database"];
   this->db_sqlite = std::make_shared<qtl::sqlite::database>();
   try {
     this->db_sqlite->open(

@@ -45,39 +45,40 @@ bool openrs::manager::WorldManager::Update(
 
 bool openrs::manager::WorldManager::HandleEvent(
     const openrs::event::EventLogin& kEvent) {
+  this->StartPlayer(std::get<0>(kEvent), std::get<1>(kEvent));
   return true;
 }
 
 void openrs::manager::WorldManager::StartPlayer(
     const std::shared_ptr<openrs::game::Player>& kPlayer,
-    std::shared_ptr<openrs::net::Session>& session) const {
+    std::shared_ptr<openrs::net::Session> session) const {
   const auto& kInterfaceManager = openrs::manager::InterfaceManager::get();
   const auto& kConfigManager = openrs::manager::ConfigManager::get();
 
   this->SendMap(kPlayer, session, true);
-  kInterfaceManager.SendInterfaces(kPlayer, session);
+  kInterfaceManager->SendInterfaces(kPlayer, session);
   this->SendRunEnergy(kPlayer, session);
   this->SendPlayerHitPoints(kPlayer, session);
   this->SendItemLook(kPlayer, session);
   this->SendCustom161(kPlayer, session);
   this->SendMessage(
       kPlayer, session, openrs::manager::WorldManager::MessageType::kDefault,
-      "Welcome to " + kConfigManager["server"]["name"].get<std::string>());
+      "Welcome to " + (*kConfigManager)["server"]["name"].get<std::string>());
   this->SendMessage(
       kPlayer, session, openrs::manager::WorldManager::MessageType::kDefault,
-      kConfigManager["server"]["name"].get<std::string>() +
+      (*kConfigManager)["server"]["name"].get<std::string>() +
           " is distributed under the GNU AGPL license. Please visit " +
-          kConfigManager["server"]["source_url"].get<std::string>() +
+          (*kConfigManager)["server"]["source_url"].get<std::string>() +
           " to view the source code.");
 
   this->SendMultiCombatArea(kPlayer, session);
-  kConfigManager.SendConfig(kPlayer, session,
-                            openrs::manager::ConfigManager::Config::k281, 1000);
-  kConfigManager.SendConfig(kPlayer, session,
-                            openrs::manager::ConfigManager::Config::k1159, 1);
-  kConfigManager.SendConfig(kPlayer, session,
-                            openrs::manager::ConfigManager::Config::k1160, -1);
-  kConfigManager.SendGameBarStages(kPlayer, session);
+  kConfigManager->SendConfig(
+      kPlayer, session, openrs::manager::ConfigManager::Config::k281, 1000);
+  kConfigManager->SendConfig(kPlayer, session,
+                             openrs::manager::ConfigManager::Config::k1159, 1);
+  kConfigManager->SendConfig(kPlayer, session,
+                             openrs::manager::ConfigManager::Config::k1160, -1);
+  kConfigManager->SendGameBarStages(kPlayer, session);
 
   for (std::underlying_type_t<openrs::game::player::Skills::Skill> skill = 0;
        skill !=
@@ -122,7 +123,7 @@ void openrs::manager::WorldManager::SendMapRegion(
 
   std::vector<uint32_t> map_regions;
   const auto& kCacheConfig =
-      openrs::manager::ConfigManager::get().cache_config().at(718);
+      openrs::manager::ConfigManager::get()->cache_config().at(718);
   kPlayer->GetMapRegions(
       openrs::game::WorldTile::MAP_SIZES[kPlayer->map_size()] >> 4,
       &map_regions);
@@ -185,7 +186,7 @@ void openrs::manager::WorldManager::SendDynamicMapRegion(
   delete bitset;
 
   const auto& kCacheConfig =
-      openrs::manager::ConfigManager::get().cache_config().at(718);
+      openrs::manager::ConfigManager::get()->cache_config().at(718);
   for (const auto& kMapRegion : real_map_regions) {
     if (kCacheConfig["map_archive_keys"].contains(std::to_string(kMapRegion))) {
       for (const auto& kXteaKey :
@@ -260,7 +261,7 @@ void openrs::manager::WorldManager::SendRunEnergy(
 void openrs::manager::WorldManager::SendPlayerHitPoints(
     const std::shared_ptr<openrs::game::Player>& kPlayer,
     std::shared_ptr<openrs::net::Session>& session) const {
-  openrs::manager::ConfigManager::get().SendFileConfig(
+  openrs::manager::ConfigManager::get()->SendFileConfig(
       kPlayer, session, openrs::manager::ConfigManager::ConfigFile::kHitPoints,
       kPlayer->hit_points());
 }
@@ -372,11 +373,11 @@ void openrs::manager::WorldManager::SendMultiCombatArea(
     std::shared_ptr<openrs::net::Session>& session) const {
   const auto& kConfigManager = openrs::manager::ConfigManager::get();
   if (this->worlds().at(1).IsMultiCombatArea(*kPlayer)) {
-    kConfigManager.SendGlobalConfig(
+    kConfigManager->SendGlobalConfig(
         kPlayer, session,
         openrs::manager::ConfigManager::ConfigGlobal::kCombatMode, 1);
   } else {
-    kConfigManager.SendGlobalConfig(
+    kConfigManager->SendGlobalConfig(
         kPlayer, session,
         openrs::manager::ConfigManager::ConfigGlobal::kCombatMode, 0);
   }

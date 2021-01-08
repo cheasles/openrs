@@ -34,22 +34,22 @@ int main() {
 
   std::cout << "openrs Server" << std::endl;
 
-  if (!openrs::manager::ConfigManager::get().Init()) {
+  if (!openrs::manager::ConfigManager::get()->Init()) {
     std::cerr << "Failed to init config manager." << std::endl;
     return 1;
   }
 
-  if (!openrs::manager::DatabaseManager::get().Init()) {
+  if (!openrs::manager::DatabaseManager::get()->Init()) {
     std::cerr << "Failed to init database manager." << std::endl;
     return 1;
   }
 
-  if (!openrs::manager::cache::CacheManager::get().Init()) {
+  if (!openrs::manager::cache::CacheManager::get()->Init()) {
     std::cerr << "Failed to init cache manager." << std::endl;
     return 1;
   }
 
-  if (!openrs::manager::WorldManager::get().Init()) {
+  if (!openrs::manager::WorldManager::get()->Init()) {
     std::cerr << "Failed to init world manager." << std::endl;
     return 1;
   }

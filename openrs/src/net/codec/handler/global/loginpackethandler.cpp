@@ -39,6 +39,12 @@
 #include "openrs/net/codec/encoder/global/worldencoder.h"
 #include "openrs/net/codec/handler/global/worldpackethandler.h"
 
+openrs::net::codec::handler::global::LoginPacketHandler::LoginPacketHandler()
+    : PacketHandler(),
+      openrs::common::event::EventSource<openrs::event::EventLogin>() {
+  this->add_sink(openrs::manager::WorldManager::get());
+}
+
 void SendLoginDetails(const std::shared_ptr<openrs::game::Player>& player,
                       std::shared_ptr<openrs::net::Session>& session) {
   if (std::numeric_limits<uint8_t>::max() < player->rights) {
@@ -57,12 +63,12 @@ void SendLoginDetails(const std::shared_ptr<openrs::game::Player>& player,
   buffer.PutDataBE<uint8_t>(0);
   buffer.PutDataBE(static_cast<uint16_t>(player->id));
   buffer.PutDataBE(static_cast<uint8_t>(
-      openrs::manager::WorldManager::get().worlds().at(1).world_type()));
+      openrs::manager::WorldManager::get()->worlds().at(1).world_type()));
   buffer.PutDataBE<uint8_t>(0);
   buffer.PutDataBE<uint8_t>(0);
   buffer.PutDataBE<uint8_t>(0);
   buffer.PutDataBE(static_cast<uint8_t>(
-      openrs::manager::WorldManager::get().worlds().at(1).world_type()));
+      openrs::manager::WorldManager::get()->worlds().at(1).world_type()));
   buffer.PutString(player->username);
 
   openrs::net::codec::Packet details_packet;
@@ -86,7 +92,7 @@ void openrs::net::codec::handler::global::LoginPacketHandler::HandleLoginWorld(
   }
 
   CryptoPP::RSA::PublicKey rsa_function;
-  const auto& login_config = openrs::manager::ConfigManager::get()["login"];
+  const auto& login_config = (*openrs::manager::ConfigManager::get())["login"];
   CryptoPP::Integer private_exponent(
       login_config["private_exponent"].get<std::string>().c_str());
   CryptoPP::Integer modulus(login_config["modulus"].get<std::string>().c_str());
@@ -219,7 +225,7 @@ void openrs::net::codec::handler::global::LoginPacketHandler::HandleLoginWorld(
   decoded_packet.seek(SEEK_CUR, sizeof(uint8_t));
 
   // Validate cache hashes.
-  const auto& cache = openrs::manager::cache::CacheManager::get().cache();
+  const auto& cache = openrs::manager::cache::CacheManager::get()->cache();
   for (uint32_t index = 0;
        index < std::min(static_cast<uint32_t>(32), cache->GetTypeCount());
        ++index) {
@@ -239,10 +245,10 @@ void openrs::net::codec::handler::global::LoginPacketHandler::HandleLoginWorld(
   auto player = std::make_shared<openrs::game::Player>();
   auto& database_manager = openrs::manager::DatabaseManager::get();
   std::vector<openrs::database::models::PlayerModel> players;
-  if (!database_manager.GetModel<openrs::database::models::PlayerModel>(
+  if (!database_manager->GetModel<openrs::database::models::PlayerModel>(
           &players)) {
     const auto& kStartingLocation =
-        openrs::manager::ConfigManager::get()["game"]["starting_location"]
+        (*openrs::manager::ConfigManager::get())["game"]["starting_location"]
             .get<std::vector<uint32_t>>();
     player->username = username;
     openrs::game::Player::GenerateRandomString(24, &player->salt);
@@ -251,7 +257,7 @@ void openrs::net::codec::handler::global::LoginPacketHandler::HandleLoginWorld(
     player->set_x(kStartingLocation[0]);
     player->set_y(kStartingLocation[1]);
     player->set_z(kStartingLocation[2]);
-    database_manager.CreateModel(*player);
+    database_manager->CreateModel(*player);
     openrs::common::Log(openrs::common::Log::LogLevel::kInfo)
         << "Player " << username << " has registered.";
   } else {
@@ -289,7 +295,7 @@ void openrs::net::codec::handler::global::LoginPacketHandler::HandleLoginWorld(
 
   // Start the game.
   session->set_player_index(
-      openrs::manager::WorldManager::get().add_player(1, player));
+      openrs::manager::WorldManager::get()->add_player(1, player));
   SendLoginDetails(player, session);
   this->EmitEvent({player, session});
 }
