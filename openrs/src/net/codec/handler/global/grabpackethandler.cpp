@@ -16,10 +16,10 @@
  */
 #include "openrs/net/codec/handler/global/grabpackethandler.h"
 
-#include <openrs/common/io/buffer.h>
-#include <openrs/common/log.h>
 #include <endian.h>
 #include <integer.h>
+#include <openrs/common/io/buffer.h>
+#include <openrs/common/log.h>
 #include <rsa.h>
 #include <whrlpool.h>
 
@@ -51,7 +51,7 @@ bool PackCacheData(const uint8_t& kIndexId, const uint32_t& kArchiveId,
   return true;
 }
 
-void SendUKeys(openrs::net::Session* session) {
+void SendUKeys(std::shared_ptr<openrs::net::Session>& session) {
   openrs::common::io::Buffer<> ukeys_data_packet_buffer;
   const auto& cache = openrs::manager::cache::CacheManager::get().cache();
 
@@ -118,7 +118,8 @@ void SendUKeys(openrs::net::Session* session) {
 }
 
 void openrs::net::codec::handler::global::GrabPacketHandler::Handle(
-    openrs::net::codec::Packet& packet, openrs::net::Session* session) {
+    openrs::net::codec::Packet& packet,
+    std::shared_ptr<openrs::net::Session> session) {
   while (packet.data.position() != packet.data.size()) {
     uint8_t* priority_ptr = nullptr;
     uint8_t* index_id_ptr = nullptr;

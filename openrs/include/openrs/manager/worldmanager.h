@@ -84,7 +84,7 @@ class WorldManager : public openrs::manager::Manager,
    * @param session The client session to send the data to.
    */
   void StartPlayer(const std::shared_ptr<openrs::game::Player>& kPlayer,
-                   openrs::net::Session* session) const;
+                   std::shared_ptr<openrs::net::Session>& session) const;
 
   /**
    * Populate a buffer with information about local players.
@@ -110,7 +110,7 @@ class WorldManager : public openrs::manager::Manager,
    * @param kSendLocalPlayerUpdate Send the local player information too.
    */
   inline void SendMap(const std::shared_ptr<openrs::game::Player>& kPlayer,
-                      openrs::net::Session* session,
+                      std::shared_ptr<openrs::net::Session>& session,
                       const bool kSendLocalPlayerUpdate = false) const {
     if (false) {
       this->SendDynamicMapRegion(kPlayer, session, kSendLocalPlayerUpdate);
@@ -129,7 +129,7 @@ class WorldManager : public openrs::manager::Manager,
    * @param kSendLocalPlayerUpdate Send the local player information too.
    */
   void SendMapRegion(const std::shared_ptr<openrs::game::Player>& kPlayer,
-                     openrs::net::Session* session,
+                     std::shared_ptr<openrs::net::Session>& session,
                      const bool kSendLocalPlayerUpdate = false) const;
 
   /**
@@ -141,7 +141,7 @@ class WorldManager : public openrs::manager::Manager,
    */
   void SendDynamicMapRegion(
       const std::shared_ptr<openrs::game::Player>& kPlayer,
-      openrs::net::Session* session,
+      std::shared_ptr<openrs::net::Session>& session,
       const bool kSendLocalPlayerUpdate = false) const;
 
   /**
@@ -152,7 +152,7 @@ class WorldManager : public openrs::manager::Manager,
    */
   void SendLocalPlayerUpdate(
       const std::shared_ptr<openrs::game::Player>& kPlayer,
-      openrs::net::Session* session) const;
+      std::shared_ptr<openrs::net::Session>& session) const;
 
   /**
    * Sends the players run energy to them.
@@ -161,7 +161,7 @@ class WorldManager : public openrs::manager::Manager,
    * @param session The client session to send the data to.
    */
   void SendRunEnergy(const std::shared_ptr<openrs::game::Player>& kPlayer,
-                     openrs::net::Session* session) const;
+                     std::shared_ptr<openrs::net::Session>& session) const;
 
   /**
    * Sends the players hitpoints to them.
@@ -170,7 +170,7 @@ class WorldManager : public openrs::manager::Manager,
    * @param session The client session to send the data to.
    */
   void SendPlayerHitPoints(const std::shared_ptr<openrs::game::Player>& kPlayer,
-                           openrs::net::Session* session) const;
+                           std::shared_ptr<openrs::net::Session>& session) const;
 
   /**
    * Sends the item look packet to the client.
@@ -179,7 +179,7 @@ class WorldManager : public openrs::manager::Manager,
    * @param session The client session to send the data to.
    */
   void SendItemLook(const std::shared_ptr<openrs::game::Player>& kPlayer,
-                    openrs::net::Session* session) const;
+                    std::shared_ptr<openrs::net::Session>& session) const;
 
   /**
    * Sends custom packet to the client.
@@ -188,7 +188,7 @@ class WorldManager : public openrs::manager::Manager,
    * @param session The client session to send the data to.
    */
   void SendCustom161(const std::shared_ptr<openrs::game::Player>& kPlayer,
-                     openrs::net::Session* session) const;
+                     std::shared_ptr<openrs::net::Session>& session) const;
 
   /**
    * Sends a text message to the client.
@@ -199,7 +199,7 @@ class WorldManager : public openrs::manager::Manager,
    * @param kMessage The string message to send.
    */
   void SendMessage(const std::shared_ptr<openrs::game::Player>& kPlayer,
-                   openrs::net::Session* session,
+                   std::shared_ptr<openrs::net::Session>& session,
                    const MessageType& kMessageType,
                    const std::string& kMessage) const;
 
@@ -211,7 +211,7 @@ class WorldManager : public openrs::manager::Manager,
    * @param kTile The tile to send.
    */
   void SendCreateWorldTile(const std::shared_ptr<openrs::game::Player>& kPlayer,
-                           openrs::net::Session* session,
+                           std::shared_ptr<openrs::net::Session>& session,
                            const openrs::game::WorldTile& kTile) const;
 
   /**
@@ -224,7 +224,7 @@ class WorldManager : public openrs::manager::Manager,
    * @param kVolume The volumne to play the track at. 255 is max volume.
    */
   void SendMusic(const std::shared_ptr<openrs::game::Player>& player,
-                 openrs::net::Session* session, const MusicTrackID& kMusicId,
+                 std::shared_ptr<openrs::net::Session>& session, const MusicTrackID& kMusicId,
                  const uint8_t& kDelay = 100,
                  const uint8_t& kVolume = 255) const;
 
@@ -237,7 +237,7 @@ class WorldManager : public openrs::manager::Manager,
    * @param kVolume The volumne to play the effect at. 255 is max volume.
    */
   void SendMusicEffect(const std::shared_ptr<openrs::game::Player>& player,
-                       openrs::net::Session* session,
+                       std::shared_ptr<openrs::net::Session>& session,
                        const MusicEffectID& kMusicId,
                        const uint8_t& kVolume = 255) const;
 
@@ -248,7 +248,7 @@ class WorldManager : public openrs::manager::Manager,
    * @param session The client session to send the data to.
    */
   void SendMultiCombatArea(const std::shared_ptr<openrs::game::Player>& kPlayer,
-                           openrs::net::Session* session) const;
+                           std::shared_ptr<openrs::net::Session>& session) const;
 
   /**
    * Sends player skill information to a client.
@@ -258,7 +258,7 @@ class WorldManager : public openrs::manager::Manager,
    * @param kSkill The skill to send to the player.
    */
   void SendPlayerSkill(const std::shared_ptr<openrs::game::Player>& kPlayer,
-                       openrs::net::Session* session,
+                       std::shared_ptr<openrs::net::Session>& session,
                        const openrs::game::player::Skills::Skill& kSkill) const;
 
   inline const auto& worlds() const { return this->worlds_; }

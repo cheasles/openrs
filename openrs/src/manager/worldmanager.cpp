@@ -33,9 +33,24 @@ bool openrs::manager::WorldManager::Init() {
   return true;
 }
 
+bool openrs::manager::WorldManager::Update(
+    const std::chrono::milliseconds& kTimeSinceLastUpdate) {
+  for (const auto& kWorld : this->worlds_) {
+    for (const auto& kPlayer : kWorld.second.players()) {
+    }
+  }
+
+  return true;
+}
+
+bool openrs::manager::WorldManager::HandleEvent(
+    const openrs::event::EventLogin& kEvent) {
+  return true;
+}
+
 void openrs::manager::WorldManager::StartPlayer(
     const std::shared_ptr<openrs::game::Player>& kPlayer,
-    openrs::net::Session* session) const {
+    std::shared_ptr<openrs::net::Session>& session) const {
   const auto& kInterfaceManager = openrs::manager::InterfaceManager::get();
   const auto& kConfigManager = openrs::manager::ConfigManager::get();
 
@@ -93,7 +108,8 @@ void openrs::manager::WorldManager::GetLocalPlayerUpdate(
 
 void openrs::manager::WorldManager::SendMapRegion(
     const std::shared_ptr<openrs::game::Player>& kPlayer,
-    openrs::net::Session* session, const bool kSendLocalPlayerUpdate) const {
+    std::shared_ptr<openrs::net::Session>& session,
+    const bool kSendLocalPlayerUpdate) const {
   openrs::common::io::BitBuffer<> buffer;
   if (kSendLocalPlayerUpdate) {
     this->GetLocalPlayerUpdate(1, session->player_index(), kPlayer, &buffer);
@@ -133,7 +149,8 @@ void openrs::manager::WorldManager::SendMapRegion(
 
 void openrs::manager::WorldManager::SendDynamicMapRegion(
     const std::shared_ptr<openrs::game::Player>& kPlayer,
-    openrs::net::Session* session, const bool kSendLocalPlayerUpdate) const {
+    std::shared_ptr<openrs::net::Session>& session,
+    const bool kSendLocalPlayerUpdate) const {
   openrs::common::io::BitBuffer<> buffer;
   if (kSendLocalPlayerUpdate) {
     this->GetLocalPlayerUpdate(1, session->player_index(), kPlayer, &buffer);
@@ -192,7 +209,7 @@ void openrs::manager::WorldManager::SendDynamicMapRegion(
 
 void openrs::manager::WorldManager::SendLocalPlayerUpdate(
     const std::shared_ptr<openrs::game::Player>& kPlayer,
-    openrs::net::Session* session) const {
+    std::shared_ptr<openrs::net::Session>& session) const {
   openrs::common::io::BitBuffer<> buffer;
 
   openrs::common::io::Buffer<> appearance_buffer;
@@ -230,7 +247,7 @@ void openrs::manager::WorldManager::SendLocalPlayerUpdate(
 
 void openrs::manager::WorldManager::SendRunEnergy(
     const std::shared_ptr<openrs::game::Player>& kPlayer,
-    openrs::net::Session* session) const {
+    std::shared_ptr<openrs::net::Session>& session) const {
   openrs::common::io::Buffer<> buffer;
   buffer.PutData<uint8_t>(kPlayer->run_energy());
 
@@ -242,7 +259,7 @@ void openrs::manager::WorldManager::SendRunEnergy(
 
 void openrs::manager::WorldManager::SendPlayerHitPoints(
     const std::shared_ptr<openrs::game::Player>& kPlayer,
-    openrs::net::Session* session) const {
+    std::shared_ptr<openrs::net::Session>& session) const {
   openrs::manager::ConfigManager::get().SendFileConfig(
       kPlayer, session, openrs::manager::ConfigManager::ConfigFile::kHitPoints,
       kPlayer->hit_points());
@@ -250,7 +267,7 @@ void openrs::manager::WorldManager::SendPlayerHitPoints(
 
 void openrs::manager::WorldManager::SendItemLook(
     const std::shared_ptr<openrs::game::Player>& kPlayer,
-    openrs::net::Session* session) const {
+    std::shared_ptr<openrs::net::Session>& session) const {
   openrs::common::io::Buffer<> buffer;
   buffer.PutData<uint8_t>(kPlayer->old_items_look() ? 1 : 0);
 
@@ -262,7 +279,7 @@ void openrs::manager::WorldManager::SendItemLook(
 
 void openrs::manager::WorldManager::SendCustom161(
     const std::shared_ptr<openrs::game::Player>& kPlayer,
-    openrs::net::Session* session) const {
+    std::shared_ptr<openrs::net::Session>& session) const {
   openrs::common::io::Buffer<> buffer;
   uint8_t flag = 0;
   if (kPlayer->is_shift_drop()) {
@@ -285,8 +302,8 @@ void openrs::manager::WorldManager::SendCustom161(
 
 void openrs::manager::WorldManager::SendMessage(
     const std::shared_ptr<openrs::game::Player>& kPlayer,
-    openrs::net::Session* session, const MessageType& kMessageType,
-    const std::string& kMessage) const {
+    std::shared_ptr<openrs::net::Session>& session,
+    const MessageType& kMessageType, const std::string& kMessage) const {
   openrs::common::io::Buffer<> buffer;
   buffer.PutSmartBE(static_cast<uint16_t>(kMessageType));
   buffer.PutDataBE<uint32_t>(kPlayer->tile_hash());
@@ -302,7 +319,8 @@ void openrs::manager::WorldManager::SendMessage(
 
 void openrs::manager::WorldManager::SendCreateWorldTile(
     const std::shared_ptr<openrs::game::Player>& kPlayer,
-    openrs::net::Session* session, const openrs::game::WorldTile& kTile) const {
+    std::shared_ptr<openrs::net::Session>& session,
+    const openrs::game::WorldTile& kTile) const {
   openrs::common::io::Buffer<> buffer;
   buffer.PutShiftedPosDataBE<uint8_t>(kTile.GetLocalY(
       *kPlayer, openrs::game::WorldTile::MAP_SIZES[kPlayer->map_size()] >> 4));
@@ -318,8 +336,9 @@ void openrs::manager::WorldManager::SendCreateWorldTile(
 
 void openrs::manager::WorldManager::SendMusic(
     const std::shared_ptr<openrs::game::Player>& player,
-    openrs::net::Session* session, const MusicTrackID& kMusicId,
-    const uint8_t& kDelay, const uint8_t& kVolume) const {
+    std::shared_ptr<openrs::net::Session>& session,
+    const MusicTrackID& kMusicId, const uint8_t& kDelay,
+    const uint8_t& kVolume) const {
   openrs::common::io::Buffer<> buffer;
   buffer.PutDataBE<uint8_t>(kDelay);
   buffer.PutShiftedPosDataLE(static_cast<uint16_t>(kMusicId));
@@ -333,8 +352,8 @@ void openrs::manager::WorldManager::SendMusic(
 
 void openrs::manager::WorldManager::SendMusicEffect(
     const std::shared_ptr<openrs::game::Player>& player,
-    openrs::net::Session* session, const MusicEffectID& kMusicId,
-    const uint8_t& kVolume) const {
+    std::shared_ptr<openrs::net::Session>& session,
+    const MusicEffectID& kMusicId, const uint8_t& kVolume) const {
   openrs::common::io::Buffer<> buffer;
   buffer.PutShiftedNegDataLE(kVolume);
   buffer.PutData<uint8_t>(0);
@@ -350,7 +369,7 @@ void openrs::manager::WorldManager::SendMusicEffect(
 
 void openrs::manager::WorldManager::SendMultiCombatArea(
     const std::shared_ptr<openrs::game::Player>& kPlayer,
-    openrs::net::Session* session) const {
+    std::shared_ptr<openrs::net::Session>& session) const {
   const auto& kConfigManager = openrs::manager::ConfigManager::get();
   if (this->worlds().at(1).IsMultiCombatArea(*kPlayer)) {
     kConfigManager.SendGlobalConfig(
@@ -365,7 +384,7 @@ void openrs::manager::WorldManager::SendMultiCombatArea(
 
 void openrs::manager::WorldManager::SendPlayerSkill(
     const std::shared_ptr<openrs::game::Player>& kPlayer,
-    openrs::net::Session* session,
+    std::shared_ptr<openrs::net::Session>& session,
     const openrs::game::player::Skills::Skill& kSkill) const {
   openrs::common::io::Buffer<> buffer;
   buffer.PutShiftedNegDataBE(

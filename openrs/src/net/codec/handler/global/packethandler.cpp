@@ -31,7 +31,8 @@
 #include "openrs/net/codec/handler/global/loginpackethandler.h"
 
 void openrs::net::codec::handler::global::PacketHandler::Handle(
-    openrs::net::codec::Packet& packet, openrs::net::Session* session) {
+    openrs::net::codec::Packet& packet,
+    std::shared_ptr<openrs::net::Session> session) {
   if (PacketType::kHandshake == packet.type &&
       session->status() == SessionStatus::kConnected) {
     uint32_t* client_revision = nullptr;

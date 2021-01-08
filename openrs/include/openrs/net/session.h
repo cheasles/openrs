@@ -28,29 +28,20 @@
 #include "openrs/net/io/socket.h"
 
 namespace openrs {
-
 namespace net {
-
 namespace codec {
-
 namespace handler {
-
 namespace global {
 
 class PacketHandler;
 
 }  // namespace global
-
 }  // namespace handler
-
 }  // namespace codec
-
 }  // namespace net
-
 }  // namespace openrs
 
 namespace openrs {
-
 namespace net {
 
 enum SessionStatus {
@@ -61,7 +52,7 @@ enum SessionStatus {
   kLoggedIn
 };
 
-class Session {
+class Session : public std::enable_shared_from_this<Session> {
  private:
   SessionStatus status_;
   io::DataSocket socket_;
@@ -169,5 +160,4 @@ class Session {
 };
 
 }  // namespace net
-
 }  // namespace openrs

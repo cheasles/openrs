@@ -26,37 +26,31 @@
 #include "openrs/net/codec/packet.h"
 
 namespace openrs {
-
 namespace net {
 
 class Session;
 
 }  // namespace net
-
 }  // namespace openrs
 
 namespace openrs {
-
 namespace net {
-
 namespace codec {
-
 namespace handler {
-
 namespace global {
 
 class LoginPacketHandler : public PacketHandler {
  public:
   void Handle(openrs::net::codec::Packet& packet,
-              openrs::net::Session* session) override;
+              std::shared_ptr<openrs::net::Session> session) override;
+
+ private:
+  void HandleLoginWorld(openrs::net::codec::Packet& packet,
+                        std::shared_ptr<openrs::net::Session>& session) const;
 };
 
 }  // namespace global
-
 }  // namespace handler
-
 }  // namespace codec
-
 }  // namespace net
-
 }  // namespace openrs

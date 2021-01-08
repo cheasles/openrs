@@ -40,7 +40,7 @@
 #include "openrs/net/codec/handler/global/worldpackethandler.h"
 
 void SendLoginDetails(const std::shared_ptr<openrs::game::Player>& player,
-                      openrs::net::Session* session) {
+                      std::shared_ptr<openrs::net::Session>& session) {
   if (std::numeric_limits<uint8_t>::max() < player->rights) {
     throw new std::logic_error("Invalid player.rights value.");
   }
@@ -69,13 +69,11 @@ void SendLoginDetails(const std::shared_ptr<openrs::game::Player>& player,
   details_packet.type = openrs::net::codec::PacketType::kLoginDetails;
   details_packet.data = buffer;
   session->Send(details_packet);
-
-  const auto& world_manager = openrs::manager::WorldManager::get();
-  world_manager.StartPlayer(player, session);
 }
 
-void HandleLoginWorld(openrs::net::codec::Packet& packet,
-                      openrs::net::Session* session) {
+void openrs::net::codec::handler::global::LoginPacketHandler::HandleLoginWorld(
+    openrs::net::codec::Packet& packet,
+    std::shared_ptr<openrs::net::Session>& session) const {
   packet.data.seek(SEEK_CUR, sizeof(uint8_t));
   uint16_t* rsa_block_size_ptr = nullptr;
   if (!packet.data.GetData(&rsa_block_size_ptr)) {
@@ -293,10 +291,12 @@ void HandleLoginWorld(openrs::net::codec::Packet& packet,
   session->set_player_index(
       openrs::manager::WorldManager::get().add_player(1, player));
   SendLoginDetails(player, session);
+  this->EmitEvent({player, session});
 }
 
 void openrs::net::codec::handler::global::LoginPacketHandler::Handle(
-    openrs::net::codec::Packet& packet, openrs::net::Session* session) {
+    openrs::net::codec::Packet& packet,
+    std::shared_ptr<openrs::net::Session> session) {
   session->ResetDecoder();
 
   uint16_t* packet_size_ptr = nullptr;

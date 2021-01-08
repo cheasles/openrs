@@ -55,7 +55,7 @@ void openrs::net::Session::Read() {
       return;
     }
 
-    this->packet_handler_->Handle(packet, this);
+    this->packet_handler_->Handle(packet, shared_from_this());
   }
   this->buffer_input_.clear();
 

@@ -21,7 +21,8 @@
 #include "openrs/manager/interfacemanager.h"
 
 void openrs::net::codec::handler::global::WorldPacketHandler::Handle(
-    openrs::net::codec::Packet& packet, openrs::net::Session* session) {
+    openrs::net::codec::Packet& packet,
+    std::shared_ptr<openrs::net::Session> session) {
   switch (packet.type) {
     case PacketType::kPing: {
       openrs::net::codec::Packet ping_packet;

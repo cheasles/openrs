@@ -147,7 +147,7 @@ class InterfaceManager : public openrs::manager::Manager,
   bool Init() override;
 
   void SendInterfaces(const std::shared_ptr<openrs::game::Player>& player,
-                      openrs::net::Session* session) const;
+                      std::shared_ptr<openrs::net::Session>& session) const;
 
   inline bool IsResizable(
       const std::shared_ptr<openrs::game::Player>& player) const {
@@ -159,25 +159,25 @@ class InterfaceManager : public openrs::manager::Manager,
 
  private:
   void SendFixedInterfaces(const std::shared_ptr<openrs::game::Player>& player,
-                           openrs::net::Session* session) const;
+                           std::shared_ptr<openrs::net::Session>& session) const;
 
   void SendResizableInterfaces(
       const std::shared_ptr<openrs::game::Player>& player,
-      openrs::net::Session* session) const;
+      std::shared_ptr<openrs::net::Session>& session) const;
 
   void SendTab(const std::shared_ptr<openrs::game::Player>& player,
-               openrs::net::Session* session, const PaneID& kWindowId,
+               std::shared_ptr<openrs::net::Session>& session, const PaneID& kWindowId,
                const TabID& kTabId, const InterfaceID& kInterfaceId,
                const bool& kNoClipped = true) const;
 
   void SendInterfaceComponentAnimation(
       const std::shared_ptr<openrs::game::Player>& player,
-      openrs::net::Session* session, const InterfaceID& kInterfaceId,
+      std::shared_ptr<openrs::net::Session>& session, const InterfaceID& kInterfaceId,
       const ComponentID& kComponentId, const EmoteID& kEmote) const;
 
   void SendInterfaceComponentText(
       const std::shared_ptr<openrs::game::Player>& player,
-      openrs::net::Session* session, const InterfaceID& kInterfaceId,
+      std::shared_ptr<openrs::net::Session>& session, const InterfaceID& kInterfaceId,
       const ComponentID& kComponentId, const std::string& kText) const;
 
   /**
@@ -193,7 +193,7 @@ class InterfaceManager : public openrs::manager::Manager,
    */
   void SendInterfaceComponentSettings(
       const std::shared_ptr<openrs::game::Player>& kPlayer,
-      openrs::net::Session* session, const InterfaceID& kInterfaceId,
+      std::shared_ptr<openrs::net::Session>& session, const InterfaceID& kInterfaceId,
       const ComponentID& kComponentId, const uint16_t& kFromSlot,
       const uint16_t& kToSlot, const uint32_t& kSettingsHash) const;
 
@@ -208,7 +208,7 @@ class InterfaceManager : public openrs::manager::Manager,
    */
   void SendHideInterfaceComponent(
       const std::shared_ptr<openrs::game::Player>& kPlayer,
-      openrs::net::Session* session, const InterfaceID& kInterfaceId,
+      std::shared_ptr<openrs::net::Session>& session, const InterfaceID& kInterfaceId,
       const ComponentID& kComponentId, const bool& kHidden) const;
 
   /**
@@ -224,7 +224,7 @@ class InterfaceManager : public openrs::manager::Manager,
    */
   inline void SendUnlockInterfaceComponentOptionsSlot(
       const std::shared_ptr<openrs::game::Player>& kPlayer,
-      openrs::net::Session* session, const InterfaceID& kInterfaceId,
+      std::shared_ptr<openrs::net::Session>& session, const InterfaceID& kInterfaceId,
       const ComponentID& kComponentId, const uint16_t& kFromSlot,
       const uint16_t& kToSlot, const std::vector<uint8_t>& kSlots) const {
     uint32_t settings_hash = 0;
@@ -237,7 +237,7 @@ class InterfaceManager : public openrs::manager::Manager,
   }
 
   inline void SendTab(const std::shared_ptr<openrs::game::Player>& player,
-                      openrs::net::Session* session,
+                      std::shared_ptr<openrs::net::Session>& session,
                       const TabID& kTabIdResizable, const TabID& kTabIdFixed,
                       const InterfaceID& kInterfaceId) const {
     const auto kWindow =
@@ -255,7 +255,7 @@ class InterfaceManager : public openrs::manager::Manager,
    * @param kInterfaceId The interface the setting applies to.
    */
   inline void SendOverlay(const std::shared_ptr<openrs::game::Player>& player,
-                          openrs::net::Session* session,
+                          std::shared_ptr<openrs::net::Session>& session,
                           const InterfaceID& kInterfaceId) const {
     this->SendTab(player, session, TabID::kOverlay, TabID::kOverlayFixed,
                   kInterfaceId);
@@ -263,7 +263,7 @@ class InterfaceManager : public openrs::manager::Manager,
 
   inline void SendTabCombatStyles(
       const std::shared_ptr<openrs::game::Player>& player,
-      openrs::net::Session* session) const {
+      std::shared_ptr<openrs::net::Session>& session) const {
     this->SendTab(player, session, TabID::kCombatStyles,
                   TabID::kCombatStylesFixed, InterfaceID::kCombatStyles);
     this->SendInterfaceComponentText(
@@ -273,67 +273,67 @@ class InterfaceManager : public openrs::manager::Manager,
 
   inline void SendTabTaskSystem(
       const std::shared_ptr<openrs::game::Player>& player,
-      openrs::net::Session* session) const {
+      std::shared_ptr<openrs::net::Session>& session) const {
     this->SendTab(player, session, TabID::kTaskSystem, TabID::kTaskSystemFixed,
                   InterfaceID::kTaskSystem);
   }
 
   inline void SendTabSkills(const std::shared_ptr<openrs::game::Player>& player,
-                            openrs::net::Session* session) const {
+                            std::shared_ptr<openrs::net::Session>& session) const {
     this->SendTab(player, session, TabID::kSkills, TabID::kSkillsFixed,
                   InterfaceID::kSkills);
   }
 
   inline void SendTabSettings(
       const std::shared_ptr<openrs::game::Player>& player,
-      openrs::net::Session* session) const {
+      std::shared_ptr<openrs::net::Session>& session) const {
     this->SendTab(player, session, TabID::kSettings, TabID::kSettingsFixed,
                   InterfaceID::kSettings);
   }
 
   inline void SendTabPrayerBook(
       const std::shared_ptr<openrs::game::Player>& player,
-      openrs::net::Session* session) const {
+      std::shared_ptr<openrs::net::Session>& session) const {
     this->SendTab(player, session, TabID::kPrayerBook, TabID::kPrayerBookFixed,
                   InterfaceID::kPrayerBook);
   }
 
   inline void SendTabEmotes(const std::shared_ptr<openrs::game::Player>& player,
-                            openrs::net::Session* session) const {
+                            std::shared_ptr<openrs::net::Session>& session) const {
     this->SendTab(player, session, TabID::kEmotes, TabID::kEmotesFixed,
                   InterfaceID::kEmotes);
   }
 
   inline void SendTabQuests(const std::shared_ptr<openrs::game::Player>& player,
-                            openrs::net::Session* session) const {
+                            std::shared_ptr<openrs::net::Session>& session) const {
     this->SendTab(player, session, TabID::kQuests, TabID::kQuestsFixed,
                   InterfaceID::kQuests);
   }
 
   inline void SendTabDungeon(
       const std::shared_ptr<openrs::game::Player>& player,
-      openrs::net::Session* session) const {
+      std::shared_ptr<openrs::net::Session>& session) const {
     this->SendTab(player, session, TabID::kDungeon, TabID::kDungeonFixed,
                   InterfaceID::kDungeon);
   }
 
   inline void SendTabInventory(
       const std::shared_ptr<openrs::game::Player>& player,
-      openrs::net::Session* session) const {
+      std::shared_ptr<openrs::net::Session>& session) const {
     this->SendTab(player, session, TabID::kInventory, TabID::kInventoryFixed,
                   InterfaceID::kInventory);
   }
 
   inline void SendTabEquipment(
       const std::shared_ptr<openrs::game::Player>& player,
-      openrs::net::Session* session) const {
+      std::shared_ptr<openrs::net::Session>& session) const {
     this->SendTab(player, session, TabID::kEquipment, TabID::kEquipmentFixed,
                   InterfaceID::kEquipment);
   }
 
   inline void SendTabSqueelOfFortune(
       const std::shared_ptr<openrs::game::Player>& player,
-      openrs::net::Session* session) const {
+      std::shared_ptr<openrs::net::Session>& session) const {
     this->SendTab(player, session, TabID::kSqueelOfFortune,
                   TabID::kSqueelOfFortuneFixed, InterfaceID::kSqueelOfFortune);
     this->SendHideInterfaceComponent(
@@ -343,7 +343,7 @@ class InterfaceManager : public openrs::manager::Manager,
   }
 
   inline void SendTabTimer(const std::shared_ptr<openrs::game::Player>& player,
-                           openrs::net::Session* session) const {
+                           std::shared_ptr<openrs::net::Session>& session) const {
     this->SendTab(player, session, TabID::kTimer, TabID::kTimerFixed,
                   InterfaceID::kTimer);
   }
@@ -356,7 +356,7 @@ class InterfaceManager : public openrs::manager::Manager,
    */
   inline void SendUnlockAttackStyleButtons(
       const std::shared_ptr<openrs::game::Player>& kPlayer,
-      openrs::net::Session* session) const {
+      std::shared_ptr<openrs::net::Session>& session) const {
     this->SendUnlockInterfaceComponentOptionsSlot(kPlayer, session,
                                                   InterfaceID::kCombatStyles,
                                                   ComponentID::k7, -1, 0, {0});
@@ -379,7 +379,7 @@ class InterfaceManager : public openrs::manager::Manager,
    */
   inline void SendUnlockEmotesBook(
       const std::shared_ptr<openrs::game::Player>& kPlayer,
-      openrs::net::Session* session) const {
+      std::shared_ptr<openrs::net::Session>& session) const {
     this->SendUnlockInterfaceComponentOptionsSlot(
         kPlayer, session, InterfaceID::kEmotes, ComponentID::k8, 0, 118,
         {0, 1});
@@ -396,13 +396,13 @@ class InterfaceManager : public openrs::manager::Manager,
    * @param kCursor The cursor to show when hovering over the item.
    */
   void SendPlayerOption(const std::shared_ptr<openrs::game::Player>& kPlayer,
-                        openrs::net::Session* session,
+                        std::shared_ptr<openrs::net::Session>& session,
                         const std::string& kOption, const uint8_t& kSlot,
                         const bool& kTop = false,
                         const uint16_t& kCursor = -1) const;
 
   void SendWindowPane(const std::shared_ptr<openrs::game::Player>& player,
-                      openrs::net::Session* session, const PaneID& kId,
+                      std::shared_ptr<openrs::net::Session>& session, const PaneID& kId,
                       const PaneType& kType) const;
 };
 

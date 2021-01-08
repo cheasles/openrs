@@ -21,33 +21,27 @@
 #include <map>
 #include <vector>
 
-#include "openrs/net/session.h"
 #include "openrs/net/codec/packet.h"
+#include "openrs/net/session.h"
 
 namespace openrs {
-
 namespace net {
 
 class Session;
 
 }  // namespace net
-
 }  // namespace openrs
 
 namespace openrs {
-
 namespace net {
-
 namespace codec {
-
 namespace handler {
-
 namespace global {
 
 class PacketHandler {
  public:
   virtual void Handle(openrs::net::codec::Packet& packet,
-                      openrs::net::Session* session);
+                      std::shared_ptr<openrs::net::Session> session);
 
   virtual std::vector<openrs::net::codec::PacketType> HandledTypes() const {
     return {
@@ -57,11 +51,7 @@ class PacketHandler {
 };
 
 }  // namespace global
-
 }  // namespace handler
-
 }  // namespace codec
-
 }  // namespace net
-
 }  // namespace openrs

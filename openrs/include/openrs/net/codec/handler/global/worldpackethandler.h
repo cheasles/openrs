@@ -42,7 +42,7 @@ namespace global {
 class WorldPacketHandler : public PacketHandler {
  public:
   void Handle(openrs::net::codec::Packet& packet,
-              openrs::net::Session* session) override;
+              std::shared_ptr<openrs::net::Session> session) override;
 };
 
 }  // namespace global
