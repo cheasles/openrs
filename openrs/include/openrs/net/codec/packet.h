@@ -54,6 +54,15 @@ enum struct PacketType : uint8_t {
   kMusic,
   kMusicEffect,
   kPlayerSkill,
+  kActionButton1,
+  kActionButton2,
+  kActionButton3,
+  kActionButton4,
+  kActionButton5,
+  kActionButton6,
+  kActionButton7,
+  kActionButton8,
+  kActionButton9,
 };
 
 enum struct PacketOpCode : uint8_t {
