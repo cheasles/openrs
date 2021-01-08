@@ -51,8 +51,9 @@ class LoginPacketHandler
               std::shared_ptr<openrs::net::Session> session) override;
 
  private:
-  void HandleLoginWorld(openrs::net::codec::Packet& packet,
-                        std::shared_ptr<openrs::net::Session>& session) const;
+  void HandleLoginWorld(
+      openrs::net::codec::Packet& packet,
+      const std::shared_ptr<openrs::net::Session>& session) const;
 };
 
 }  // namespace global

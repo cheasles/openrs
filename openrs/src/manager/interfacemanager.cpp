@@ -25,7 +25,7 @@ bool openrs::manager::InterfaceManager::Init() { return true; }
 
 void openrs::manager::InterfaceManager::SendInterfaces(
     const std::shared_ptr<openrs::game::Player>& player,
-    std::shared_ptr<openrs::net::Session>& session) const {
+    const std::shared_ptr<openrs::net::Session>& session) const {
   const auto kResizable = this->IsResizable(player);
   const auto kWindow = kResizable ? PaneID::kResizable : PaneID::kFixed;
   this->SendWindowPane(player, session, kWindow, PaneType::kNone);
@@ -44,7 +44,7 @@ void openrs::manager::InterfaceManager::SendInterfaces(
 
 void openrs::manager::InterfaceManager::SendFixedInterfaces(
     const std::shared_ptr<openrs::game::Player>& player,
-    std::shared_ptr<openrs::net::Session>& session) const {
+    const std::shared_ptr<openrs::net::Session>& session) const {
   this->SendTab(player, session, PaneID::kFixed, TabID::k161,
                 InterfaceID::k752);
   this->SendTab(player, session, PaneID::kFixed, TabID::k37, InterfaceID::k751);
@@ -88,7 +88,7 @@ void openrs::manager::InterfaceManager::SendFixedInterfaces(
 
 void openrs::manager::InterfaceManager::SendResizableInterfaces(
     const std::shared_ptr<openrs::game::Player>& player,
-    std::shared_ptr<openrs::net::Session>& session) const {
+    const std::shared_ptr<openrs::net::Session>& session) const {
   this->SendTab(player, session, PaneID::kResizable, TabID::k21,
                 InterfaceID::k752);
   this->SendTab(player, session, PaneID::kResizable, TabID::k22,
@@ -136,9 +136,9 @@ void openrs::manager::InterfaceManager::SendResizableInterfaces(
 
 void openrs::manager::InterfaceManager::SendTab(
     const std::shared_ptr<openrs::game::Player>& player,
-    std::shared_ptr<openrs::net::Session>& session, const PaneID& kWindowId,
-    const TabID& kTabId, const InterfaceID& kInterfaceId,
-    const bool& kNoClipped) const {
+    const std::shared_ptr<openrs::net::Session>& session,
+    const PaneID& kWindowId, const TabID& kTabId,
+    const InterfaceID& kInterfaceId, const bool& kNoClipped) const {
   openrs::common::io::Buffer<> buffer;
   buffer.PutDataBE(
       static_cast<std::underlying_type_t<InterfaceID>>(kInterfaceId));
@@ -159,7 +159,7 @@ void openrs::manager::InterfaceManager::SendTab(
 
 void openrs::manager::InterfaceManager::SendInterfaceComponentText(
     const std::shared_ptr<openrs::game::Player>& player,
-    std::shared_ptr<openrs::net::Session>& session,
+    const std::shared_ptr<openrs::net::Session>& session,
     const InterfaceID& kInterfaceId, const ComponentID& kComponentId,
     const std::string& kText) const {
   openrs::common::io::Buffer<> buffer;
@@ -175,7 +175,7 @@ void openrs::manager::InterfaceManager::SendInterfaceComponentText(
 
 void openrs::manager::InterfaceManager::SendInterfaceComponentSettings(
     const std::shared_ptr<openrs::game::Player>& player,
-    std::shared_ptr<openrs::net::Session>& session,
+    const std::shared_ptr<openrs::net::Session>& session,
     const InterfaceID& kInterfaceId, const ComponentID& kComponentId,
     const uint16_t& kFromSlot, const uint16_t& kToSlot,
     const uint32_t& kSettingsHash) const {
@@ -194,7 +194,7 @@ void openrs::manager::InterfaceManager::SendInterfaceComponentSettings(
 
 void openrs::manager::InterfaceManager::SendHideInterfaceComponent(
     const std::shared_ptr<openrs::game::Player>& player,
-    std::shared_ptr<openrs::net::Session>& session,
+    const std::shared_ptr<openrs::net::Session>& session,
     const InterfaceID& kInterfaceId, const ComponentID& kComponentId,
     const bool& kHidden) const {
   openrs::common::io::Buffer<> buffer;
@@ -210,7 +210,7 @@ void openrs::manager::InterfaceManager::SendHideInterfaceComponent(
 
 void openrs::manager::InterfaceManager::SendInterfaceComponentAnimation(
     const std::shared_ptr<openrs::game::Player>& player,
-    std::shared_ptr<openrs::net::Session>& session,
+    const std::shared_ptr<openrs::net::Session>& session,
     const InterfaceID& kInterfaceId, const ComponentID& kComponentId,
     const EmoteID& kEmote) const {
   openrs::common::io::Buffer<> buffer;
@@ -227,8 +227,9 @@ void openrs::manager::InterfaceManager::SendInterfaceComponentAnimation(
 
 void openrs::manager::InterfaceManager::SendPlayerOption(
     const std::shared_ptr<openrs::game::Player>& kPlayer,
-    std::shared_ptr<openrs::net::Session>& session, const std::string& kOption,
-    const uint8_t& kSlot, const bool& kTop, const uint16_t& kCursor) const {
+    const std::shared_ptr<openrs::net::Session>& session,
+    const std::string& kOption, const uint8_t& kSlot, const bool& kTop,
+    const uint16_t& kCursor) const {
   openrs::common::io::Buffer<> buffer;
   buffer.PutShiftedPosDataBE(kSlot);
   buffer.PutString(kOption);
@@ -243,7 +244,7 @@ void openrs::manager::InterfaceManager::SendPlayerOption(
 
 void openrs::manager::InterfaceManager::SendWindowPane(
     const std::shared_ptr<openrs::game::Player>& player,
-    std::shared_ptr<openrs::net::Session>& session, const PaneID& kId,
+    const std::shared_ptr<openrs::net::Session>& session, const PaneID& kId,
     const PaneType& kType) const {
   openrs::common::io::Buffer<> buffer;
   buffer.PutShiftedNegDataBE(

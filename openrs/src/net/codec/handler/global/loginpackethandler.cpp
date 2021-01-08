@@ -46,7 +46,7 @@ openrs::net::codec::handler::global::LoginPacketHandler::LoginPacketHandler()
 }
 
 void SendLoginDetails(const std::shared_ptr<openrs::game::Player>& player,
-                      std::shared_ptr<openrs::net::Session>& session) {
+                      const std::shared_ptr<openrs::net::Session>& session) {
   if (std::numeric_limits<uint8_t>::max() < player->rights) {
     throw new std::logic_error("Invalid player.rights value.");
   }
@@ -79,7 +79,7 @@ void SendLoginDetails(const std::shared_ptr<openrs::game::Player>& player,
 
 void openrs::net::codec::handler::global::LoginPacketHandler::HandleLoginWorld(
     openrs::net::codec::Packet& packet,
-    std::shared_ptr<openrs::net::Session>& session) const {
+    const std::shared_ptr<openrs::net::Session>& session) const {
   packet.data.seek(SEEK_CUR, sizeof(uint8_t));
   uint16_t* rsa_block_size_ptr = nullptr;
   if (!packet.data.GetData(&rsa_block_size_ptr)) {

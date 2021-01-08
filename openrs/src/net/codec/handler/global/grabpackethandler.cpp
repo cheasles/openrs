@@ -51,7 +51,7 @@ bool PackCacheData(const uint8_t& kIndexId, const uint32_t& kArchiveId,
   return true;
 }
 
-void SendUKeys(std::shared_ptr<openrs::net::Session>& session) {
+void SendUKeys(const std::shared_ptr<openrs::net::Session>& session) {
   openrs::common::io::Buffer<> ukeys_data_packet_buffer;
   const auto& cache = openrs::manager::cache::CacheManager::get()->cache();
 
