@@ -17,6 +17,7 @@
 #pragma once
 
 #include <inttypes.h>
+#include <openrs/common/event/eventsink.h>
 #include <openrs/common/io/bitbuffer.h>
 #include <openrs/common/singleton.h>
 #include <openrs/game/player/skills.h>
@@ -24,6 +25,7 @@
 
 #include <unordered_map>
 
+#include "openrs/event/login.h"
 #include "openrs/manager/manager.h"
 #include "openrs/net/session.h"
 
@@ -33,8 +35,10 @@ namespace manager {
 /**
  * Manages each world the server is currently hosting.
  */
-class WorldManager : public openrs::manager::Manager,
-                     public openrs::common::Singleton<WorldManager> {
+class WorldManager
+    : public openrs::manager::Manager,
+      public openrs::common::Singleton<WorldManager>,
+      public openrs::common::event::EventSink<openrs::event::EventLogin> {
  public:
   /**
    * Supported message types to send to clients.
@@ -71,6 +75,24 @@ class WorldManager : public openrs::manager::Manager,
   bool Init() override;
 
   /**
+   * Updates each object that is managed by this instance.
+   *
+   * @param kTimeSinceLastUpdate The amount of time that has passed since the
+   *  last update.
+   * @return True on a successful update, false otherwise.
+   */
+  bool Update(const std::chrono::milliseconds& kTimeSinceLastUpdate) override;
+
+  /**
+   * Handles a player login event.
+   *
+   * @param kEvent The event details.
+   * @return True if event processing should continue to other event handlers,
+   *  or false to stop handling this event.
+   */
+  bool HandleEvent(const openrs::event::EventLogin& kEvent) override;
+
+  /**
    * Starts a game session for a player.
    *
    * When a player first logs into the server, we have to send a few different
@@ -84,7 +106,7 @@ class WorldManager : public openrs::manager::Manager,
    * @param session The client session to send the data to.
    */
   void StartPlayer(const std::shared_ptr<openrs::game::Player>& kPlayer,
-                   std::shared_ptr<openrs::net::Session>& session) const;
+                   std::shared_ptr<openrs::net::Session> session) const;
 
   /**
    * Populate a buffer with information about local players.
@@ -169,8 +191,9 @@ class WorldManager : public openrs::manager::Manager,
    * @param kPlayer The player to get hitpoint data for.
    * @param session The client session to send the data to.
    */
-  void SendPlayerHitPoints(const std::shared_ptr<openrs::game::Player>& kPlayer,
-                           std::shared_ptr<openrs::net::Session>& session) const;
+  void SendPlayerHitPoints(
+      const std::shared_ptr<openrs::game::Player>& kPlayer,
+      std::shared_ptr<openrs::net::Session>& session) const;
 
   /**
    * Sends the item look packet to the client.
@@ -224,8 +247,8 @@ class WorldManager : public openrs::manager::Manager,
    * @param kVolume The volumne to play the track at. 255 is max volume.
    */
   void SendMusic(const std::shared_ptr<openrs::game::Player>& player,
-                 std::shared_ptr<openrs::net::Session>& session, const MusicTrackID& kMusicId,
-                 const uint8_t& kDelay = 100,
+                 std::shared_ptr<openrs::net::Session>& session,
+                 const MusicTrackID& kMusicId, const uint8_t& kDelay = 100,
                  const uint8_t& kVolume = 255) const;
 
   /**
@@ -247,8 +270,9 @@ class WorldManager : public openrs::manager::Manager,
    * @param kPlayer The player to check the combat area type for.
    * @param session The client session to send the data to.
    */
-  void SendMultiCombatArea(const std::shared_ptr<openrs::game::Player>& kPlayer,
-                           std::shared_ptr<openrs::net::Session>& session) const;
+  void SendMultiCombatArea(
+      const std::shared_ptr<openrs::game::Player>& kPlayer,
+      std::shared_ptr<openrs::net::Session>& session) const;
 
   /**
    * Sends player skill information to a client.
