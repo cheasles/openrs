@@ -79,15 +79,6 @@ class WorldManager
   bool Init() override;
 
   /**
-   * Updates each object that is managed by this instance.
-   *
-   * @param kTimeSinceLastUpdate The amount of time that has passed since the
-   *  last update.
-   * @return True on a successful update, false otherwise.
-   */
-  bool Update(const std::chrono::milliseconds& kTimeSinceLastUpdate) override;
-
-  /**
    * Handles a player login event.
    *
    * @param kEvent The event details.

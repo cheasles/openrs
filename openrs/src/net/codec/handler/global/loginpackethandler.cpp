@@ -286,7 +286,8 @@ void openrs::net::codec::handler::global::LoginPacketHandler::HandleLoginWorld(
   // Make sure the next packets are handled correctly.
   session->SetDecoder(
       std::make_unique<openrs::net::codec::decoder::global::WorldDecoder>());
-  session->SetEncoder(openrs::net::codec::encoder::global::WorldEncoder::get());
+  session->SetEncoder(
+      std::make_unique<openrs::net::codec::encoder::global::WorldEncoder>());
   session->SetHandler(
       std::make_unique<
           openrs::net::codec::handler::global::WorldPacketHandler>());

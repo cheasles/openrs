@@ -33,16 +33,6 @@ bool openrs::manager::WorldManager::Init() {
   return true;
 }
 
-bool openrs::manager::WorldManager::Update(
-    const std::chrono::milliseconds& kTimeSinceLastUpdate) {
-  for (const auto& kWorld : this->worlds_) {
-    for (const auto& kPlayer : kWorld.second.players()) {
-    }
-  }
-
-  return true;
-}
-
 bool openrs::manager::WorldManager::HandleEvent(
     const openrs::event::EventLogin& kEvent) {
   this->sessions_.insert(

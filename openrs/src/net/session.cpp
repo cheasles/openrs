@@ -35,7 +35,9 @@ openrs::net::Session::Session()
       player_world_(-1),
       bytes_received_(0),
       bytes_sent_(0) {
-  this->TransitionState(this->status_);
+  this->ResetEncoder();
+  this->ResetDecoder();
+  this->ResetHandler();
 }
 
 openrs::net::Session::~Session() {}
@@ -81,35 +83,4 @@ void openrs::net::Session::Write() {
 void openrs::net::Session::Send(const openrs::common::io::Buffer<>& buffer) {
   this->buffer_output_.insert(this->buffer_output_.cend(), buffer.cbegin(),
                               buffer.cend());
-}
-
-void openrs::net::Session::TransitionState(const SessionStatus& kState) {
-  switch (kState) {
-    case SessionStatus::kDownloadingCache: {
-      static const auto HANDLER = std::make_shared<
-          openrs::net::codec::handler::global::GrabPacketHandler>();
-      static const auto DECODER =
-          std::make_shared<openrs::net::codec::decoder::global::GrabDecoder>();
-      static const auto ENCODER =
-          std::make_shared<openrs::net::codec::encoder::global::GrabEncoder>();
-      this->SetHandler(HANDLER);
-      this->SetDecoder(DECODER);
-      this->SetEncoder(ENCODER);
-      break;
-    }
-    default: {
-      static const auto HANDLER = std::make_shared<
-          openrs::net::codec::handler::global::PacketHandler>();
-      static const auto DECODER =
-          std::make_shared<openrs::net::codec::decoder::global::Decoder>();
-      static const auto ENCODER =
-          std::make_shared<openrs::net::codec::encoder::global::Encoder>();
-      this->SetHandler(HANDLER);
-      this->SetDecoder(DECODER);
-      this->SetEncoder(ENCODER);
-      break;
-    }
-  }
-
-  this->set_status(kState);
 }
