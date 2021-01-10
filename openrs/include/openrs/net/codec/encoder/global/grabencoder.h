@@ -26,13 +26,9 @@
 #include "openrs/net/codec/packet.h"
 
 namespace openrs {
-
 namespace net {
-
 namespace codec {
-
 namespace encoder {
-
 namespace global {
 
 class GrabEncoder : public Encoder {
@@ -43,16 +39,11 @@ class GrabEncoder : public Encoder {
 
  public:
   bool Encode(const openrs::net::codec::Packet& packet,
-              const std::weak_ptr<openrs::game::Player>& player,
-              openrs::common::io::Buffer<>* buffer) override;
+              openrs::common::io::Buffer<>* buffer) const override;
 };
 
 }  // namespace global
-
 }  // namespace encoder
-
 }  // namespace codec
-
 }  // namespace net
-
 }  // namespace openrs

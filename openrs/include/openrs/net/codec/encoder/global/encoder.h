@@ -16,9 +16,10 @@
  */
 #pragma once
 
-#include <openrs/common/io/buffer.h>
-#include <openrs/game/player.h>
 #include <frozen/map.h>
+#include <openrs/common/io/buffer.h>
+#include <openrs/common/singleton.h>
+#include <openrs/game/player.h>
 #include <stdint.h>
 
 #include <map>
@@ -27,13 +28,9 @@
 #include "openrs/net/codec/packet.h"
 
 namespace openrs {
-
 namespace net {
-
 namespace codec {
-
 namespace encoder {
-
 namespace global {
 
 class Encoder {
@@ -43,16 +40,11 @@ class Encoder {
 
  public:
   virtual bool Encode(const openrs::net::codec::Packet& packet,
-                      const std::weak_ptr<openrs::game::Player>& player,
-                      openrs::common::io::Buffer<>* buffer);
+                      openrs::common::io::Buffer<>* buffer) const;
 };
 
 }  // namespace global
-
 }  // namespace encoder
-
 }  // namespace codec
-
 }  // namespace net
-
 }  // namespace openrs

@@ -19,17 +19,23 @@
 #include <openrs/common/log.h>
 #include <sys/socket.h>
 
+#include "openrs/net/codec/decoder/global/grabdecoder.h"
+#include "openrs/net/codec/decoder/global/logindecoder.h"
+#include "openrs/net/codec/encoder/global/grabencoder.h"
+#include "openrs/net/codec/encoder/global/loginencoder.h"
+#include "openrs/net/codec/handler/global/grabpackethandler.h"
+#include "openrs/net/codec/handler/global/loginpackethandler.h"
 #include "openrs/net/codec/packet.h"
 
 openrs::net::Session::Session()
     : status_(SessionStatus::kConnected),
       socket_(openrs::net::io::BaseSocket::kInvalidSocketId),
       client_build_(0),
+      player_index_(-1),
+      player_world_(-1),
       bytes_received_(0),
       bytes_sent_(0) {
-  this->ResetDecoder();
-  this->ResetEncoder();
-  this->ResetHandler();
+  this->TransitionState(this->status_);
 }
 
 openrs::net::Session::~Session() {}
@@ -75,4 +81,35 @@ void openrs::net::Session::Write() {
 void openrs::net::Session::Send(const openrs::common::io::Buffer<>& buffer) {
   this->buffer_output_.insert(this->buffer_output_.cend(), buffer.cbegin(),
                               buffer.cend());
+}
+
+void openrs::net::Session::TransitionState(const SessionStatus& kState) {
+  switch (kState) {
+    case SessionStatus::kDownloadingCache: {
+      static const auto HANDLER = std::make_shared<
+          openrs::net::codec::handler::global::GrabPacketHandler>();
+      static const auto DECODER =
+          std::make_shared<openrs::net::codec::decoder::global::GrabDecoder>();
+      static const auto ENCODER =
+          std::make_shared<openrs::net::codec::encoder::global::GrabEncoder>();
+      this->SetHandler(HANDLER);
+      this->SetDecoder(DECODER);
+      this->SetEncoder(ENCODER);
+      break;
+    }
+    default: {
+      static const auto HANDLER = std::make_shared<
+          openrs::net::codec::handler::global::PacketHandler>();
+      static const auto DECODER =
+          std::make_shared<openrs::net::codec::decoder::global::Decoder>();
+      static const auto ENCODER =
+          std::make_shared<openrs::net::codec::encoder::global::Encoder>();
+      this->SetHandler(HANDLER);
+      this->SetDecoder(DECODER);
+      this->SetEncoder(ENCODER);
+      break;
+    }
+  }
+
+  this->set_status(kState);
 }

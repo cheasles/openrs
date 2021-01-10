@@ -282,18 +282,17 @@ void openrs::net::codec::handler::global::LoginPacketHandler::HandleLoginWorld(
   player->set_display_mode(*display_mode_ptr);
   player->set_screen_width(::be16toh(*screen_width_ptr));
   player->set_screen_height(::be16toh(*screen_height_ptr));
-  session->set_player(player);
 
   // Make sure the next packets are handled correctly.
   session->SetDecoder(
       std::make_unique<openrs::net::codec::decoder::global::WorldDecoder>());
-  session->SetEncoder(
-      std::make_unique<openrs::net::codec::encoder::global::WorldEncoder>());
+  session->SetEncoder(openrs::net::codec::encoder::global::WorldEncoder::get());
   session->SetHandler(
       std::make_unique<
           openrs::net::codec::handler::global::WorldPacketHandler>());
 
   // Start the game.
+  session->set_player_world(1);
   session->set_player_index(
       openrs::manager::WorldManager::get()->add_player(1, player));
   SendLoginDetails(player, session);

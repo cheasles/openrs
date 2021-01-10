@@ -16,11 +16,13 @@
  */
 #pragma once
 
+#include <openrs/common/event/eventsource.h>
 #include <stdint.h>
 
 #include <map>
 #include <vector>
 
+#include "openrs/event/packet/screen.h"
 #include "openrs/net/codec/handler/global/packethandler.h"
 #include "openrs/net/codec/packet.h"
 #include "openrs/net/session.h"
@@ -39,8 +41,12 @@ namespace codec {
 namespace handler {
 namespace global {
 
-class WorldPacketHandler : public PacketHandler {
+class WorldPacketHandler : public PacketHandler,
+                           public openrs::common::event::EventSource<
+                               openrs::event::packet::EventPacketScreen> {
  public:
+  WorldPacketHandler();
+
   void Handle(openrs::net::codec::Packet& packet,
               std::shared_ptr<openrs::net::Session> session) override;
 };

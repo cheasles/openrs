@@ -45,7 +45,32 @@ bool openrs::manager::WorldManager::Update(
 
 bool openrs::manager::WorldManager::HandleEvent(
     const openrs::event::EventLogin& kEvent) {
+  this->sessions_.insert(
+      std::make_pair<uint32_t, std::weak_ptr<openrs::net::Session>>(
+          this->add_player(1, std::get<0>(kEvent)), std::get<1>(kEvent)));
   this->StartPlayer(std::get<0>(kEvent), std::get<1>(kEvent));
+  return true;
+}
+
+bool openrs::manager::WorldManager::HandleEvent(
+    const openrs::event::packet::EventPacketScreen& kEvent) {
+  const auto& kWorld = this->worlds_.find(std::get<0>(kEvent)->player_world());
+  if (this->worlds_.cend() == kWorld) {
+    return false;
+  }
+
+  const auto& kPlayer =
+      kWorld->second.players().find(std::get<0>(kEvent)->player_index());
+  if (kWorld->second.players().cend() == kPlayer) {
+    return false;
+  }
+
+  kPlayer->second->set_display_mode(std::get<1>(kEvent));
+  kPlayer->second->set_screen_width(std::get<2>(kEvent));
+  kPlayer->second->set_screen_height(std::get<3>(kEvent));
+
+  const auto& interface_manager = openrs::manager::InterfaceManager::get();
+  interface_manager->SendInterfaces(kPlayer->second, std::get<0>(kEvent));
   return true;
 }
 

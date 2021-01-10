@@ -17,7 +17,6 @@
 #pragma once
 
 #include <openrs/common/io/buffer.h>
-#include <openrs/game/player.h>
 #include <sys/epoll.h>
 
 #include <memory>
@@ -57,10 +56,10 @@ class Session : public std::enable_shared_from_this<Session> {
   SessionStatus status_;
   io::DataSocket socket_;
 
-  std::unique_ptr<openrs::net::codec::decoder::global::Decoder> decoder_;
-  std::unique_ptr<openrs::net::codec::handler::global::PacketHandler>
+  std::shared_ptr<openrs::net::codec::decoder::global::Decoder> decoder_;
+  std::shared_ptr<openrs::net::codec::handler::global::PacketHandler>
       packet_handler_;
-  std::unique_ptr<openrs::net::codec::encoder::global::Encoder> encoder_;
+  std::shared_ptr<openrs::net::codec::encoder::global::Encoder> encoder_;
 
   openrs::common::io::Buffer<> buffer_input_;
   openrs::common::io::Buffer<> buffer_output_;
@@ -70,7 +69,7 @@ class Session : public std::enable_shared_from_this<Session> {
 
   uint32_t client_build_;
   uint32_t player_index_;
-  std::weak_ptr<openrs::game::Player> player_;
+  uint32_t player_world_;
 
   static constexpr size_t kReadSize = 1024;
 
@@ -85,7 +84,7 @@ class Session : public std::enable_shared_from_this<Session> {
 
   inline void Send(const openrs::net::codec::Packet& packet) {
     openrs::common::io::Buffer<> buffer;
-    this->encoder_->Encode(packet, this->player_, &buffer);
+    this->encoder_->Encode(packet, &buffer);
     this->Send(buffer);
   }
 
@@ -95,6 +94,14 @@ class Session : public std::enable_shared_from_this<Session> {
     this->Send(error_packet);
   }
 
+  /**
+   * Transition the state of a client connection so that subsequent packets are
+   *  handled differently.
+   *
+   * @param kState The new state to transition to.
+   */
+  void TransitionState(const SessionStatus& kState);
+
   inline bool HasOutput() const { return this->buffer_output_.size() != 0; }
 
   inline void SetDecoder(
@@ -103,8 +110,9 @@ class Session : public std::enable_shared_from_this<Session> {
   }
 
   inline void SetEncoder(
-      std::unique_ptr<openrs::net::codec::encoder::global::Encoder>&& encoder) {
-    this->encoder_ = std::move(encoder);
+      const std::shared_ptr<openrs::net::codec::encoder::global::Encoder>&
+          kEncoder) {
+    this->encoder_ = kEncoder;
   }
 
   inline void SetHandler(
@@ -138,7 +146,7 @@ class Session : public std::enable_shared_from_this<Session> {
 
   inline uint32_t client_build() const { return this->client_build_; }
   inline uint32_t player_index() const { return this->player_index_; }
-  inline auto player() const { return this->player_; }
+  inline uint32_t player_world() const { return this->player_world_; }
 
   inline void set_socket(io::DataSocket& socket) {
     this->socket_ = std::move(socket);
@@ -154,8 +162,8 @@ class Session : public std::enable_shared_from_this<Session> {
   inline void set_player_index(const uint32_t& player_index) {
     this->player_index_ = player_index;
   }
-  inline void set_player(const std::weak_ptr<openrs::game::Player>& player) {
-    this->player_ = player;
+  inline void set_player_world(const uint32_t& kPlayerWorld) {
+    this->player_world_ = kPlayerWorld;
   }
 };
 

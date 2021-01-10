@@ -26,6 +26,7 @@
 #include <unordered_map>
 
 #include "openrs/event/login.h"
+#include "openrs/event/packet/screen.h"
 #include "openrs/manager/manager.h"
 #include "openrs/net/session.h"
 
@@ -38,7 +39,9 @@ namespace manager {
 class WorldManager
     : public openrs::manager::Manager,
       public openrs::common::Singleton<WorldManager>,
-      public openrs::common::event::EventSink<openrs::event::EventLogin> {
+      public openrs::common::event::EventSink<openrs::event::EventLogin>,
+      public openrs::common::event::EventSink<
+          openrs::event::packet::EventPacketScreen> {
  public:
   /**
    * Supported message types to send to clients.
@@ -63,6 +66,7 @@ class WorldManager
 
  private:
   std::unordered_map<uint32_t, openrs::game::World> worlds_;
+  std::unordered_map<uint32_t, std::weak_ptr<openrs::net::Session>> sessions_;
 
  public:
   WorldManager(void) {}
@@ -91,6 +95,16 @@ class WorldManager
    *  or false to stop handling this event.
    */
   bool HandleEvent(const openrs::event::EventLogin& kEvent) override;
+
+  /**
+   * Handles a player screen change event.
+   *
+   * @param kEvent The event details.
+   * @return True if event processing should continue to other event handlers,
+   *  or false to stop handling this event.
+   */
+  bool HandleEvent(
+      const openrs::event::packet::EventPacketScreen& kEvent) override;
 
   /**
    * Starts a game session for a player.

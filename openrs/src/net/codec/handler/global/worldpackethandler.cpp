@@ -19,6 +19,14 @@
 #include <openrs/common/log.h>
 
 #include "openrs/manager/interfacemanager.h"
+#include "openrs/manager/worldmanager.h"
+
+openrs::net::codec::handler::global::WorldPacketHandler::WorldPacketHandler()
+    : PacketHandler(),
+      openrs::common::event::EventSource<
+          openrs::event::packet::EventPacketScreen>() {
+  this->add_sink(openrs::manager::WorldManager::get());
+}
 
 void openrs::net::codec::handler::global::WorldPacketHandler::Handle(
     openrs::net::codec::Packet& packet,
@@ -43,15 +51,9 @@ void openrs::net::codec::handler::global::WorldPacketHandler::Handle(
             << "[World] Failed to read packet data.";
         return;
       }
-      if (auto player = session->player().lock()) {
-        player->set_display_mode(*display_mode_ptr);
-        player->set_screen_width(::be16toh(*screen_width_ptr));
-        player->set_screen_height(::be16toh(*screen_height_ptr));
-        const auto& interface_manager =
-            openrs::manager::InterfaceManager::get();
-        interface_manager->SendInterfaces(player, session);
-      }
 
+      this->EmitEvent({session, *display_mode_ptr, ::be16toh(*screen_width_ptr),
+                       ::be16toh(*screen_height_ptr)});
       break;
     }
   }
