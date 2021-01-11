@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <openrs/common/singleton.h>
 #include <stdint.h>
 
 #include <map>
@@ -41,7 +42,7 @@ namespace global {
 class PacketHandler {
  public:
   virtual void Handle(openrs::net::codec::Packet& packet,
-                      std::shared_ptr<openrs::net::Session> session);
+                      std::shared_ptr<openrs::net::Session> session) const;
 
   virtual std::vector<openrs::net::codec::PacketType> HandledTypes() const {
     return {

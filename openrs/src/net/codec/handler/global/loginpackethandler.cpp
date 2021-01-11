@@ -284,13 +284,10 @@ void openrs::net::codec::handler::global::LoginPacketHandler::HandleLoginWorld(
   player->set_screen_height(::be16toh(*screen_height_ptr));
 
   // Make sure the next packets are handled correctly.
-  session->SetDecoder(
-      std::make_unique<openrs::net::codec::decoder::global::WorldDecoder>());
-  session->SetEncoder(
-      std::make_unique<openrs::net::codec::encoder::global::WorldEncoder>());
+  session->SetDecoder(openrs::net::codec::decoder::global::WorldDecoder::get());
+  session->SetEncoder(openrs::net::codec::encoder::global::WorldEncoder::get());
   session->SetHandler(
-      std::make_unique<
-          openrs::net::codec::handler::global::WorldPacketHandler>());
+      openrs::net::codec::handler::global::WorldPacketHandler::get());
 
   // Start the game.
   session->set_player_world(1);
@@ -302,7 +299,7 @@ void openrs::net::codec::handler::global::LoginPacketHandler::HandleLoginWorld(
 
 void openrs::net::codec::handler::global::LoginPacketHandler::Handle(
     openrs::net::codec::Packet& packet,
-    std::shared_ptr<openrs::net::Session> session) {
+    std::shared_ptr<openrs::net::Session> session) const {
   session->ResetDecoder();
 
   uint16_t* packet_size_ptr = nullptr;

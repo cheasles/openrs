@@ -18,6 +18,7 @@
 
 #include <frozen/map.h>
 #include <openrs/common/io/buffer.h>
+#include <openrs/common/singleton.h>
 #include <stdint.h>
 
 #include <map>
@@ -31,7 +32,8 @@ namespace codec {
 namespace encoder {
 namespace global {
 
-class GrabEncoder : public Encoder {
+class GrabEncoder : public Encoder,
+                    public openrs::common::Singleton<GrabEncoder> {
  private:
   static inline constexpr frozen::map<PacketType, uint8_t, 2> code_mapping_{
       {PacketType::kStartUp, 0},

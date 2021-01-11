@@ -105,8 +105,9 @@ class Session : public std::enable_shared_from_this<Session> {
   inline bool HasOutput() const { return this->buffer_output_.size() != 0; }
 
   inline void SetDecoder(
-      std::unique_ptr<openrs::net::codec::decoder::global::Decoder>&& decoder) {
-    this->decoder_ = std::move(decoder);
+      const std::shared_ptr<openrs::net::codec::decoder::global::Decoder>&
+          kDecoder) {
+    this->decoder_ = kDecoder;
   }
 
   inline void SetEncoder(
@@ -116,24 +117,27 @@ class Session : public std::enable_shared_from_this<Session> {
   }
 
   inline void SetHandler(
-      std::unique_ptr<openrs::net::codec::handler::global::PacketHandler>&&
-          handler) {
-    this->packet_handler_ = std::move(handler);
+      const std::shared_ptr<openrs::net::codec::handler::global::PacketHandler>&
+          kHandler) {
+    this->packet_handler_ = kHandler;
   }
 
   inline void ResetEncoder() {
-    this->encoder_ =
-        std::make_unique<openrs::net::codec::encoder::global::Encoder>();
+    static auto encoder =
+        std::make_shared<openrs::net::codec::encoder::global::Encoder>();
+    this->encoder_ = encoder;
   }
 
   inline void ResetDecoder() {
-    this->decoder_ =
-        std::make_unique<openrs::net::codec::decoder::global::Decoder>();
+    static auto decoder =
+        std::make_shared<openrs::net::codec::decoder::global::Decoder>();
+    this->decoder_ = decoder;
   }
 
   inline void ResetHandler() {
-    this->packet_handler_ =
-        std::make_unique<openrs::net::codec::handler::global::PacketHandler>();
+    static auto handler =
+        std::make_shared<openrs::net::codec::handler::global::PacketHandler>();
+    this->packet_handler_ = handler;
   }
 
   inline SessionStatus status() const { return this->status_; }

@@ -17,6 +17,7 @@
 #pragma once
 
 #include <openrs/common/event/eventsource.h>
+#include <openrs/common/singleton.h>
 #include <stdint.h>
 
 #include <map>
@@ -43,12 +44,13 @@ namespace global {
 
 class LoginPacketHandler
     : public PacketHandler,
+      public openrs::common::Singleton<LoginPacketHandler>,
       public openrs::common::event::EventSource<openrs::event::EventLogin> {
  public:
   LoginPacketHandler();
 
   void Handle(openrs::net::codec::Packet& packet,
-              std::shared_ptr<openrs::net::Session> session) override;
+              std::shared_ptr<openrs::net::Session> session) const override;
 
  private:
   void HandleLoginWorld(

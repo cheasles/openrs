@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <openrs/common/singleton.h>
 #include <stdint.h>
 
 #include <map>
@@ -39,10 +40,11 @@ namespace codec {
 namespace handler {
 namespace global {
 
-class GrabPacketHandler : public PacketHandler {
+class GrabPacketHandler : public PacketHandler,
+                          public openrs::common::Singleton<GrabPacketHandler> {
  public:
   void Handle(openrs::net::codec::Packet& packet,
-              std::shared_ptr<openrs::net::Session> session) override;
+              std::shared_ptr<openrs::net::Session> session) const override;
 };
 
 }  // namespace global

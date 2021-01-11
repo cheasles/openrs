@@ -16,8 +16,8 @@
  */
 #pragma once
 
-#include <openrs/common/io/buffer.h>
 #include <frozen/map.h>
+#include <openrs/common/io/buffer.h>
 #include <stdint.h>
 
 #include <map>
@@ -25,13 +25,9 @@
 #include "openrs/net/codec/packet.h"
 
 namespace openrs {
-
 namespace net {
-
 namespace codec {
-
 namespace decoder {
-
 namespace global {
 
 class Decoder {
@@ -44,15 +40,11 @@ class Decoder {
 
  public:
   virtual bool Decode(openrs::common::io::Buffer<>& buffer,
-                      openrs::net::codec::Packet* packet);
+                      openrs::net::codec::Packet* packet) const;
 };
 
 }  // namespace global
-
 }  // namespace decoder
-
 }  // namespace codec
-
 }  // namespace net
-
 }  // namespace openrs

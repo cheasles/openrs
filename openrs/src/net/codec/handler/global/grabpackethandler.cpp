@@ -119,7 +119,7 @@ void SendUKeys(const std::shared_ptr<openrs::net::Session>& session) {
 
 void openrs::net::codec::handler::global::GrabPacketHandler::Handle(
     openrs::net::codec::Packet& packet,
-    std::shared_ptr<openrs::net::Session> session) {
+    std::shared_ptr<openrs::net::Session> session) const {
   while (packet.data.position() != packet.data.size()) {
     uint8_t* priority_ptr = nullptr;
     uint8_t* index_id_ptr = nullptr;

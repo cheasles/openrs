@@ -30,7 +30,7 @@ openrs::net::codec::handler::global::WorldPacketHandler::WorldPacketHandler()
 
 void openrs::net::codec::handler::global::WorldPacketHandler::Handle(
     openrs::net::codec::Packet& packet,
-    std::shared_ptr<openrs::net::Session> session) {
+    std::shared_ptr<openrs::net::Session> session) const {
   switch (packet.type) {
     case PacketType::kPing: {
       openrs::net::codec::Packet ping_packet;

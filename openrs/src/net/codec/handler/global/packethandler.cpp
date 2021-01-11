@@ -32,7 +32,7 @@
 
 void openrs::net::codec::handler::global::PacketHandler::Handle(
     openrs::net::codec::Packet& packet,
-    std::shared_ptr<openrs::net::Session> session) {
+    std::shared_ptr<openrs::net::Session> session) const {
   if (PacketType::kHandshake == packet.type &&
       session->status() == SessionStatus::kConnected) {
     uint32_t* client_revision = nullptr;
@@ -66,9 +66,9 @@ void openrs::net::codec::handler::global::PacketHandler::Handle(
     session->set_status(SessionStatus::kDownloadingCache);
 
     // Make sure the next packets are handled correctly.
-    session->SetDecoder(std::make_unique<decoder::global::GrabDecoder>());
-    session->SetEncoder(std::make_unique<encoder::global::GrabEncoder>());
-    session->SetHandler(std::make_unique<handler::global::GrabPacketHandler>());
+    session->SetDecoder(decoder::global::GrabDecoder::get());
+    session->SetEncoder(encoder::global::GrabEncoder::get());
+    session->SetHandler(handler::global::GrabPacketHandler::get());
 
     // Send the grab data back to the client.
     common::io::Buffer<> buffer;
@@ -83,10 +83,9 @@ void openrs::net::codec::handler::global::PacketHandler::Handle(
     session->set_status(SessionStatus::kLoggingIn);
 
     // Make sure the next packets are handled correctly.
-    session->SetDecoder(std::make_unique<decoder::global::LoginDecoder>());
-    session->SetEncoder(std::make_unique<encoder::global::LoginEncoder>());
-    session->SetHandler(
-        std::make_unique<handler::global::LoginPacketHandler>());
+    session->SetDecoder(decoder::global::LoginDecoder::get());
+    session->SetEncoder(encoder::global::LoginEncoder::get());
+    session->SetHandler(handler::global::LoginPacketHandler::get());
 
     session->SendOpCode(PacketType::kStartUp);
   } else {

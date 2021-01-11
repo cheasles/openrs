@@ -18,6 +18,7 @@
 
 #include <frozen/map.h>
 #include <openrs/common/io/buffer.h>
+#include <openrs/common/singleton.h>
 #include <stdint.h>
 
 #include <map>
@@ -31,7 +32,8 @@ namespace codec {
 namespace encoder {
 namespace global {
 
-class WorldEncoder : public Encoder {
+class WorldEncoder : public Encoder,
+                     public openrs::common::Singleton<WorldEncoder> {
  private:
   enum struct PacketHeaderType : uint8_t { kNone, kUint8, kUint16 };
 

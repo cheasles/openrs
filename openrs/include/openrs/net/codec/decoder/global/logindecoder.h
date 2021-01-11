@@ -16,8 +16,9 @@
  */
 #pragma once
 
-#include <openrs/common/io/buffer.h>
 #include <frozen/map.h>
+#include <openrs/common/io/buffer.h>
+#include <openrs/common/singleton.h>
 #include <stdint.h>
 
 #include <map>
@@ -31,7 +32,8 @@ namespace codec {
 namespace decoder {
 namespace global {
 
-class LoginDecoder : public Decoder {
+class LoginDecoder : public Decoder,
+                     public openrs::common::Singleton<LoginDecoder> {
  private:
   static inline constexpr frozen::map<uint8_t, PacketType, 3> code_mapping_{
       {16, PacketType::kLoginWorld},
@@ -41,7 +43,7 @@ class LoginDecoder : public Decoder {
 
  public:
   bool Decode(openrs::common::io::Buffer<>& buffer,
-              openrs::net::codec::Packet* packet) override;
+              openrs::net::codec::Packet* packet) const override;
 };
 
 }  // namespace global

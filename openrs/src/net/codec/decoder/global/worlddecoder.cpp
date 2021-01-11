@@ -24,7 +24,8 @@
 #include "openrs/net/codec/packet.h"
 
 bool openrs::net::codec::decoder::global::WorldDecoder::Decode(
-    openrs::common::io::Buffer<>& buffer, openrs::net::codec::Packet* packet) {
+    openrs::common::io::Buffer<>& buffer,
+    openrs::net::codec::Packet* packet) const {
   if (!packet) {
     return false;
   }
