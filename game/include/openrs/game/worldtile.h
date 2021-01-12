@@ -20,6 +20,7 @@
 #include <openrs/database/columnsets/worldtile.h>
 
 #include <array>
+#include <cmath>
 #include <set>
 #include <vector>
 
@@ -78,17 +79,20 @@ class WorldTile
       return false;
     }
 
-    const int32_t kDeltaX = kPoint.x() - this->x();
-    const int32_t kDeltaY = kPoint.y() - this->y();
-    return kDeltaX <= kDistance && kDeltaX >= -1 * kDistance &&
-           kDeltaY <= kDistance && kDeltaY >= -1 * kDistance;
+    const uint32_t kDeltaX =
+        std::abs(static_cast<int32_t>(kPoint.x() - this->x()));
+    const uint32_t kDeltaY =
+        std::abs(static_cast<int32_t>(kPoint.y() - this->y()));
+    return kDeltaX <= kDistance && kDeltaY <= kDistance;
   }
 
-  inline uint32_t GetLocalX(const WorldTile& local, const uint8_t& kMapSize) const {
+  inline uint32_t GetLocalX(const WorldTile& local,
+                            const uint8_t& kMapSize) const {
     return this->x() - 8 * (local.chunk_x() - kMapSize);
   }
 
-  inline uint32_t GetLocalY(const WorldTile& local, const uint8_t& kMapSize) const {
+  inline uint32_t GetLocalY(const WorldTile& local,
+                            const uint8_t& kMapSize) const {
     return this->y() - 8 * (local.chunk_y() - kMapSize);
   }
 
