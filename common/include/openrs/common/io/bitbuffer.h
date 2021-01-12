@@ -61,7 +61,7 @@ class BitBuffer : public openrs::common::io::Buffer<Container> {
     }
 
     if (this->size() <= byte_position) {
-      this->resize(byte_position);
+      this->resize(byte_position == 0 ? 1 : byte_position);
     }
 
     if (num_bits == bit_offset) {
@@ -69,8 +69,8 @@ class BitBuffer : public openrs::common::io::Buffer<Container> {
       (*this)[byte_position] |= data & ((1 << bit_offset) - 1);
     } else {
       (*this)[byte_position] &=
-          ~(((1 << bit_offset) - 1) << bit_offset - num_bits);
-      (*this)[byte_position] |= (data & ((1 << bit_offset) - 1))
+          ~(((1 << num_bits) - 1) << bit_offset - num_bits);
+      (*this)[byte_position] |= (data & ((1 << num_bits) - 1))
                                 << bit_offset - num_bits;
     }
     return true;
