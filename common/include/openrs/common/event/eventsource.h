@@ -34,7 +34,7 @@ class EventSource {
   void EmitEvent(const T& kEvent) const {
     for (const auto& kSink : this->sinks_) {
       if (auto sink_instance = kSink.lock()) {
-        if (!sink_instance->HandleEvent(kEvent)) {
+        if (sink_instance->HandleEvent(kEvent)) {
           break;
         }
       }

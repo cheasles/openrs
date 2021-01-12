@@ -44,8 +44,8 @@ class EventTestSink : public openrs::common::event::EventSink<EventTest> {
    * Handles a test event.
    *
    * @param kEvent The event details.
-   * @return True if event processing should continue to other event handlers,
-   *  or false to stop handling this event.
+   * @return True if the event was processed by this sink and shouldn't be
+   *  passed to the next registered sink.
    */
   inline bool HandleEvent(const EventTest& kEvent) override {
     this->last_event_value = std::get<0>(kEvent);

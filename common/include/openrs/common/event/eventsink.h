@@ -29,8 +29,8 @@ class EventSink {
    * Handle an event.
    *
    * @param kEvent The event details.
-   * @return True if event processing should continue to other event handlers,
-   *  or false to stop handling this event.
+   * @return True if the event was processed by this sink and shouldn't be
+   *  passed to the next registered sink.
    */
   virtual bool HandleEvent(const T& kEvent) = 0;
 };

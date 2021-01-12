@@ -18,6 +18,7 @@
 
 #include <inttypes.h>
 #include <openrs/common/event/eventsink.h>
+#include <openrs/common/event/eventsource.h>
 #include <openrs/common/io/bitbuffer.h>
 #include <openrs/common/singleton.h>
 #include <openrs/game/player/skills.h>
@@ -25,6 +26,7 @@
 
 #include <unordered_map>
 
+#include "openrs/event/entity/move.h"
 #include "openrs/event/login.h"
 #include "openrs/event/packet/screen.h"
 #include "openrs/manager/manager.h"
@@ -41,7 +43,11 @@ class WorldManager
       public openrs::common::Singleton<WorldManager>,
       public openrs::common::event::EventSink<openrs::event::EventLogin>,
       public openrs::common::event::EventSink<
-          openrs::event::packet::EventPacketScreen> {
+          openrs::event::entity::EventEntityMove>,
+      public openrs::common::event::EventSink<
+          openrs::event::packet::EventPacketScreen>,
+      public openrs::common::event::EventSource<
+          openrs::event::entity::EventEntityMove> {
  public:
   /**
    * Supported message types to send to clients.
@@ -82,17 +88,32 @@ class WorldManager
    * Handles a player login event.
    *
    * @param kEvent The event details.
-   * @return True if event processing should continue to other event handlers,
-   *  or false to stop handling this event.
+   * @return True if the event was processed by this sink and shouldn't be
+   *  passed to the next registered sink.
    */
   bool HandleEvent(const openrs::event::EventLogin& kEvent) override;
+
+  /**
+   * Handles an entity move event.
+   *
+   * When an entity moves, we need to make sure that every player in the
+   *  vicinity receives the display information for the entity.
+   *
+   * @note This is triggered at the start of the move.
+   *
+   * @param kEvent The event details.
+   * @return True if the event was processed by this sink and shouldn't be
+   *  passed to the next registered sink.
+   */
+  bool HandleEvent(
+      const openrs::event::entity::EventEntityMove& kEvent) override;
 
   /**
    * Handles a player screen change event.
    *
    * @param kEvent The event details.
-   * @return True if event processing should continue to other event handlers,
-   *  or false to stop handling this event.
+   * @return True if the event was processed by this sink and shouldn't be
+   *  passed to the next registered sink.
    */
   bool HandleEvent(
       const openrs::event::packet::EventPacketScreen& kEvent) override;
@@ -307,6 +328,7 @@ class WorldManager
   }
   inline void remove_player(const uint32_t& kWorldId,
                             const uint32_t& kPlayerId) {
+    this->sessions_.erase(kPlayerId);
     this->worlds_[kWorldId].remove_player(kPlayerId);
   }
   inline void remove_player(
