@@ -144,18 +144,25 @@ class Appearance
     switch (kPart) {
       case BodyPart::kHair:
         this->look_hair = kStyle;
+        break;
       case BodyPart::kBeard:
         this->look_beard = kStyle;
+        break;
       case BodyPart::kTorso:
         this->look_torso = kStyle;
+        break;
       case BodyPart::kArms:
         this->look_arms = kStyle;
+        break;
       case BodyPart::kForearms:
         this->look_forearms = kStyle;
+        break;
       case BodyPart::kLegs:
         this->look_legs = kStyle;
+        break;
       case BodyPart::kBoots:
         this->look_shoes = kStyle;
+        break;
       default:
         throw std::logic_error("Unknown bodypart specified in appearance.");
     }
@@ -172,14 +179,19 @@ class Appearance
     switch (kPart) {
       case BodyPart::kHair:
         this->colour_hair = kColour;
+        break;
       case BodyPart::kTorso:
         this->colour_torso = kColour;
+        break;
       case BodyPart::kLegs:
         this->colour_legs = kColour;
+        break;
       case BodyPart::kBoots:
         this->colour_shoes = kColour;
+        break;
       case BodyPart::kSkin:
         this->colour_shoes = kColour;
+        break;
       default:
         throw std::logic_error("Unknown bodypart specified in appearance.");
     }
