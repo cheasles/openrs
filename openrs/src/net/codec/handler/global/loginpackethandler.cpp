@@ -267,6 +267,12 @@ void openrs::net::codec::handler::global::LoginPacketHandler::HandleLoginWorld(
       player->SetDefaultMale();
     }
 
+    // No default skin colour, randomly select one.
+    static auto random_skin = std::bind(std::uniform_int_distribution<>(0, 500),
+                                        std::default_random_engine());
+    player->SetAppearanceColour(
+        openrs::game::player::Appearance::BodyPart::kSkin, random_skin());
+
     database_manager->CreateModel(*player);
     openrs::common::Log(openrs::common::Log::LogLevel::kInfo)
         << "Player " << username << " has registered.";
