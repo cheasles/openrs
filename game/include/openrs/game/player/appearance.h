@@ -51,6 +51,40 @@ class Appearance
   Appearance() : openrs::database::columnsets::AppearanceColumnSet() {}
 
   /**
+   * Set the appearance to the default male character.
+   */
+  inline void SetDefaultMale() {
+    this->SetAppearanceLook(BodyPart::kHair, 7);
+    this->SetAppearanceLook(BodyPart::kBeard, 14);
+    this->SetAppearanceLook(BodyPart::kTorso, 18);
+    this->SetAppearanceLook(BodyPart::kArms, 26);
+    this->SetAppearanceLook(BodyPart::kForearms, 34);
+    this->SetAppearanceLook(BodyPart::kLegs, 38);
+    this->SetAppearanceLook(BodyPart::kBoots, 42);
+    this->SetAppearanceColour(BodyPart::kBoots, 0);
+    this->SetAppearanceColour(BodyPart::kLegs, 32);
+    this->SetAppearanceColour(BodyPart::kTorso, 95);
+    this->SetAppearanceColour(BodyPart::kHair, 17);
+  }
+
+  /**
+   * Set the appearance to the default female character.
+   */
+  inline void SetDefaultFemale() {
+    this->SetAppearanceLook(BodyPart::kHair, 276);
+    this->SetAppearanceLook(BodyPart::kBeard, 57);
+    this->SetAppearanceLook(BodyPart::kTorso, 57);
+    this->SetAppearanceLook(BodyPart::kArms, 65);
+    this->SetAppearanceLook(BodyPart::kForearms, 68);
+    this->SetAppearanceLook(BodyPart::kLegs, 77);
+    this->SetAppearanceLook(BodyPart::kBoots, 80);
+    this->SetAppearanceColour(BodyPart::kBoots, 0);
+    this->SetAppearanceColour(BodyPart::kLegs, 95);
+    this->SetAppearanceColour(BodyPart::kTorso, 95);
+    this->SetAppearanceColour(BodyPart::kHair, 78);
+  }
+
+  /**
    * Gets the style of a specific body part.
    *
    * @param kPart The specific body part.
@@ -97,6 +131,57 @@ class Appearance
         return static_cast<uint8_t>(this->colour_shoes);
       default:
         return 0;
+    }
+  }
+
+  /**
+   * Sets the style of a specific body part.
+   *
+   * @param kPart The specific body part.
+   * @param kStyle The style of the specified body part.
+   */
+  inline void SetAppearanceLook(const BodyPart& kPart, const uint16_t& kStyle) {
+    switch (kPart) {
+      case BodyPart::kHair:
+        this->look_hair = kStyle;
+      case BodyPart::kBeard:
+        this->look_beard = kStyle;
+      case BodyPart::kTorso:
+        this->look_torso = kStyle;
+      case BodyPart::kArms:
+        this->look_arms = kStyle;
+      case BodyPart::kForearms:
+        this->look_forearms = kStyle;
+      case BodyPart::kLegs:
+        this->look_legs = kStyle;
+      case BodyPart::kBoots:
+        this->look_shoes = kStyle;
+      default:
+        throw std::logic_error("Unknown bodypart specified in appearance.");
+    }
+  }
+
+  /**
+   * Sets the colour of a specific body part.
+   *
+   * @param kPart The specific body part.
+   * @param kColour The colour of the specified body part.
+   */
+  inline void SetAppearanceColour(const BodyPart& kPart,
+                                  const uint8_t& kColour) {
+    switch (kPart) {
+      case BodyPart::kHair:
+        this->colour_hair = kColour;
+      case BodyPart::kTorso:
+        this->colour_torso = kColour;
+      case BodyPart::kLegs:
+        this->colour_legs = kColour;
+      case BodyPart::kBoots:
+        this->colour_shoes = kColour;
+      case BodyPart::kSkin:
+        this->colour_shoes = kColour;
+      default:
+        throw std::logic_error("Unknown bodypart specified in appearance.");
     }
   }
 };

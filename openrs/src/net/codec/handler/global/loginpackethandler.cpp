@@ -28,6 +28,7 @@
 #include <tea.h>
 
 #include <limits>
+#include <random>
 #include <string>
 
 #include "openrs/manager/cache/cachemanager.h"
@@ -257,6 +258,15 @@ void openrs::net::codec::handler::global::LoginPacketHandler::HandleLoginWorld(
     player->set_x(kStartingLocation[0]);
     player->set_y(kStartingLocation[1]);
     player->set_z(kStartingLocation[2]);
+
+    static auto random_bool = std::bind(std::uniform_int_distribution<>(0, 1),
+                                        std::default_random_engine());
+    if (random_bool()) {
+      player->SetDefaultFemale();
+    } else {
+      player->SetDefaultMale();
+    }
+
     database_manager->CreateModel(*player);
     openrs::common::Log(openrs::common::Log::LogLevel::kInfo)
         << "Player " << username << " has registered.";
