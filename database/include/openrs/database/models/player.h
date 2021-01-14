@@ -51,55 +51,35 @@ struct PlayerModel
         openrs::database::columnsets::SkillsColumnSet(),
         openrs::database::columnsets::WorldTileColumnSet() {}
 
-  template <typename Database>
+  template <typename Database, typename Statement>
   inline bool Save(Database& database) {
     if (this->id == 0) {
-      this->id = database.insert(
-          "INSERT INTO " + PlayerModel::TABLE_NAME +
-              " (username, password, salt, rights, position_x, position_y) "
-              "VALUES (?, ?, ?, ?, ?, ?);",
-          std::forward_as_tuple(this->username, this->password, this->salt,
-                                this->rights, this->position_x,
-                                this->position_y));
+      return Model::Insert<PlayerModel, Database, Statement,
+                           openrs::database::columnsets::PlayerColumnSet,
+                           openrs::database::columnsets::AppearanceColumnSet,
+                           openrs::database::columnsets::SkillsColumnSet,
+                           openrs::database::columnsets::WorldTileColumnSet>(
+          *this, database, PlayerModel::TABLE_NAME);
     } else {
-      database.execute_direct(
-          std::string("UPDATE " + PlayerModel::TABLE_NAME +
-                      " SET "
-                      "username=?, password=?, salt=?, rights=?, "
-                      "position_x=?, position_y=? WHERE id=?")
-              .c_str(),
-          nullptr, this->username, this->password, this->salt, this->rights,
-          this->position_x, this->position_y, this->id);
+      return Model::Update<PlayerModel, Database, Statement,
+                           openrs::database::columnsets::PlayerColumnSet,
+                           openrs::database::columnsets::AppearanceColumnSet,
+                           openrs::database::columnsets::SkillsColumnSet,
+                           openrs::database::columnsets::WorldTileColumnSet>(
+          *this, database, PlayerModel::TABLE_NAME);
     }
-
-    return true;
   }
 
   template <typename Database>
-  static void CreateModelTable(Database& database);
+  inline static bool CreateModelTable(Database& database) {
+    return Model::CreateTable<Database,
+                              openrs::database::columnsets::PlayerColumnSet,
+                              openrs::database::columnsets::AppearanceColumnSet,
+                              openrs::database::columnsets::SkillsColumnSet,
+                              openrs::database::columnsets::WorldTileColumnSet>(
+        database, PlayerModel::TABLE_NAME);
+  }
 };
-
-template <>
-inline void PlayerModel::CreateModelTable<qtl::mysql::database>(
-    qtl::mysql::database& database) {
-  throw std::logic_error("Not implemented.");
-}
-
-template <>
-inline void PlayerModel::CreateModelTable<qtl::sqlite::database>(
-    qtl::sqlite::database& database) {
-  static const std::string kQuery = "CREATE TABLE IF NOT EXISTS " +
-                                    PlayerModel::TABLE_NAME +
-                                    " ( "
-                                    "id INTEGER PRIMARY KEY, "
-                                    "username TEXT NOT NULL UNIQUE, "
-                                    "password TEXT NOT NULL, "
-                                    "salt TEXT NOT NULL , "
-                                    "rights INTEGER NOT NULL DEFAULT 0, "
-                                    "position_x INTEGER NOT NULL DEFAULT 0, "
-                                    "position_y INTEGER NOT NULL DEFAULT 0 );";
-  database.simple_execute(kQuery.c_str());
-}
 
 }  // namespace models
 }  // namespace database

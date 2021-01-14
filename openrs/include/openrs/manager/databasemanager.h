@@ -87,9 +87,11 @@ class DatabaseManager : public openrs::manager::Manager,
     const auto& database_config =
         (*openrs::manager::ConfigManager::get())["database"];
     if (database_config["mode"].get<std::string>() == "mysql") {
-      return model.Save(*this->db_mysql.get());
+      return model.template Save<qtl::mysql::database, qtl::mysql::statement>(
+          *this->db_mysql.get());
     } else if (database_config["mode"].get<std::string>() == "sqlite") {
-      return model.Save(*this->db_sqlite.get());
+      return model.template Save<qtl::sqlite::database, qtl::sqlite::statement>(
+          *this->db_sqlite.get());
     }
 
     return false;

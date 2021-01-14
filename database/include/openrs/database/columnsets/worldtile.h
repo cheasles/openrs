@@ -28,10 +28,24 @@ namespace openrs {
 namespace database {
 namespace columnsets {
 
+/**
+ * Describes a position inside the game space.
+ */
 class WorldTileColumnSet : public ColumnSet {
  public:
+  /**
+   * The X coordinate.
+   */
   int position_x;
+
+  /**
+   * The Y coordinate.
+   */
   int position_y;
+
+  /**
+   * The Z or plane coordinate.
+   */
   int position_z;
 
  public:
@@ -44,9 +58,15 @@ class WorldTileColumnSet : public ColumnSet {
       : position_x(x), position_y(y), position_z(z) {}
 
  public:
+  /**
+   * Get a list of the column names and their associated member variables.
+   *
+   * @return a vector of tuples containing the column name and the member
+   *  variable for binding.
+   */
   static inline const std::vector<
       std::tuple<std::string, ColumnSet::member_bind<WorldTileColumnSet>>>
-  GetColumnDefinitions() {
+  GetColumnBinds() {
     return {
         {"position_x",
          std::bind(&WorldTileColumnSet::position_x, std::placeholders::_1)},
@@ -56,6 +76,18 @@ class WorldTileColumnSet : public ColumnSet {
          std::bind(&WorldTileColumnSet::position_z, std::placeholders::_1)},
     };
   }
+
+  /**
+   * Get a list of the column names and their associated database properties.
+   *
+   * @tparam Database The database object to work with. Used for
+   *  specialization.
+   * @return a vector of tuples containing the column name and the column
+   *  description depending on the type of database specified.
+   */
+  template <typename Database>
+  static const std::vector<std::tuple<std::string, std::string>>
+  GetColumnDefinitions();
 };
 
 }  // namespace columnsets

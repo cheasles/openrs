@@ -28,8 +28,14 @@ namespace openrs {
 namespace database {
 namespace columnsets {
 
+/**
+ * A set of columns related to a player's skills.
+ */
 class SkillsColumnSet : public ColumnSet {
  public:
+  /**
+   * The amount of XP in the Attack skill.
+   */
   int skill_attack;
 
  public:
@@ -38,14 +44,32 @@ class SkillsColumnSet : public ColumnSet {
       : ColumnSet(other), skill_attack(other.skill_attack) {}
 
  public:
+  /**
+   * Get a list of the column names and their associated member variables.
+   *
+   * @return a vector of tuples containing the column name and the member
+   *  variable for binding.
+   */
   static inline const std::vector<
       std::tuple<std::string, ColumnSet::member_bind<SkillsColumnSet>>>
-  GetColumnDefinitions() {
+  GetColumnBinds() {
     return {
         {"skill_attack",
          std::bind(&SkillsColumnSet::skill_attack, std::placeholders::_1)},
     };
   }
+
+  /**
+   * Get a list of the column names and their associated database properties.
+   *
+   * @tparam Database The database object to work with. Used for
+   *  specialization.
+   * @return a vector of tuples containing the column name and the column
+   *  description depending on the type of database specified.
+   */
+  template <typename Database>
+  static const std::vector<std::tuple<std::string, std::string>>
+  GetColumnDefinitions();
 };
 
 }  // namespace columnsets

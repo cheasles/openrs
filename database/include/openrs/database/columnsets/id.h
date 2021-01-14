@@ -28,19 +28,43 @@ namespace openrs {
 namespace database {
 namespace columnsets {
 
+/**
+ * The basic columnset containing an ID column.
+ */
 class IDColumnSet : public ColumnSet {
  public:
+  /**
+   * The database row ID that the model inheriting this class relates to.
+   */
   int id;
 
  public:
   IDColumnSet() : id(0) {}
 
  public:
+  /**
+   * Get a list of the column names and their associated member variables.
+   *
+   * @return a vector of tuples containing the column name and the member
+   *  variable for binding.
+   */
   static inline const std::vector<
       std::tuple<std::string, ColumnSet::member_bind<IDColumnSet>>>
-  GetColumnDefinitions() {
+  GetColumnBinds() {
     return {{"id", std::bind(&IDColumnSet::id, std::placeholders::_1)}};
   }
+
+  /**
+   * Get a list of the column names and their associated database properties.
+   *
+   * @tparam Database The database object to work with. Used for
+   *  specialization.
+   * @return a vector of tuples containing the column name and the column
+   *  description depending on the type of database specified.
+   */
+  template <typename Database>
+  static const std::vector<std::tuple<std::string, std::string>>
+  GetColumnDefinitions();
 };
 
 }  // namespace columnsets

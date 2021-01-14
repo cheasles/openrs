@@ -41,24 +41,25 @@ class ColumnSet {
 
  public:
   static inline const std::vector<std::tuple<std::string, member_bind<>>>
-  GetColumnDefinitions() {
+  GetColumnBinds() {
     return {};
   }
 
   template <typename Statement, typename ColumnSet>
   static constexpr inline void BindFields(Statement& command, ColumnSet& v) {
-    auto columns = ColumnSet::GetColumnDefinitions();
+    auto columns = ColumnSet::GetColumnBinds();
     for (auto& column : columns) {
       std::visit(
           [&v, &column, &command](auto&& arg) {
             using T = std::decay_t<decltype(arg)>;
-            if constexpr (std::is_same_v<T, openrs::database::ColumnSet::
-                                                member_bind_string<ColumnSet>>) {
+            if constexpr (std::is_same_v<T,
+                                         openrs::database::ColumnSet::
+                                             member_bind_string<ColumnSet>>) {
               qtl::bind_field<Statement, std::string>(
                   command, std::get<0>(column).c_str(), arg(v));
-            } else if constexpr (std::is_same_v<T,
-                                                openrs::database::ColumnSet::
-                                                    member_bind_int<ColumnSet>>) {
+            } else if constexpr (std::is_same_v<
+                                     T, openrs::database::ColumnSet::
+                                            member_bind_int<ColumnSet>>) {
               qtl::bind_field<Statement, int>(
                   command, std::get<0>(column).c_str(), arg(v));
             } else {

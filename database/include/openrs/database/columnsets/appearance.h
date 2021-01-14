@@ -28,19 +28,69 @@ namespace openrs {
 namespace database {
 namespace columnsets {
 
+/**
+ * A set of columns related to a player's appearance.
+ */
 class AppearanceColumnSet : public ColumnSet {
  public:
+  /**
+   * Describes the player's hairstyle.
+   */
   int look_hair;
+
+  /**
+   * Describes the style of the player's the beard.
+   */
   int look_beard;
+
+  /**
+   * Describes the style of the player's torso.
+   */
   int look_torso;
+
+  /**
+   * Describes the style of the player's arms.
+   */
   int look_arms;
+
+  /**
+   * Describes the style of the player's hands/forearms.
+   */
   int look_forearms;
+
+  /**
+   * Describes the style of the player's legs.
+   */
   int look_legs;
+
+  /**
+   * Describes the style of the player's shoes.
+   */
   int look_shoes;
+
+  /**
+   * Describes the colour of the player's shoes.
+   */
   int colour_shoes;
+
+  /**
+   * Describes the colour of the player's legs.
+   */
   int colour_legs;
+
+  /**
+   * Describes the colour of the player's torso.
+   */
   int colour_torso;
+
+  /**
+   * Describes the colour of the player's hair.
+   */
   int colour_hair;
+
+  /**
+   * Describes the colour of the player's skin.
+   */
   int colour_skin;
 
  public:
@@ -73,9 +123,15 @@ class AppearanceColumnSet : public ColumnSet {
         colour_skin(other.colour_skin) {}
 
  public:
+  /**
+   * Get a list of the column names and their associated member variables.
+   *
+   * @return a vector of tuples containing the column name and the member
+   *  variable for binding.
+   */
   static inline const std::vector<
       std::tuple<std::string, ColumnSet::member_bind<AppearanceColumnSet>>>
-  GetColumnDefinitions() {
+  GetColumnBinds() {
     return {
         {"look_hair",
          std::bind(&AppearanceColumnSet::look_hair, std::placeholders::_1)},
@@ -103,6 +159,18 @@ class AppearanceColumnSet : public ColumnSet {
          std::bind(&AppearanceColumnSet::colour_skin, std::placeholders::_1)},
     };
   }
+
+  /**
+   * Get a list of the column names and their associated database properties.
+   *
+   * @tparam Database The database object to work with. Used for
+   *  specialization.
+   * @return a vector of tuples containing the column name and the column
+   *  description depending on the type of database specified.
+   */
+  template <typename Database>
+  static const std::vector<std::tuple<std::string, std::string>>
+  GetColumnDefinitions();
 };
 
 }  // namespace columnsets
