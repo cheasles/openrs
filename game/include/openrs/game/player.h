@@ -66,15 +66,15 @@ class Player : public database::models::PlayerModel,
         is_zoom_(false),
         database::models::PlayerModel() {}
 
-  Player& operator=(const Player&) = default;
-  inline Player& operator=(const database::models::PlayerModel& other) {
-    this->id = other.id;
-    this->username = other.username;
-    this->password = other.password;
-    this->salt = other.salt;
-    this->rights = other.rights;
-    this->position_x = other.position_x;
-    this->position_y = other.position_y;
+  Player& operator=(const Player& kOther) {
+    database::models::PlayerModel::operator=(kOther);
+    openrs::game::Entity::operator=(kOther);
+    openrs::game::player::Appearance::operator=(kOther);
+    openrs::game::player::Skills::operator=(kOther);
+    return *this;
+  }
+  inline Player& operator=(const database::models::PlayerModel& kOther) {
+    database::models::PlayerModel::operator=(kOther);
     return *this;
   }
 

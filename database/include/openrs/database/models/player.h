@@ -42,14 +42,24 @@ struct PlayerModel
       virtual public openrs::database::columnsets::AppearanceColumnSet,
       virtual public openrs::database::columnsets::SkillsColumnSet,
       virtual public openrs::database::columnsets::WorldTileColumnSet {
+ public:
   inline static const std::string TABLE_NAME = "players";
 
+ public:
   PlayerModel()
       : openrs::database::Model(),
         openrs::database::columnsets::PlayerColumnSet(),
         openrs::database::columnsets::AppearanceColumnSet(),
         openrs::database::columnsets::SkillsColumnSet(),
         openrs::database::columnsets::WorldTileColumnSet() {}
+  inline PlayerModel& operator=(const PlayerModel& kOther) {
+    openrs::database::Model::operator=(kOther);
+    openrs::database::columnsets::PlayerColumnSet::operator=(kOther);
+    openrs::database::columnsets::AppearanceColumnSet::operator=(kOther);
+    openrs::database::columnsets::SkillsColumnSet::operator=(kOther);
+    openrs::database::columnsets::WorldTileColumnSet::operator=(kOther);
+    return *this;
+  }
 
   template <typename Database, typename Statement>
   inline bool Save(Database& database) {
@@ -78,6 +88,47 @@ struct PlayerModel
                               openrs::database::columnsets::SkillsColumnSet,
                               openrs::database::columnsets::WorldTileColumnSet>(
         database, PlayerModel::TABLE_NAME);
+  }
+
+  /**
+   * Selects a set of rows inside a table in the database.
+   *
+   * @tparam Database The type of database to use.
+   * @param database The database object itself.
+   * @param output The location to store the results.
+   * @return True on success, false otherwise.
+   */
+  template <typename Database>
+  inline static bool Select(Database& database,
+                            std::vector<PlayerModel>* output) {
+    return Model::Select<PlayerModel, Database,
+                         openrs::database::columnsets::PlayerColumnSet,
+                         openrs::database::columnsets::AppearanceColumnSet,
+                         openrs::database::columnsets::SkillsColumnSet,
+                         openrs::database::columnsets::WorldTileColumnSet>(
+        database, PlayerModel::TABLE_NAME, output);
+  }
+
+  /**
+   * Selects a set of rows inside a table in the database.
+   *
+   * @tparam Database The type of database to use.
+   * @param database The database object itself.
+   * @param kWhereField The name of the column to use in the WHERE clause.
+   * @param kWhereValue The value to search for.
+   * @param output The location to store the results.
+   * @return True on success, false otherwise.
+   */
+  template <typename Database, typename Field>
+  inline static bool Select(Database& database, const std::string& kWhereField,
+                            const Field& kWhereValue,
+                            std::vector<PlayerModel>* output) {
+    return Model::Select<PlayerModel, Database, Field,
+                         openrs::database::columnsets::PlayerColumnSet,
+                         openrs::database::columnsets::AppearanceColumnSet,
+                         openrs::database::columnsets::SkillsColumnSet,
+                         openrs::database::columnsets::WorldTileColumnSet>(
+        database, PlayerModel::TABLE_NAME, kWhereField, kWhereValue, output);
   }
 };
 

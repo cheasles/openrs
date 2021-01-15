@@ -45,41 +45,52 @@ class DatabaseManager : public openrs::manager::Manager,
 
   bool Init() override;
 
+  /**
+   * Selects a set of rows inside a table in the database.
+   *
+   * @tparam Model The type of model to select from the database.
+   * @param output The location to store the results.
+   * @return True on success, false otherwise.
+   */
   template <typename Model>
   inline bool GetModel(std::vector<Model>* output) {
     const auto& database_config =
         (*openrs::manager::ConfigManager::get())["database"];
     if (database_config["mode"].get<std::string>() == "mysql") {
-      for (auto& record : this->db_mysql->result<Model>("select * from " +
-                                                        Model::TABLE_NAME)) {
-        output->emplace_back(record);
-      }
+      return Model::template Select<qtl::mysql::database>(*this->db_mysql.get(),
+                                                          output);
     } else if (database_config["mode"].get<std::string>() == "sqlite") {
-      this->db_sqlite->query(
-          "select * from " + Model::TABLE_NAME,
-          [&output](const Model& record) { output->emplace_back(record); });
+      return Model::template Select<qtl::sqlite::database>(
+          *this->db_sqlite.get(), output);
     }
-    return output->size() != 0;
+
+    return false;
   }
 
+  /**
+   * Selects a set of rows inside a table in the database.
+   *
+   * @tparam Field The type of data stored in the where field.
+   * @tparam Model The type of model to select from the database.
+   * @param kWhereField The name of the column to use in the WHERE clause.
+   * @param kWhereValue The value to search for.
+   * @param output The location to store the results.
+   * @return True on success, false otherwise.
+   */
   template <typename Field, typename Model>
   inline bool GetModel(const std::string& kWhereField, const Field& kWhereValue,
                        std::vector<Model>* output) const {
     const auto& database_config =
         (*openrs::manager::ConfigManager::get())["database"];
-    const std::string kQuery = std::string("select * from ") +
-                               Model::TABLE_NAME + " WHERE " + kWhereField +
-                               "=?;";
     if (database_config["mode"].get<std::string>() == "mysql") {
-      for (auto& record : this->db_mysql->result<Model>(kQuery, kWhereValue)) {
-        output->emplace_back(record);
-      }
+      return Model::template Select<qtl::mysql::database, Field>(
+          *this->db_mysql.get(), kWhereField, kWhereValue, output);
     } else if (database_config["mode"].get<std::string>() == "sqlite") {
-      this->db_sqlite->query(
-          kQuery, kWhereValue,
-          [&output](const Model& record) { output->emplace_back(record); });
+      return Model::template Select<qtl::sqlite::database, Field>(
+          *this->db_sqlite.get(), kWhereField, kWhereValue, output);
     }
-    return output->size() != 0;
+
+    return false;
   }
 
   template <typename Model>

@@ -64,7 +64,13 @@ class Skills : virtual public openrs::database::columnsets::SkillsColumnSet {
     kLast
   };
 
- public : Skills() : openrs::database::columnsets::SkillsColumnSet() {}
+ public:
+  Skills() : openrs::database::columnsets::SkillsColumnSet() {}
+  Skills& operator=(const Skills& kOther) {
+    openrs::database::columnsets::SkillsColumnSet::operator=(kOther);
+    return *this;
+  }
+
   /**
    * Gets the current XP count for a specific skill.
    *

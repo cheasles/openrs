@@ -49,6 +49,10 @@ class Appearance
 
  public:
   Appearance() : openrs::database::columnsets::AppearanceColumnSet() {}
+  Appearance& operator=(const Appearance& kOther) {
+    openrs::database::columnsets::AppearanceColumnSet::operator=(kOther);
+    return *this;
+  }
 
   /**
    * Set the appearance to the default male character.

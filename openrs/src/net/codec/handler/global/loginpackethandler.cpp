@@ -246,8 +246,9 @@ void openrs::net::codec::handler::global::LoginPacketHandler::HandleLoginWorld(
   auto player = std::make_shared<openrs::game::Player>();
   auto& database_manager = openrs::manager::DatabaseManager::get();
   std::vector<openrs::database::models::PlayerModel> players;
-  if (!database_manager->GetModel<openrs::database::models::PlayerModel>(
-          &players)) {
+  if (!database_manager
+           ->GetModel<std::string, openrs::database::models::PlayerModel>(
+               "username", username, &players)) {
     const auto& kStartingLocation =
         (*openrs::manager::ConfigManager::get())["game"]["starting_location"]
             .get<std::vector<uint32_t>>();

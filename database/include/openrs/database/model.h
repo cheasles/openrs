@@ -20,6 +20,7 @@
 #include <qtl_mysql.hpp>
 #include <qtl_sqlite.hpp>
 #include <variant>
+#include <vector>
 
 #include "openrs/database/columnset.h"
 #include "openrs/database/columnsets/id.h"
@@ -264,6 +265,83 @@ class Model : public openrs::database::columnsets::IDColumnSet {
     }
 
     return true;
+  }
+
+  /**
+   * Selects a set of rows inside a table in the database.
+   *
+   * @tparam Model The type of model to use when pulling column definitions.
+   * @tparam Database The type of database to use.
+   * @tparam ColumnSets The ColumnSet types to get column information from.
+   *  This should not include the IDColumnSet as it is added automatically.
+   * @param database The database object itself.
+   * @param kTableName The name of the table to insert the row into.
+   * @param output The location to store the results.
+   * @return True on success, false otherwise.
+   */
+  template <typename Model, typename Database, typename... ColumnSets>
+  inline static bool Select(Database& database, const std::string& kTableName,
+                            std::vector<Model>* output) {
+    const auto kColumns = Model::template GetAllColumnDefinitions<
+        Database, openrs::database::columnsets::IDColumnSet, ColumnSets...>();
+
+    std::string column_names;
+    for (auto column = kColumns.cbegin(); column != kColumns.cend(); ++column) {
+      column_names += std::get<0>(*column);
+      if (column != kColumns.cend() - 1) {
+        column_names += ",";
+      }
+    }
+
+    for (auto& record : database.template result<Model>(
+             "SELECT " + column_names + " FROM " + kTableName + ";")) {
+      output->emplace_back(record);
+    }
+
+    return output->size() != 0;
+  }
+
+  /**
+   * Selects a set of rows inside a table in the database that match a WHERE
+   *  clause.
+   *
+   * @tparam Model The type of model to use when pulling column definitions.
+   * @tparam Database The type of database to use.
+   * @tparam Field The type of data stored in the where field.
+   * @tparam ColumnSets The ColumnSet types to get column information from.
+   *  This should not include the IDColumnSet as it is added automatically.
+   * @param database The database object itself.
+   * @param kTableName The name of the table to insert the row into.
+   * @param kWhereField The name of the column to use in the WHERE clause.
+   * @param kWhereValue The value to search for.
+   * @param output The location to store the results.
+   * @return True on success, false otherwise.
+   */
+  template <typename Model, typename Database, typename Field,
+            typename... ColumnSets>
+  inline static bool Select(Database& database, const std::string& kTableName,
+                            const std::string& kWhereField,
+                            const Field& kWhereValue,
+                            std::vector<Model>* output) {
+    const auto kColumns = Model::template GetAllColumnDefinitions<
+        Database, openrs::database::columnsets::IDColumnSet, ColumnSets...>();
+
+    std::string column_names;
+    for (auto column = kColumns.cbegin(); column != kColumns.cend(); ++column) {
+      column_names += std::get<0>(*column);
+      if (column != kColumns.cend() - 1) {
+        column_names += ",";
+      }
+    }
+
+    for (auto& record : database.template result<Model>(
+             "SELECT " + column_names + " FROM " + kTableName + " WHERE " +
+                 kWhereField + "=?;",
+             kWhereValue)) {
+      output->emplace_back(record);
+    }
+
+    return output->size() != 0;
   }
 };
 
