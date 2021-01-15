@@ -36,6 +36,9 @@ namespace openrs {
 namespace database {
 namespace models {
 
+/**
+ * Groups a set of ColumnSet objects into a full Player model.
+ */
 struct PlayerModel
     : public openrs::database::Model,
       virtual public openrs::database::columnsets::PlayerColumnSet,
@@ -61,6 +64,38 @@ struct PlayerModel
     return *this;
   }
 
+  /**
+   * Creates a table in the database that can store this model.
+   *
+   * @note This is a helper method that simply passes the correct templates to
+   *  Model::CreateTable.
+   *
+   * @tparam Database The type of database to use.
+   * @param database The database object itself.
+   * @return True on success, false otherwise.
+   */
+  template <typename Database>
+  inline static bool CreateModelTable(Database& database) {
+    return Model::CreateTable<Database,
+                              openrs::database::columnsets::PlayerColumnSet,
+                              openrs::database::columnsets::AppearanceColumnSet,
+                              openrs::database::columnsets::SkillsColumnSet,
+                              openrs::database::columnsets::WorldTileColumnSet>(
+        database, PlayerModel::TABLE_NAME);
+  }
+
+  /**
+   * Saves this model into the database.
+   *
+   * @note This is a helper method that simply passes the correct templates to
+   *  Model::Insert or Model::Update depending on whether or not this instance
+   *  has an ID or not.
+   *
+   * @tparam Database The type of database to use.
+   * @tparam Statement The type of database statement to use.
+   * @param database The database object itself.
+   * @return True on success, false otherwise.
+   */
   template <typename Database, typename Statement>
   inline bool Save(Database& database) {
     if (this->id == 0) {
@@ -78,16 +113,6 @@ struct PlayerModel
                            openrs::database::columnsets::WorldTileColumnSet>(
           *this, database, PlayerModel::TABLE_NAME);
     }
-  }
-
-  template <typename Database>
-  inline static bool CreateModelTable(Database& database) {
-    return Model::CreateTable<Database,
-                              openrs::database::columnsets::PlayerColumnSet,
-                              openrs::database::columnsets::AppearanceColumnSet,
-                              openrs::database::columnsets::SkillsColumnSet,
-                              openrs::database::columnsets::WorldTileColumnSet>(
-        database, PlayerModel::TABLE_NAME);
   }
 
   /**

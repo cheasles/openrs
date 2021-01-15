@@ -127,6 +127,9 @@ class ModelBinds {
   }
 };
 
+/**
+ * Groups a set of ColumnSet objects into a full database table.
+ */
 class Model : public openrs::database::columnsets::IDColumnSet {
  public:
   Model() : openrs::database::columnsets::IDColumnSet() {}

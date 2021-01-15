@@ -29,22 +29,62 @@ inline constexpr bool always_false_v = false;
 namespace openrs {
 namespace database {
 
+/**
+ * Describes a set of columns in a database and their member variables.
+ *
+ * This is a helper interface class to define a subset of columns within a
+ * database table so that they can be managed in distinct groups. For example,
+ * a table containing information about players might include their login
+ * information, their skill levels and their appearance. To avoid defining one
+ * massive list of all columns, we can instead define three distinct ColumnSet
+ * classes for each category.
+ */
 class ColumnSet {
  public:
+  /**
+   * The type used when binding to an integer member.
+   *
+   * @tparam M The ColumnSet type the bind refers to.
+   */
   template <typename M = ColumnSet>
   using member_bind_int = std::_Bind<int M::*(std::_Placeholder<1>)>;
+
+  /**
+   * The type used when binding to a string member.
+   *
+   * @tparam M The ColumnSet type the bind refers to.
+   */
   template <typename M = ColumnSet>
   using member_bind_string = std::_Bind<std::string M::*(std::_Placeholder<1>)>;
 
+  /**
+   * Describes all types that can be bound to.
+   *
+   * @tparam M The ColumnSet type the bind refers to.
+   */
   template <typename M = ColumnSet>
   using member_bind = std::variant<member_bind_int<M>, member_bind_string<M>>;
 
  public:
+  /**
+   * Retrieves a list of bindings for this set of columns.
+   *
+   * @return A vector of strings paired with a member variable bind.
+   */
   static inline const std::vector<std::tuple<std::string, member_bind<>>>
   GetColumnBinds() {
     return {};
   }
 
+  /**
+   * Retrieves a list of bindings for a set of columns.
+   *
+   * @tparam Statement The database statement type to work with.
+   * @tparam ColumnSet The type of ColumnSet to retrieve binds for.
+   * @param command The database statement to bind to.
+   * @param v An instance of the ColumnSet object to bind with.
+   * @return A vector of strings paired with a member variable bind.
+   */
   template <typename Statement, typename ColumnSet>
   static constexpr inline void BindFields(Statement& command, ColumnSet& v) {
     auto columns = ColumnSet::GetColumnBinds();
