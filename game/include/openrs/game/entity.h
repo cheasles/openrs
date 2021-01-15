@@ -18,6 +18,9 @@
 
 #include <inttypes.h>
 
+#include <array>
+
+#include "openrs/game/graphics.h"
 #include "openrs/game/worldtile.h"
 
 namespace openrs {
@@ -27,13 +30,29 @@ class Entity : public openrs::game::WorldTile {
  public:
   enum struct Direction : uint8_t { kNorth, kEast, kSouth, kWest };
 
- private:
+ protected:
   Direction direction_;
+  std::array<openrs::game::Graphics, 4> graphics_;
+  uint32_t face_entity_last_;
+  uint32_t face_entity_next_;
 
  public:
-  Entity() : direction_(Direction::kNorth) {}
+  Entity()
+      : direction_(Direction::kNorth),
+        face_entity_last_(-1),
+        face_entity_next_(-2) {}
+
+  /**
+   * Sets or resets the next graphics slot to the input value.
+   *
+   * @param kGraphics The next graphics value to set. Can be zero.
+   */
+  void SetNextGraphics(const openrs::game::Graphics& kGraphics);
 
   inline auto direction() const { return this->direction_; }
+  inline const auto& graphics() const { return this->graphics_; }
+  inline auto face_entity_last() const { return this->face_entity_last_; }
+  inline auto face_entity_next() const { return this->face_entity_next_; }
 };
 
 }  // namespace game

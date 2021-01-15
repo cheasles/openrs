@@ -25,8 +25,7 @@ void openrs::manager::AppearanceManager::GetPlayerAppearance(
 
   // Total length, empty for now.
   buffer->PutData<uint8_t>(0);
-  uint8_t* length_ptr = buffer->data() + buffer->position() - 1;
-  const auto kStartingOffset = buffer->position();
+  const auto kStartingOffset = buffer->size();
 
   buffer->PutData(flag);
   buffer->PutData<uint8_t>(kPlayer->HasSkull() ? 0 : -1);
@@ -74,10 +73,7 @@ void openrs::manager::AppearanceManager::GetPlayerAppearance(
   // Aura.
   buffer->PutData<uint8_t>(0);
 
-  // Slot data length.
-  buffer->PutDataBE<uint16_t>(0);
-
-  // Hash.
+  // Slot data hash.
   buffer->PutDataBE<uint16_t>(0);
 
   // Colours.
@@ -109,5 +105,6 @@ void openrs::manager::AppearanceManager::GetPlayerAppearance(
   buffer->PutData<uint8_t>(-1);
   buffer->PutData<uint8_t>(0);
 
-  *length_ptr = static_cast<uint8_t>(buffer->position() - kStartingOffset);
+  (*buffer)[kStartingOffset - 1] =
+      static_cast<uint8_t>(buffer->size() - kStartingOffset);
 }

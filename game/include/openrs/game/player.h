@@ -22,6 +22,7 @@
 #include <osrng.h>
 
 #include "openrs/game/entity.h"
+#include "openrs/game/graphics.h"
 #include "openrs/game/player/appearance.h"
 #include "openrs/game/player/skills.h"
 
@@ -51,6 +52,8 @@ class Player : public database::models::PlayerModel,
   bool is_shift_drop_;
   bool is_slow_drag_;
   bool is_zoom_;
+  bool update_movement_type_;
+  bool is_running_;
 
  public:
   Player()
@@ -64,7 +67,11 @@ class Player : public database::models::PlayerModel,
         is_shift_drop_(false),
         is_slow_drag_(false),
         is_zoom_(false),
-        database::models::PlayerModel() {}
+        update_movement_type_(true),
+        is_running_(true),
+        database::models::PlayerModel() {
+    this->SetNextGraphics(openrs::game::Graphics(188));
+  }
 
   Player& operator=(const Player& kOther) {
     database::models::PlayerModel::operator=(kOther);
@@ -130,6 +137,10 @@ class Player : public database::models::PlayerModel,
   inline auto is_shift_drop() const { return this->is_shift_drop_; }
   inline auto is_slow_drag() const { return this->is_slow_drag_; }
   inline auto is_zoom() const { return this->is_zoom_; }
+  inline auto update_movement_type() const {
+    return this->update_movement_type_;
+  }
+  inline auto is_running() const { return this->is_running_; }
 
   inline void set_display_mode(const DisplayMode& kDisplayMode) {
     this->display_mode_ = kDisplayMode;
@@ -152,6 +163,12 @@ class Player : public database::models::PlayerModel,
   }
   inline void set_old_items_look(const bool& kOldItemsLook) {
     this->old_items_look_ = kOldItemsLook;
+  }
+  inline void set_update_movement_type(const bool& kUpdateMovementType) {
+    this->update_movement_type_ = kUpdateMovementType;
+  }
+  inline void set_is_running(const bool& kIsRunning) {
+    this->is_running_ = kIsRunning;
   }
 };
 

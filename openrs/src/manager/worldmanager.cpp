@@ -27,6 +27,7 @@
 
 bool openrs::manager::WorldManager::Init() {
   this->add_world(1, openrs::game::World());
+  this->add_sink(openrs::manager::WorldManager::get());
 
   common::Log(common::Log::LogLevel::kInfo)
       << "[WorldManager] Initialized " << this->worlds_.size() << " worlds.";
@@ -37,9 +38,143 @@ bool openrs::manager::WorldManager::HandleEvent(
     const openrs::event::EventLogin& kEvent) {
   this->sessions_.insert(
       std::make_pair<uint32_t, std::weak_ptr<openrs::net::Session>>(
-          this->add_player(1, std::get<0>(kEvent)), std::get<1>(kEvent)));
+          std::get<1>(kEvent)->player_index(), std::get<1>(kEvent)));
   this->StartPlayer(std::get<0>(kEvent), std::get<1>(kEvent));
+  this->EmitEvent({std::get<0>(kEvent), openrs::game::WorldTile(0, 0, 0)});
   return true;
+}
+
+bool openrs::manager::WorldManager::HandleEvent(
+    const openrs::event::entity::EventEntityMove& kEvent) {
+  const auto& kEntity = std::get<0>(kEvent);
+  const auto& kPreviousPosition = std::get<1>(kEvent);
+
+  const auto& kWorld = this->worlds_.find(1);
+  if (this->worlds_.cend() == kWorld) {
+    return false;
+  }
+
+  for (const auto& kPlayer : kWorld->second.players()) {
+    const auto& kSession = this->sessions_.find(kPlayer.first);
+    if (this->sessions_.cend() == kSession) {
+      // TODO: Cleanup player object.
+      continue;
+    }
+
+    if (auto session = kSession->second.lock()) {
+      openrs::common::io::BitBuffer<> buffer;
+      openrs::common::io::Buffer<> appearance_buffer;
+
+      if (kPlayer.second->WithinDistance(kPreviousPosition) &&
+          !kPlayer.second->WithinDistance(*kEntity)) {
+        // The entity has moved out of view of this player.
+        buffer.PutData<uint8_t>(1, 1);
+        buffer.PutData<uint8_t>(1, 0);
+        buffer.PutData<uint8_t>(2, 0);
+
+        // TODO: Region matching
+        buffer.PutData<uint8_t>(1, 0);
+      } else if (!kPlayer.second->WithinDistance(kPreviousPosition) &&
+                 kPlayer.second->WithinDistance(*kEntity)) {
+        // The entity has moved into view of this player.
+        buffer.PutData<uint8_t>(1, 1);
+        buffer.PutData<uint8_t>(1, 1);
+        buffer.PutData<uint8_t>(2, 0);
+
+        uint32_t data_mask = 0x40000 | 0x10;
+        if (kPlayer.second->face_entity_last() != -2) {
+          data_mask |= 0x1;
+        }
+        if (kPlayer.second->graphics()[0] != 0) {
+          data_mask |= 0x4;
+        }
+        if (kPlayer.second->graphics()[1] != 0) {
+          data_mask |= 0x8000;
+        }
+        if (kPlayer.second->graphics()[2] != 0) {
+          data_mask |= 0x400000;
+        }
+        if (kPlayer.second->graphics()[3] != 0) {
+          data_mask |= 0x800000;
+        }
+        if (kPlayer.second->update_movement_type()) {
+          data_mask |= 0x80;
+        }
+
+        if (data_mask >= std::numeric_limits<uint8_t>::max()) {
+          data_mask |= 0x2;
+        }
+        if (data_mask >= std::numeric_limits<uint16_t>::max()) {
+          data_mask |= 0x400;
+        }
+        appearance_buffer.PutData(static_cast<uint8_t>(data_mask));
+        if (data_mask > std::numeric_limits<uint8_t>::max()) {
+          appearance_buffer.PutData(static_cast<uint8_t>(data_mask >> 8));
+        }
+        if (data_mask > std::numeric_limits<uint16_t>::max()) {
+          appearance_buffer.PutData(static_cast<uint8_t>(data_mask >> 16));
+        }
+
+        if (kPlayer.second->graphics()[0] != 0) {
+          appearance_buffer.PutDataBE<uint16_t>(
+              kPlayer.second->graphics()[0].id());
+          appearance_buffer.PutDataVBE(
+              kPlayer.second->graphics()[0].GetSettingsHash());
+          appearance_buffer.PutShiftedPosDataBE(
+              kPlayer.second->graphics()[0].GetSettingsHash2());
+        }
+        if (kPlayer.second->graphics()[1] != 0) {
+          appearance_buffer.PutDataBE<uint16_t>(
+              kPlayer.second->graphics()[1].id());
+          appearance_buffer.PutDataVBE(
+              kPlayer.second->graphics()[1].GetSettingsHash());
+          appearance_buffer.PutShiftedPosDataBE(
+              kPlayer.second->graphics()[1].GetSettingsHash2());
+        }
+        if (kPlayer.second->graphics()[2] != 0) {
+          appearance_buffer.PutDataBE<uint16_t>(
+              kPlayer.second->graphics()[2].id());
+          appearance_buffer.PutDataVBE(
+              kPlayer.second->graphics()[2].GetSettingsHash());
+          appearance_buffer.PutShiftedPosDataBE(
+              kPlayer.second->graphics()[2].GetSettingsHash2());
+        }
+        if (kPlayer.second->graphics()[3] != 0) {
+          appearance_buffer.PutDataBE<uint16_t>(
+              kPlayer.second->graphics()[3].id());
+          appearance_buffer.PutDataVBE(
+              kPlayer.second->graphics()[3].GetSettingsHash());
+          appearance_buffer.PutShiftedPosDataBE(
+              kPlayer.second->graphics()[3].GetSettingsHash2());
+        }
+        openrs::manager::AppearanceManager::GetPlayerAppearance(
+            kPlayer.second, &appearance_buffer);
+        if (kPlayer.second->face_entity_last() != -2) {
+          appearance_buffer.PutShiftedPosDataBE(
+              kPlayer.second->face_entity_last());
+        }
+
+        // Clan.
+        appearance_buffer.PutData<uint8_t>(0);
+
+        if (kPlayer.second->update_movement_type()) {
+          appearance_buffer.PutShiftedPosDataBE(
+              kPlayer.second->is_running() ? 2 : 1);
+        }
+      }
+
+      buffer.insert(buffer.end(), appearance_buffer.begin(),
+                    appearance_buffer.end());
+
+      openrs::net::codec::Packet packet;
+      packet.type = openrs::net::codec::PacketType::kLocalPlayerUpdate;
+      packet.data = buffer;
+      session->Send(packet);
+    }
+  }
+
+  // Return false to allow other event sinks to handle this type too.
+  return false;
 }
 
 bool openrs::manager::WorldManager::HandleEvent(
