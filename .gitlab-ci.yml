@@ -11,18 +11,40 @@ build:
   before_script:
     - apt update && apt -y install cmake
   script:
+    - mkdir build
+    - cd build
     - cmake .. -DCPACK_PACKAGE_CONTACT=jenkins@coruscate.nz -DCMAKE_BUILD_TYPE=Release
-    - cmake --build . --target package
+    - cmake --build .
   artifacts:
+    expire_in: 2 hrs
     paths:
-      - mybinary
-      # depending on your build setup it's most likely a good idea to cache outputs to reduce the build time
-      # cache:
-      #   paths:
-      #     - "*.o"
+      - build/
 
 # run tests using the binary built before
-test:
+test:common:
   stage: test
+  dependencies:
+    - build
   script:
-    - ./runmytests.sh
+    - cd build/test/common
+    - ./openrs-test-common
+
+test:game:
+  stage: test
+  dependencies:
+    - build
+  script:
+    - cd build/test/game
+    - ./openrs-test-game
+
+package:
+  stage: package
+  dependencies:
+    - build
+  script:
+    - cd build
+    - cmake --build . --target package
+  artifacts:
+    expire_in: 1 mos
+    paths:
+      - build/*.deb
