@@ -1,68 +1,105 @@
-# Distributed under the OSI-approved BSD 3-Clause License.  See accompanying
-# file Copyright.txt or https://cmake.org/licensing for details.
+# Find Sqlite3
+# ~~~~~~~~~~~~
+# Try NCBI layout first
 
-#[=======================================================================[.rst:
-FindSQLite3
------------
+#message("FindSqlite3 SQLITE3_INCLUDE_DIR ${SQLITE3_INCLUDE_DIR}")
+if (APPLE)
+  set(SQLITE3_NAME "sqlite-3.6.14.2-ncbi1")
+else (APPLE)
+  set(SQLITE3_NAME "sqlite-3.7.13-ncbi1")
+endif (APPLE)
 
-.. versionadded:: 3.14
+IF( SQLITE3_INCLUDE_DIR AND SQLITE3_LIBRARY_RELEASE AND SQLITE3_LIBRARY_DEBUG )
+    SET(SQLITE3_FIND_QUIETLY TRUE)
+ENDIF( SQLITE3_INCLUDE_DIR AND SQLITE3_LIBRARY_RELEASE AND SQLITE3_LIBRARY_DEBUG )
 
-Find the SQLite libraries, v3
+FIND_PATH( SQLITE3_INCLUDE_DIR sqlite3.h
+           PATHS ${NCBI_TOOLS_ROOT}/${SQLITE3_NAME}/include
+           NO_DEFAULT_PATH )
 
-IMPORTED targets
-^^^^^^^^^^^^^^^^
+IF (SQLITE3_INCLUDE_DIR)
+    FIND_LIBRARY( SQLITE3_LIBRARY NAMES sqlite3
+                  PATHS ${NCBI_TOOLS_ROOT}/${SQLITE3_NAME}/${CMAKE_BUILD_TYPE}64MT/lib/
+                  NO_DEFAULT_PATH )
 
-This module defines the following :prop_tgt:`IMPORTED` target:
+    IF ("${SQLITE3_LIBRARY}" STREQUAL "")
+      MESSAGE(FATAL_ERROR "Include ${SQLITE3_INCLUDE_DIR}/sqlite3.h found, but no library in ${NCBI_TOOLS_ROOT}/${SQLITE3_NAME}/${CMAKE_BUILD_TYPE}64MT/lib/ ")
+    ELSE ()
+      SET(SQLITE3_FOUND TRUE)
+      RETURN()
+    ENDIF ()
+ENDIF (SQLITE3_INCLUDE_DIR)
 
-``SQLite::SQLite3``
+# ~~~~~~~~~~~~
+# Copyright (c) 2007, Martin Dobias <wonder.sk at gmail.com>
+# Redistribution and use is allowed according to the terms of the BSD license.
+# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
+#
+# CMake module to search for Sqlite3 library
+#
+# If it's found it sets SQLITE3_FOUND to TRUE
+# and following variables are set:
+#    SQLITE3_INCLUDE_DIR
+#    SQLITE3_LIBRARY
 
-Result variables
-^^^^^^^^^^^^^^^^
 
-This module will set the following variables if found:
+# FIND_PATH and FIND_LIBRARY normally search standard locations
+# before the specified paths. To search non-standard paths first,
+# FIND_* is invoked first with specified paths and NO_DEFAULT_PATH
+# and then again with no specified paths to search the default
+# locations. When an earlier FIND_* succeeds, subsequent FIND_*s
+# searching for the same item do nothing.
 
-``SQLite3_INCLUDE_DIRS``
-  where to find sqlite3.h, etc.
-``SQLite3_LIBRARIES``
-  the libraries to link against to use SQLite3.
-``SQLite3_VERSION``
-  version of the SQLite3 library found
-``SQLite3_FOUND``
-  TRUE if found
+# try to use framework on mac
+# want clean framework path, not unix compatibility path
+IF (APPLE)
+  IF (CMAKE_FIND_FRAMEWORK MATCHES "FIRST"
+      OR CMAKE_FRAMEWORK_PATH MATCHES "ONLY"
+      OR NOT CMAKE_FIND_FRAMEWORK)
+    SET (CMAKE_FIND_FRAMEWORK_save ${CMAKE_FIND_FRAMEWORK} CACHE STRING "" FORCE)
+    SET (CMAKE_FIND_FRAMEWORK "ONLY" CACHE STRING "" FORCE)
+    #FIND_PATH(SQLITE3_INCLUDE_DIR SQLite3/sqlite3.h)
+    FIND_LIBRARY(SQLITE3_LIBRARY SQLite3)
+    IF (SQLITE3_LIBRARY)
+      # FIND_PATH doesn't add "Headers" for a framework
+      SET (SQLITE3_INCLUDE_DIR ${SQLITE3_LIBRARY}/Headers CACHE PATH "Path to a file.")
+    ENDIF (SQLITE3_LIBRARY)
+    SET (CMAKE_FIND_FRAMEWORK ${CMAKE_FIND_FRAMEWORK_save} CACHE STRING "" FORCE)
+  ENDIF ()
+ENDIF (APPLE)
 
-#]=======================================================================]
+FIND_PATH(SQLITE3_INCLUDE_DIR sqlite3.h
+  "$ENV{LIB_DIR}/include"
+  "$ENV{LIB_DIR}/include/sqlite"
+  #mingw
+  c:/msys/local/include
+  NO_DEFAULT_PATH
+  )
+FIND_PATH(SQLITE3_INCLUDE_DIR sqlite3.h)
 
-# Look for the necessary header
-find_path(SQLite3_INCLUDE_DIR NAMES sqlite3.h)
-mark_as_advanced(SQLite3_INCLUDE_DIR)
+FIND_LIBRARY(SQLITE3_LIBRARY NAMES sqlite3 sqlite3_i PATHS
+  $ENV{LIB}
+  /usr/lib
+  "$ENV{LIB_DIR}/lib"
+  #mingw
+  c:/msys/local/lib
+  NO_DEFAULT_PATH
+  )
+FIND_LIBRARY(SQLITE3_LIBRARY NAMES sqlite3)
 
-# Look for the necessary library
-find_library(SQLite3_LIBRARY NAMES sqlite3 sqlite)
-mark_as_advanced(SQLite3_LIBRARY)
+IF (SQLITE3_INCLUDE_DIR AND SQLITE3_LIBRARY)
+   SET(SQLITE3_FOUND TRUE)
+ENDIF (SQLITE3_INCLUDE_DIR AND SQLITE3_LIBRARY)
 
-# Extract version information from the header file
-if(SQLite3_INCLUDE_DIR)
-    file(STRINGS ${SQLite3_INCLUDE_DIR}/sqlite3.h _ver_line
-         REGEX "^#define SQLITE_VERSION  *\"[0-9]+\\.[0-9]+\\.[0-9]+\""
-         LIMIT_COUNT 1)
-    string(REGEX MATCH "[0-9]+\\.[0-9]+\\.[0-9]+"
-           SQLite3_VERSION "${_ver_line}")
-    unset(_ver_line)
-endif()
 
-include(${CMAKE_CURRENT_LIST_DIR}/FindPackageHandleStandardArgs.cmake)
-find_package_handle_standard_args(SQLite3
-    REQUIRED_VARS SQLite3_INCLUDE_DIR SQLite3_LIBRARY
-    VERSION_VAR SQLite3_VERSION)
+IF (SQLITE3_FOUND)
 
-# Create the imported target
-if(SQLite3_FOUND)
-    set(SQLite3_INCLUDE_DIRS ${SQLite3_INCLUDE_DIR})
-    set(SQLite3_LIBRARIES ${SQLite3_LIBRARY})
-    if(NOT TARGET SQLite::SQLite3)
-        add_library(SQLite::SQLite3 UNKNOWN IMPORTED)
-        set_target_properties(SQLite::SQLite3 PROPERTIES
-            IMPORTED_LOCATION             "${SQLite3_LIBRARY}"
-            INTERFACE_INCLUDE_DIRECTORIES "${SQLite3_INCLUDE_DIR}")
-    endif()
-endif()
+   MESSAGE(STATUS "Found Sqlite3: ${SQLITE3_LIBRARY}")
+
+ELSE (SQLITE3_FOUND)
+
+   IF (SQLITE3_FIND_REQUIRED)
+      MESSAGE(FATAL_ERROR "Could not find Sqlite3")
+   ENDIF (SQLITE3_FIND_REQUIRED)
+
+ENDIF (SQLITE3_FOUND)
