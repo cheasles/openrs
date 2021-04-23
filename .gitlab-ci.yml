@@ -14,7 +14,7 @@ build:
   # instead of calling g++ directly you can also use some build toolkit like make
   # install the necessary build tools when needed
   before_script:
-    - apt update && apt -y install cmake googletest libsqlite3-dev liblzma-dev
+    - apt update && apt -y install libsqlite3-dev liblzma-dev
   script:
     - mkdir build
     - cd build
