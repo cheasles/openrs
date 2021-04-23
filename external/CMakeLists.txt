@@ -14,6 +14,8 @@ find_path (
     DOC "QTL header include directory"
 )
 
+include(FetchContent)
+
 FetchContent_Declare(
     googletest
     GIT_REPOSITORY https://github.com/google/googletest.git
