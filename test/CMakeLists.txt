@@ -1,6 +1,4 @@
 include(CTest)
-find_package(GTest REQUIRED)
-include(GoogleTest)
 
 #--------------------------------------------------------------------
 # Add subdirectories
