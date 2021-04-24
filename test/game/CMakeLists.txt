@@ -32,5 +32,3 @@ target_link_libraries(${PROJECT_NAME}
     GTest::GTest
     GTest::Main
     ${CMAKE_PROJECT_NAME}-game)
-
-gtest_discover_tests(${PROJECT_NAME})
