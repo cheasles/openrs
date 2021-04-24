@@ -29,6 +29,5 @@ target_include_directories (
     )
 
 target_link_libraries(${PROJECT_NAME}
-    GTest::GTest
-    GTest::Main
+    gtest gtest_main
     ${CMAKE_PROJECT_NAME}-game)
