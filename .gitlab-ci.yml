@@ -32,11 +32,11 @@ test:common:
     - build
   script:
     - cd build/test/common
-    - ./openrs-test-common --gtest_output=json
+    - ./openrs-test-common --gtest_output=xml
   artifacts:
     expire_in: 1 hour
     reports:
-      junit: build/test/common/test_detail.json
+      junit: build/test/common/test_detail.xml
 
 test:game:
   stage: test
@@ -44,11 +44,11 @@ test:game:
     - build
   script:
     - cd build/test/game
-    - ./openrs-test-game --gtest_output=json
+    - ./openrs-test-game --gtest_output=xml
   artifacts:
     expire_in: 1 hour
     reports:
-      junit: build/test/game/test_detail.json
+      junit: build/test/game/test_detail.xml
 
 package:
   stage: package
