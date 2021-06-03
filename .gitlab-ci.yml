@@ -38,6 +38,18 @@ test:common:
     reports:
       junit: build/test/common/test_detail.xml
 
+test:database:
+  stage: test
+  dependencies:
+    - build
+  script:
+    - cd build/test/database
+    - ./openrs-test-database --gtest_output=xml
+  artifacts:
+    expire_in: 1 hour
+    reports:
+      junit: build/test/database/test_detail.xml
+
 test:game:
   stage: test
   dependencies:
