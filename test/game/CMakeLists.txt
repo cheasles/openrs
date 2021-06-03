@@ -31,3 +31,5 @@ target_include_directories (
 target_link_libraries(${PROJECT_NAME}
     gtest gtest_main
     ${CMAKE_PROJECT_NAME}-game)
+
+add_test(${PROJECT_NAME} ${PROJECT_NAME})
